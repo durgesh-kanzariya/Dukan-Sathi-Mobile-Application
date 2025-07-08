@@ -1,4 +1,4 @@
-# Dukaan-Sathi-Mobile-Application
+# Dukan-Sathi-Mobile-Application
 
 ## 🔧 Getting Started
 
