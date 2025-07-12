@@ -19,7 +19,7 @@ class MainApp extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               spacing: 20,
               children: [
-                Container(
+                SizedBox(
                   height: 300,
                   width: 300,
                   child: Image.asset("assets/imgs/one.jpg"),
@@ -27,7 +27,6 @@ class MainApp extends StatelessWidget {
                 Text("Your Grocery Ready With Us"),
 
                 ElevatedButton(
-                  child: Text("Get Started  -> "),
                   onPressed: () {
                     print("");
                   },
@@ -35,6 +34,7 @@ class MainApp extends StatelessWidget {
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
                   ),
+                  child: Text("Get Started  -> "),
                 ),
               ],
             ),
