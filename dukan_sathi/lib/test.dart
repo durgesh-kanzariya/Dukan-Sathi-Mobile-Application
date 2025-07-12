@@ -27,7 +27,7 @@ class MainApp extends StatelessWidget {
                 Text("Your Grocery Ready With Us"),
 
                 ElevatedButton(
-                  child: Text("Get Started  ->"),
+                  child: Text("Get Started  -> "),
                   onPressed: () {
                     print("");
                   },
