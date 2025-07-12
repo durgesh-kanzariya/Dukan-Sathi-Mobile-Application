@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,42 +14,60 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: Color.fromARGB(255, 250, 244, 232),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 250, 244, 232),
       ),
       home: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Image.asset("assets/images/logo.png"),
-              Text(
-                """Your grocery ready
+        body: Stack(
+          children: [
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset("assets/images/logo.png"),
+                  const Text(
+                    """Your grocery ready 
 with us.""",
-                style: TextStyle(
-                  color: Color.fromARGB(255, 57, 66, 61),
-                  fontSize: 24,
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 57, 66, 61),
+                      fontSize: 24,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 50.0),
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 100,
+                      vertical: 15,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 5,
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("Get Started", style: TextStyle(fontSize: 16)),
+                      SizedBox(width: 10),
+                      Image(
+                        image: AssetImage("assets/images/Arrow 4.png"),
+                        height: 24,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              SizedBox(height: 35),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green, // ✅ Button background color
-                  foregroundColor: Colors.white, // ✅ Text/Icon color
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Get Started"),
-                    SizedBox(width: 10),
-                    Image.asset("assets/images/Arrow 4.png"),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
