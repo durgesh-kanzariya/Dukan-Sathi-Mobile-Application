@@ -7,10 +7,10 @@ class OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 250, 244, 232),
       body: Stack(
         children: [
-          Center(
+          Align(
+            alignment: Alignment.center,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -23,6 +23,7 @@ with us.""",
                     fontSize: 24,
                   ),
                 ),
+                SizedBox(height: 100),
               ],
             ),
           ),
