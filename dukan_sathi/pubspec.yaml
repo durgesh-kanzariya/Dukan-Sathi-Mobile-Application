@@ -24,4 +24,5 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: assets/images/logo.png # ← your logo path
+  image_path: assets/images/logo_white.png
+  background_color: "#FFFFFF"
