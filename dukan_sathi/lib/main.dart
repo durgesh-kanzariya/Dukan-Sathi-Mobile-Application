@@ -68,7 +68,7 @@ class MainApp extends StatelessWidget {
 
             Container(
               alignment: Alignment.center,
-              child: Text("Don’t have an account? Create"),
+              child: Text("Don’t have an account? Create |"),
             ),
 
             Row(

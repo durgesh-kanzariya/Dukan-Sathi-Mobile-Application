@@ -8,7 +8,7 @@
               mainAxisSize: MainAxisSize.min,
               spacing: 20,
               children: [
-                Container(
+                SizedBox(
                   height: 300,
                   width: 300,
                   child: Image.asset("assets/imgs/one.jpg"),
@@ -16,7 +16,6 @@
                 Text("Your Grocery Ready With Us"),
 
                 ElevatedButton(
-                  child: Text("Get Started  -> "),
                   onPressed: () {
                     print("");
                   },
@@ -24,6 +23,7 @@
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
                   ),
+                  child: Text("Get Started  -> "),
                 ),
               ],
             ),
@@ -176,7 +176,7 @@ class MainApp extends StatelessWidget {
 
             Container(
               alignment: Alignment.center,
-              child: Text("Don’t have an account? Create"),
+              child: Text("Don’t have an account? Create |"),
             ),
 
             Row(
