@@ -1,5 +1,5 @@
-import 'onboarding_page.dart';
 import 'package:flutter/material.dart';
+import 'home_page.dart';
 
 void main() {
   runApp(const MainApp());
@@ -10,12 +10,16 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: const Color.fromARGB(255, 250, 244, 232),
+    //using a SafeArea To Remove the debug banner
+    return SafeArea(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,//this is portion to remove a banner
+        home: Scaffold(
+          // body: ConstomContainer(),
+          body: Home(),
+          )
       ),
-      home: OnboardingPage(),
     );
   }
 }
+

@@ -1,59 +1,111 @@
-// import 'package:flutter/material.dart';
-
-// class LoginPage extends StatelessWidget {
-//   const LoginPage({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Placeholder();
-//   }
-// }
 import 'package:flutter/material.dart';
+import 'sign_in.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class Login extends StatefulWidget {
+  const Login({super.key});
+
+  @override
+  State<Login> createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // Vector 1 at the top
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Image.asset("assets/images/Vector 1.png", fit: BoxFit.fill),
-          ),
+      //  appBar: AppBar(
+      //   backgroundColor: Colors.green,
+      //   foregroundColor: Colors.black,
+      // ),
 
-          // Vector 2 at the bottom-left
-          Positioned(
-            bottom: 0,
-            left: 0,
-            child: Image.asset("assets/images/Vector 2.png"),
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+      //ye likhan to he jaruri ,to avoid overflow of page
+      resizeToAvoidBottomInset: true,
+      body: Container(
+        color: Color(0xFFF9F3E7),
+        height: double.infinity,
+        child: SingleChildScrollView(// isko sirf or sirf column mehi rakho for overflow avoidance
+          child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    'Login',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    Image.asset("assets/imgs/1.png", height: 110,width: double.infinity,),
+                    Text("Hello", style: TextStyle(fontSize: 70)),
+                    Text(
+                      "Sign In To Your Account",
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
+                    ),
+        
+                    Text(""),
+
+                    // DropdownButton(items: ['Shop Owner','User'], onChanged:(){print("");}),
+                    Text("Select Owner"),
+                    Padding(padding:EdgeInsetsGeometry.fromLTRB(30, 0, 30, 0), child: Card(shadowColor: Colors.black, elevation: 5, child: TextField())),
+        
+                    Text("Username"),
+                    Padding(padding:EdgeInsetsGeometry.fromLTRB(30, 0, 30, 0), child: Card(shadowColor: Colors.black, elevation: 5, child: TextField())),
+        
+                    Text("Password "),
+                    Padding(padding:EdgeInsetsGeometry.fromLTRB(30, 0, 30, 0), child: Card(shadowColor: Colors.black, elevation: 5, child: TextField(obscureText: true,))),
+          
+                    Container(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsetsGeometry.all(10),
+                        child: Text("Forget Password?"),
+                      ),
+                    ),
+        
+                    Container(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsetsGeometry.all(10),
+                        child: Row(
+                          spacing: 10,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text("Sign In",style: TextStyle(fontSize: 20),),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Colors.green,
+                              ),
+                              onPressed: () {
+                                print("");
+                              },
+                              child: Icon(Icons.arrow_forward, size: 25, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  //this is for sign in page redirect link make later
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFF9F3E7),
+                      foregroundColor: Colors.black,
+                      shadowColor: Colors.transparent,
+                    ),
+                    child: Text("Don’t have an account? Create "),
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) =>  SignIn(),   ));
+                    },
                   ),
-                  const SizedBox(height: 20),
-                  TextField(),
-                  const SizedBox(height: 12),
-                  TextField(obscureText: true),
-                  const SizedBox(height: 20),
-                  ElevatedButton(onPressed: () {}, child: Text('Login')),
-                ],
-              ),
-            ),
-          ),
-        ],
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Image.asset("assets/imgs/2.jpg", height: 200,),
+                    ],
+                  ),
+
+
+                  ],
+                ),
+        ),
       ),
     );
   }
 }
+
+
