@@ -22,7 +22,7 @@ class Home extends StatelessWidget {
                 Padding(
                   padding: EdgeInsetsGeometry.fromLTRB(100, 0, 60, 0),
                   child: Text(
-                    "Your Grocery Ready With Us.",
+                    "Your Grocery Ready With  Us.",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
