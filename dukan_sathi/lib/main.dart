@@ -16,7 +16,7 @@ class MainApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,//this is portion to remove a banner
         home: Scaffold(
           // body: ConstomContainer(),
-          body: Home(),
+          body:  Home(),
           )
       ),
     );
