@@ -6,7 +6,7 @@ class SignIn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:Center(child: Text("Hello User Sign In Here ")),
+      body:Center(child: Text("Hello User Sign In Here")),
     );
   }
 }

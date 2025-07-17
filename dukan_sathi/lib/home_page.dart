@@ -28,7 +28,7 @@ class _HomeState extends State<Home> {
                       Image.asset("assets/imgs/one.jpg",),
                       Padding(
                         padding:EdgeInsetsGeometry.fromLTRB(100, 0, 60, 0),
-                        child: Text("Your Grocery Ready With Us. ",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
+                        child: Text("Your Grocery Ready With Us.",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
                       ),
 
                       Padding(
