@@ -18,11 +18,11 @@ dev_dependencies:
 
 flutter:
   assets:
-    - assets/images/
+    - assets/imgs/
   uses-material-design: true
 
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: assets/images/logo_white.png
+  image_path: assets/imgs/one.png
   background_color: "#FFFFFF"
