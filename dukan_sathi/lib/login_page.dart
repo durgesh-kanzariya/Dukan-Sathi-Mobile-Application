@@ -31,7 +31,7 @@ class _LoginState extends State<Login> {
                     Image.asset("assets/imgs/1.png", height: 110,width: double.infinity,),
                     Text("Hello", style: TextStyle(fontSize: 70)),
                     Text(
-                      "Sign In To Your Account",
+                      "Sign In To Your Account ",
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
                     ),
         
