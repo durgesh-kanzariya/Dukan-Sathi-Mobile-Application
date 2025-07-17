@@ -28,11 +28,7 @@ class SignIn extends StatelessWidget {
                 height: 110,
                 width: double.infinity,
               ),
-              Text("Hello", style: TextStyle(fontSize: 70)),
-              Text(
-                "Sign In To Your Account ",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
-              ),
+              Text("Create Account", style: TextStyle(fontSize: 30)),
 
               Text(""),
 
@@ -129,7 +125,7 @@ class SignIn extends StatelessWidget {
                   foregroundColor: Colors.black,
                   shadowColor: Colors.transparent,
                 ),
-                child: Text("Are You Have Account ,Then Login "),
+                child: Text("If have an account? Login"),
                 onPressed: () {
                   Navigator.push(
                     context,
