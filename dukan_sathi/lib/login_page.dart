@@ -34,7 +34,7 @@ class _LoginState extends State<Login> {
                       "Sign In To Your Account ",
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
                     ),
-        
+
                     Text(""),
 
                     // DropdownButton(items: ['Shop Owner','User'], onChanged:(){print("");}),
