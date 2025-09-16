@@ -1,147 +1,255 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'login_page.dart';
+class SignIn extends StatefulWidget {
+  @override
+  _SignInState createState() => _SignInState();
+}
 
-class SignIn extends StatelessWidget {
-  const SignIn({super.key});
+class _SignInState extends State<SignIn> {
+  final _formKey = GlobalKey<FormState>();
+
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
+  String? _selectedRole = "Customer";
+  final List<String> _roles = ["Customer", "Admin", "Vendor"];
+
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController mobileController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //  appBar: AppBar(
-      //   backgroundColor: Colors.green,
-      //   foregroundColor: Colors.black,
-      // ),
+      backgroundColor: Color(0xFFF9F3E7),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.asset(
+              "assets/imgs/1.png",
+              width: double.infinity,
+              height: 110,
+            ),
+            Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 30),
+                    const Text(
+                      "Create account",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
 
-      //ye likhan to he jaruri ,to avoid overflow of page
-      resizeToAvoidBottomInset: true,
-      body: Container(
-        color: Color(0xFFF9F3E7),
-        height: double.infinity,
-        child: SingleChildScrollView(
-          // isko sirf or sirf column mehi rakho for overflow avoidance
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(
-                "assets/imgs/1.png",
-                height: 110,
-                width: double.infinity,
-              ),
-              Text("Create Account", style: TextStyle(fontSize: 30)),
-
-              Text(""),
-
-              // DropdownButton(items: ['Shop Owner','User'], onChanged:(){print("");}),
-              Text("Select Owner"),
-              Padding(
-                padding: EdgeInsetsGeometry.fromLTRB(30, 0, 30, 0),
-                child: Card(
-                  shadowColor: Colors.black,
-                  elevation: 5,
-                  child: TextField(),
-                ),
-              ),
-
-              Text("Username"),
-              Padding(
-                padding: EdgeInsetsGeometry.fromLTRB(30, 0, 30, 0),
-                child: Card(
-                  shadowColor: Colors.black,
-                  elevation: 5,
-                  child: TextField(),
-                ),
-              ),
-
-              Text("Password "),
-              Padding(
-                padding: EdgeInsetsGeometry.fromLTRB(30, 0, 30, 0),
-                child: Card(
-                  shadowColor: Colors.black,
-                  elevation: 5,
-                  child: TextField(obscureText: true),
-                ),
-              ),
-
-              Text("Email"),
-              Padding(
-                padding: EdgeInsetsGeometry.fromLTRB(30, 0, 30, 0),
-                child: Card(
-                  shadowColor: Colors.black,
-                  elevation: 5,
-                  child: TextField(),
-                ),
-              ),
-              Text("Mobile "),
-              Padding(
-                padding: EdgeInsetsGeometry.fromLTRB(30, 0, 30, 0),
-                child: Card(
-                  shadowColor: Colors.black,
-                  elevation: 5,
-                  child: TextField(),
-                ),
-              ),
-
-              Container(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: EdgeInsetsGeometry.all(10),
-                  child: Text("Forget Password?"),
-                ),
-              ),
-
-              Container(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: EdgeInsetsGeometry.all(10),
-                  child: Row(
-                    spacing: 10,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text("Create", style: TextStyle(fontSize: 20)),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Colors.green,
-                        ),
-                        onPressed: () {
-                          print("");
-                        },
-                        child: Icon(
-                          Icons.arrow_forward,
-                          size: 25,
-                          color: Colors.white,
+                    // Dropdown
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: _boxDecoration(),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _selectedRole,
+                          isExpanded: true,
+                          items: _roles.map((role) {
+                            return DropdownMenuItem(
+                              value: role,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.person),
+                                  const SizedBox(width: 10),
+                                  Text(role),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedRole = value;
+                            });
+                          },
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Username
+                    Container(
+                      decoration: _boxDecoration(),
+                      child: TextFormField(
+                        controller: usernameController,
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.person_outline),
+                          hintText: "Username",
+                          border: InputBorder.none,
+                        ),
+                        validator: (value) =>
+                            value!.isEmpty ? "Enter username" : null,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Password
+                    Container(
+                      decoration: _boxDecoration(),
+                      child: TextFormField(
+                        controller: passwordController,
+                        obscureText: _obscurePassword,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          hintText: "Password",
+                          border: InputBorder.none,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
+                        ),
+                        validator: (value) =>
+                            value!.length < 6 ? "Min 6 characters" : null,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Confirm Password
+                    Container(
+                      decoration: _boxDecoration(),
+                      child: TextFormField(
+                        controller: confirmPasswordController,
+                        obscureText: _obscureConfirmPassword,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          hintText: "Confirm Password",
+                          border: InputBorder.none,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureConfirmPassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword;
+                              });
+                            },
+                          ),
+                        ),
+                        validator: (value) => value != passwordController.text
+                            ? "Passwords do not match"
+                            : null,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Email
+                    Container(
+                      decoration: _boxDecoration(),
+                      child: TextFormField(
+                        controller: emailController,
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.email_outlined),
+                          hintText: "E-mail",
+                          border: InputBorder.none,
+                        ),
+                        validator: (value) =>
+                            !value!.contains("@") ? "Enter valid email" : null,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Mobile
+                    Container(
+                      decoration: _boxDecoration(),
+                      child: TextFormField(
+                        controller: mobileController,
+                        keyboardType: TextInputType.phone,
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.phone_android),
+                          hintText: "Mobile",
+                          border: InputBorder.none,
+                        ),
+                        validator: (value) =>
+                            value!.length != 10 ? "Enter valid number" : null,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+
+                    // Create button
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade400,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 100,
+                          vertical: 15,
+                        ),
+                      ),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          Get.off(Login());
+                        }
+                      },
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Sign Up",
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_forward, color: Colors.white),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
+            ),
 
-              //this is for sign in page redirect link make later
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFF9F3E7),
-                  foregroundColor: Colors.black,
-                  shadowColor: Colors.transparent,
-                ),
-                child: Text("If have an account? Login"),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Login()),
-                  );
-                },
-              ),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [Image.asset("assets/imgs/2.jpg", height: 200)],
-              ),
-            ],
-          ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [Image.asset("assets/imgs/2.jpg", height: 200)],
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  BoxDecoration _boxDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(30),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.shade300,
+          blurRadius: 8,
+          offset: const Offset(0, 4),
+        ),
+      ],
     );
   }
 }

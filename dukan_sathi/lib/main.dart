@@ -1,7 +1,8 @@
+import 'package:dukan_sathi/dashboard.dart';
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
-import 'package:get/get.dart';
-
+import 'shop_productpage.dart';
 
 void main() {
   runApp(const MainApp());
@@ -15,13 +16,13 @@ class MainApp extends StatelessWidget {
     //using a SafeArea To Remove the debug banner
     return SafeArea(
       child: GetMaterialApp(
-        debugShowCheckedModeBanner: false,//this is portion to remove a banner
+        debugShowCheckedModeBanner: false, //this is portion to remove a banner
         home: Scaffold(
           // body: ConstomContainer(),
-          body:  Home() ,
-          )
+          // body: Home(),
+          body: ShopProductpage(),
+        ),
       ),
     );
   }
 }
-
