@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'login_page.dart';
-class SignIn extends StatefulWidget {
+import 'Login.dart';
+import 'Login.dart';
+
+class SignUp extends StatefulWidget {
   @override
-  _SignInState createState() => _SignInState();
+  _SignUpState createState() => _SignUpState();
 }
 
-class _SignInState extends State<SignIn> {
+class _SignUpState extends State<SignUp> {
   final _formKey = GlobalKey<FormState>();
 
   bool _obscurePassword = true;
@@ -226,6 +228,18 @@ class _SignInState extends State<SignIn> {
                   ],
                 ),
               ),
+            ),
+            SizedBox(height: 15),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFF9F3E7),
+                foregroundColor: Colors.black,
+                shadowColor: Colors.transparent,
+              ),
+              child: const Text("Don’t have an account? Create "),
+              onPressed: () {
+                Get.to(Login());
+              },
             ),
 
             Row(

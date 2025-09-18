@@ -1,3 +1,4 @@
+import 'package:dukan_sathi/bottom_nav.dart';
 import 'package:flutter/material.dart';
 
 class DiscoverShop extends StatefulWidget {
@@ -84,23 +85,34 @@ class _DiscoverShopState extends State<DiscoverShop> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
-              child: ListView.builder(
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return Card(
-                    color: Colors.blue,
-                    child: const ListTile(
-                      leading: Icon(Icons.person_2_rounded),
-                      title: Text('Bakry Shop'),
-                      subtitle: Text('Best Bakry'),
-                    ),
-                  );
-                },
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                     Color(0xFF567751), // Dark Green (#567751)
+              Color(0xFFF9F3E7),
+                  ])
+                ),
+                child: ListView.builder(
+                  itemCount: 10,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      
+                      child: const ListTile(
+                        leading: Icon(Icons.person_2_rounded),
+                        title: Text('Bakry Shop'),
+                        subtitle: Text('Best Bakry'),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),
+          SizedBox(height: 20,)
         ],
       ),
+
+      bottomNavigationBar: BottomNav(),
     );
   }
 }

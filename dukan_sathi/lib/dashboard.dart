@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
 import 'bottom_nav.dart';
+import 'monthly_spending_lage.dart';
+import 'product_page.dart';
 
 class Dashboard extends StatefulWidget {
   final String username;
   final String password;
 
-   Dashboard({super.key, required this.username, required this.password});
+  Dashboard({super.key, required this.username, required this.password});
 
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -22,13 +26,12 @@ class _DashboardState extends State<Dashboard> {
 
           children: [
             Stack(
-              clipBehavior: Clip.none, // allow overflow
+              clipBehavior: Clip.none,
               children: [
-               
                 Container(
                   height: 180,
                   width: double.infinity,
-                  decoration:  BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Color(0xFF567751),
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(50),
@@ -36,7 +39,7 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                   child: ListTile(
-                    title:  Text(
+                    title: Text(
                       "Dukan Sathi",
                       style: TextStyle(
                         fontSize: 35,
@@ -48,11 +51,11 @@ class _DashboardState extends State<Dashboard> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.green,
-                        shape:  CircleBorder(),
-                        padding:  EdgeInsets.all(10),
+                        shape: CircleBorder(),
+                        padding: EdgeInsets.all(10),
                       ),
                       onPressed: () {},
-                      child:  Icon(Icons.person),
+                      child: Icon(Icons.person),
                     ),
                   ),
                 ),
@@ -62,67 +65,83 @@ class _DashboardState extends State<Dashboard> {
                   left: 40,
                   right: 40,
                   child: Container(
-                    padding:  EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.6),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.green, width: 2),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
                           blurRadius: 8,
-                          offset:  Offset(0, 4),
+                          offset: Offset(0, 10),
                         ),
                       ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                         Text(
+                        Text(
                           "Hi, Kishan",
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                         SizedBox(height: 8),
-                         Text("Last Month - ₹50,000"),
-                         SizedBox(height: 4),
-                         Text("Current Month Spending"),
-                         SizedBox(height: 4),
-                         Text(
+                        SizedBox(height: 8),
+                        Text("Last Month - ₹50,000"),
+                        SizedBox(height: 4),
+                        Text("Current Month Spending"),
+                        SizedBox(height: 4),
+                        Text(
                           "₹1,00,00,000.00",
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 10),
+                        SizedBox(height: 40),
                       ],
                     ),
                   ),
                 ),
 
-                Positioned(
-                  top:200,
-                  left:300,
-                  child:  ElevatedButton(
-                            onPressed: () {
-                              print("More button clicked");
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF567751),
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text("More →"),
-                          ),)
               ],
             ),
 
-             SizedBox(height: 150), // space below stack
+            Positioned(
+  top: 100,
+  left: 20,
+  right: 100,
+  child: Container(
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const SizedBox(height: 15),
+        Align(
+          alignment: Alignment.centerRight,
+          child: ElevatedButton(
+            onPressed: () {
+              Get.to(MonthlySpendingLage());
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF567751),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text("More →"),
+          ),
+        ),
+      ],
+    ),
+  ),
+),
+
+
+
+            SizedBox(height: 10), // space below stack
             Padding(
-              padding:  EdgeInsets.all(8.0),
-              child:  Text(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
                 "Order & Status",
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
@@ -149,18 +168,20 @@ class _DashboardState extends State<Dashboard> {
 
             SizedBox(height: 10),
             Padding(
-              padding:  EdgeInsets.all(30.0),
+              padding: EdgeInsets.all(30.0),
               child: Container(
-                height: 250,
+                height: 260,
                 width: 300,
                 // color: Colors.green.withOpacity(0.5),
                 decoration: BoxDecoration(
-                  gradient:  LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                  gradient: const LinearGradient(
+                    begin: Alignment
+                        .topLeft, // Corresponds to the top-left direction
+                    end: Alignment
+                        .bottomRight, // Corresponds to the bottom-right direction
                     colors: [
-                      Color(0xFF8DBE9B), // light green
-                      Color(0xFFDCE5D8), // very light green/cream
+                      Color(0xFF567751), // The top, dark green color
+                      Color(0xFFF9F3E7),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(20),
@@ -169,7 +190,7 @@ class _DashboardState extends State<Dashboard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding:  EdgeInsets.all(15.0),
+                      padding: EdgeInsets.all(15.0),
                       child: Text(
                         "QUICK ORDER LIST",
                         style: TextStyle(
@@ -184,7 +205,7 @@ class _DashboardState extends State<Dashboard> {
                     Center(
                       child: Card(
                         child: Padding(
-                          padding:  EdgeInsets.all(10.0),
+                          padding: EdgeInsets.all(10.0),
                           child: Text(
                             "Cookie - 250g",
                             style: TextStyle(
@@ -199,7 +220,7 @@ class _DashboardState extends State<Dashboard> {
                     Center(
                       child: Card(
                         child: Padding(
-                          padding:  EdgeInsets.all(10.0),
+                          padding: EdgeInsets.all(10.0),
                           child: Text(
                             "Cookie - 250g",
                             style: TextStyle(
@@ -214,7 +235,7 @@ class _DashboardState extends State<Dashboard> {
                     Center(
                       child: Card(
                         child: Padding(
-                          padding:  EdgeInsets.all(10.0),
+                          padding: EdgeInsets.all(10.0),
                           child: Text(
                             "Cookie - 250g",
                             style: TextStyle(
@@ -246,7 +267,7 @@ class _DashboardState extends State<Dashboard> {
         ),
       ),
 
-      bottomNavigationBar: MyBottomNav(currentIndex: 0, onTap: (index) {}),
+      bottomNavigationBar: const BottomNav(),
     );
   }
 }

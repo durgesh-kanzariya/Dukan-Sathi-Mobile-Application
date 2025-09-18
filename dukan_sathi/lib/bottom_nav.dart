@@ -1,70 +1,133 @@
+import 'package:dukan_sathi/discover_shop.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import 'monthly_spending_lage.dart';
+import 'dashboard.dart';
+import 'shop_productpage.dart';
+import 'product_page.dart';
 
-//first we can add the image from the figma
-//and then we can add the content as it is
-//first card,container(more button), exat below order details ,exate bellow view order details
-//then we have card to show the order details
-
-
-
-import 'package:flutter/material.dart';
-
-// ✅ Reusable Bottom Navigation Widget
-class MyBottomNav extends StatefulWidget {
-  final int currentIndex;
-  final Function(int) onTap;
-
-  const MyBottomNav({
-    super.key,
-    required this.currentIndex,
-    required this.onTap,
-  });
+class BottomNav extends StatefulWidget {
+  const BottomNav({super.key});
 
   @override
-  State<MyBottomNav> createState() => _MyBottomNavState();
+  State<BottomNav> createState() => _BottomNavState();
 }
 
-class _MyBottomNavState extends State<MyBottomNav> {
+class _BottomNavState extends State<BottomNav> {
   @override
   Widget build(BuildContext context) {
-    return BottomAppBar(
-      shape: const CircularNotchedRectangle(),
-      notchMargin: 6,
-      color: Colors.green,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(Icons.home, "Home", 0),
-            _buildNavItem(Icons.store, "Shops", 1),
-            const SizedBox(width: 40), // FAB space
-            _buildNavItem(Icons.history, "History", 2),
-            _buildNavItem(Icons.list, "Quick list", 3),
-          ],
-        ),
-      ),
-    );
-  }
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          height: 80,
+          decoration: const BoxDecoration(
+            color: Color(0xFF5D7B6C),
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    final isSelected = widget.currentIndex == index;
-    return InkWell(
-      onTap: () => widget.onTap(index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: isSelected ? Colors.white : Colors.white70),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.white70,
-              fontSize: 12,
-            ),
           ),
-        ],
-      ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              // Home Icon Button
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () {
+                      Get.to(
+                        Dashboard(username: "kishan", password: "1234567"),
+                      );
+                    },
+                    icon: const Icon(Icons.home_outlined, color: Colors.white),
+                    iconSize: 28,
+                  ),
+                  const Text(
+                    'Home',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+
+              // Shops Icon Button
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () {
+                      Get.to(DiscoverShop());
+                    },
+                    icon: const Icon(Icons.store_outlined, color: Colors.white),
+                    iconSize: 28,
+                  ),
+                  const Text(
+                    'Shops',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+
+              // Spacer for the floating cart button
+              const SizedBox(width: 60),
+
+              // History Icon Button
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () {
+
+                    },
+                    icon: const Icon(
+                      Icons.history_outlined,
+                      color: Colors.white,
+                    ),
+                    iconSize: 28,
+                  ),
+                  const Text(
+                    'History',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+
+              // Quick list Icon Button
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.format_list_bulleted,
+                      color: Colors.white,
+                    ),
+                    iconSize: 28,
+                  ),
+                  const Text(
+                    'Quick list',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        // Floating Action Button
+        Positioned(
+          top: -30,
+          child: FloatingActionButton(
+            onPressed: () {},
+            backgroundColor: const Color(0xFF5D7B6C),
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
+        ),
+      ],
     );
   }
 }

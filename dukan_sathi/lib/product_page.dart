@@ -10,6 +10,9 @@ class ProductPage extends StatefulWidget {
 class _ProductPageState extends State<ProductPage> {
   int quantity = 1;
 
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -211,6 +214,7 @@ class _ProductPageState extends State<ProductPage> {
               ),
             ],
           ),
+       
         ],
       ),
 

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dashboard.dart';   // 🔹 Dashboard import karo
-import 'sign_in.dart';
+import 'dashboard.dart';
+import 'sign_up.dart';
 import 'package:get/get.dart';
-import 'one.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -147,7 +146,7 @@ class _LoginState extends State<Login> {
               ),
               child: const Text("Don’t have an account? Create "),
               onPressed: () {
-                Get.to(SignIn());
+                Get.to(SignUp());
               },
             ),
             Text(msg, style: const TextStyle(color: Colors.red)),
