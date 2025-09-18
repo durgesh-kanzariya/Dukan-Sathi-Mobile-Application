@@ -3,10 +3,14 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'shop_productpage.dart';
+import 'product_page.dart';
 
 void main() {
   runApp(const MainApp());
 }
+
+
+
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
@@ -20,7 +24,8 @@ class MainApp extends StatelessWidget {
         home: Scaffold(
           // body: ConstomContainer(),
           // body: Home(),
-          body: ShopProductpage(),
+          // body: ShopProductpage(),
+          body :ProductPage(),
         ),
       ),
     );

@@ -36,9 +36,10 @@ class _ShopProductpageState extends State<ShopProductpage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    
+
                   ),
                 ),
+
 
                 Positioned(
                   top: 100,
@@ -47,27 +48,37 @@ class _ShopProductpageState extends State<ShopProductpage> {
                   child: Container(
                     padding:  EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.green, width: 2),
+                      gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.white.withOpacity(0.6), // 60% opacity
+                        Colors.white.withOpacity(0.1), // 10% opacity
+                      ],
+                    ),
+                      borderRadius: BorderRadius.circular(30),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
                           blurRadius: 8,
-                          offset:  Offset(0, 4),
+                          offset:  Offset(0, 10),
                         ),
                       ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                         Text(
+                        ListTile(
+                          title: Text(
                           "Best Bakery",
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        trailing: IconButton(onPressed: (){}, icon: Icon(Icons.heart_broken)),
+                        ),
+
                          SizedBox(height: 8),
                          Text("@best bakery"),
                          SizedBox(height: 4),
@@ -86,8 +97,8 @@ class _ShopProductpageState extends State<ShopProductpage> {
 
             SizedBox(height: 100,),
             Container(
-              height:450,
-              width: 300,
+              height:400,
+              width: 320,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [
@@ -117,6 +128,7 @@ class _ShopProductpageState extends State<ShopProductpage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // this is for the cards items
                         Card(
                           elevation: 10,
                           shadowColor: Colors.white,
@@ -124,15 +136,15 @@ class _ShopProductpageState extends State<ShopProductpage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Image.asset('assets/imgs/dukanSathi_logo-removebg-preview 1.png',height: 100,width: 100,),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                child: Image.asset('assets/imgs/image.png',height: 100,width: 110,),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                 child: Text("Chocolate Cake"),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(2.0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                 child: Text("doler50"),
                               ),
                             ],
@@ -146,21 +158,23 @@ class _ShopProductpageState extends State<ShopProductpage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Image.asset('assets/imgs/dukanSathi_logo-removebg-preview 1.png',height: 100,width: 100,),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                child: Image.asset('assets/imgs/image.png',height: 100,width: 110,),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                 child: Text("Chocolate Cake"),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(2.0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                 child: Text("doler50"),
                               ),
                             ],
                           ),
-                        )
-                      
+                        ),
+
+
+
                       ],
                     ),
                   ),
@@ -176,20 +190,21 @@ class _ShopProductpageState extends State<ShopProductpage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Image.asset('assets/imgs/dukanSathi_logo-removebg-preview 1.png',height: 100,width: 100,),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                child: Image.asset('assets/imgs/image.png',height: 100,width: 110,),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                 child: Text("Chocolate Cake"),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(2.0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                 child: Text("doler50"),
                               ),
                             ],
                           ),
                         ),
+
 
                        Card(
                           elevation: 10,
@@ -198,21 +213,21 @@ class _ShopProductpageState extends State<ShopProductpage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Image.asset('assets/imgs/dukanSathi_logo-removebg-preview 1.png',height: 100,width: 100,),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                child: Image.asset('assets/imgs/image.png',height: 100,width: 110,),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                 child: Text("Chocolate Cake"),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(2.0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                 child: Text("doler50"),
                               ),
                             ],
                           ),
                         )
-                      
+        
                       ],
                     ),
                   ),
