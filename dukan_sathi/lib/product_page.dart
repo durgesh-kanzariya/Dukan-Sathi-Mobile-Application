@@ -1,4 +1,12 @@
+import 'package:dukan_sathi/discover_shop.dart';
+import 'package:dukan_sathi/shop_productpage.dart';
 import 'package:flutter/material.dart';
+import 'dashboard.dart';
+import 'package:get/get.dart';
+
+import 'bottom_nav.dart';
+import 'monthly_spending_lage.dart';
+import 'product_page.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
@@ -9,9 +17,6 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
   int quantity = 1;
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +38,9 @@ class _ProductPageState extends State<ProductPage> {
                 ),
                 child: ListTile(
                   leading: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.to(ShopProductpage());
+                    },
                     icon: const Icon(Icons.arrow_back),
                     color: Colors.white,
                   ),
@@ -116,9 +123,9 @@ class _ProductPageState extends State<ProductPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                _sizeBox("1.5 KG"),
-                                _sizeBox("1 KG"),
-                                _sizeBox("500 GM"),
+                                Text("1.5 KG"),
+                                Text("1 KG"),
+                                Text("500 GM"),
                               ],
                             ),
 
@@ -176,8 +183,9 @@ class _ProductPageState extends State<ProductPage> {
                                       ),
                                     ),
                                     onPressed: () {},
-                                    child:
-                                        const Text("Add to quick order list"),
+                                    child: const Text(
+                                      "Add to quick order list",
+                                    ),
                                   ),
                                 ),
                               ],
@@ -192,8 +200,9 @@ class _ProductPageState extends State<ProductPage> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Color(0xFFACBF92),
                                   foregroundColor: Colors.white,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 14),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   ),
@@ -214,92 +223,11 @@ class _ProductPageState extends State<ProductPage> {
               ),
             ],
           ),
-       
         ],
       ),
 
       /// Custom Bottom Footer
-      bottomNavigationBar: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          Container(
-            height: 80,
-            decoration: const BoxDecoration(
-              color: Color(0xFF567751), // green footer background
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const [
-                _NavItem(icon: Icons.home, label: "Home"),
-                _NavItem(icon: Icons.store, label: "Shops"),
-                SizedBox(width: 60), // space for center button
-                _NavItem(icon: Icons.history, label: "History"),
-                _NavItem(icon: Icons.list, label: "Quick list"),
-              ],
-            ),
-          ),
-
-
-
-
-
-          Positioned(
-            top: -10,
-            child: Container(
-              height: 70,
-              width: 70,
-              decoration: const BoxDecoration(
-                color: Color(0xFF567751),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.add,
-                color: Colors.white,
-                size: 35,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Size box widget
-Widget _sizeBox(String text) {
-  return Container(
-    decoration: BoxDecoration(
-      gradient: LinearGradient(colors: [
-        Colors.white.withOpacity(0.3),
-        Colors.white.withOpacity(0.3),
-      ]),
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Text(text),
-    ),
-  );
-}
-
-/// Footer item widget
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  const _NavItem({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: Colors.white),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white, fontSize: 12),
-        ),
-      ],
+      bottomNavigationBar: BottomNav(),
     );
   }
 }

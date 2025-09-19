@@ -6,6 +6,8 @@ import 'monthly_spending_lage.dart';
 import 'dashboard.dart';
 import 'shop_productpage.dart';
 import 'product_page.dart';
+import 'history.dart';
+import 'quick_order.dart';
 
 class BottomNav extends StatefulWidget {
   const BottomNav({super.key});
@@ -23,10 +25,7 @@ class _BottomNavState extends State<BottomNav> {
       children: [
         Container(
           height: 80,
-          decoration: const BoxDecoration(
-            color: Color(0xFF5D7B6C),
-
-          ),
+          decoration: const BoxDecoration(color: Color(0xFF5D7B6C)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
@@ -80,7 +79,7 @@ class _BottomNavState extends State<BottomNav> {
                 children: <Widget>[
                   IconButton(
                     onPressed: () {
-
+                      Get.to(History());
                     },
                     icon: const Icon(
                       Icons.history_outlined,
@@ -101,7 +100,9 @@ class _BottomNavState extends State<BottomNav> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.to(QuickOrder());
+                    },
                     icon: const Icon(
                       Icons.format_list_bulleted,
                       color: Colors.white,

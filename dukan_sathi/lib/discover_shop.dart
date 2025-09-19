@@ -1,5 +1,8 @@
 import 'package:dukan_sathi/bottom_nav.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/state_manager.dart';
+import 'shop_productpage.dart';
 
 class DiscoverShop extends StatefulWidget {
   const DiscoverShop({super.key});
@@ -7,9 +10,6 @@ class DiscoverShop extends StatefulWidget {
   @override
   State<DiscoverShop> createState() => _DiscoverShopState();
 }
-
-
-
 
 class _DiscoverShopState extends State<DiscoverShop> {
   @override
@@ -80,27 +80,41 @@ class _DiscoverShopState extends State<DiscoverShop> {
           ),
 
           const SizedBox(height: 5), // adjust for overlap
-
           // List of shops
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [
-                     Color(0xFF567751), // Dark Green (#567751)
-              Color(0xFFF9F3E7),
-                  ])
                 ),
                 child: ListView.builder(
                   itemCount: 10,
                   itemBuilder: (context, index) {
-                    return Card(
-                      
-                      child: const ListTile(
-                        leading: Icon(Icons.person_2_rounded),
-                        title: Text('Bakry Shop'),
-                        subtitle: Text('Best Bakry'),
+                    return InkWell(
+                      onTap: () {
+                        Get.to(ShopProductpage());
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        Color(0xFF567751), // The darker green color
+        Color(0xFFF9F3E7), // The lighter off-white color
+      ],
+      
+    ),
+    borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: const ListTile(
+                            leading: Icon(Icons.person_2_rounded),
+                            title: Text('Bakry Shop'),
+                            subtitle: Text('Best Bakry'),
+                          ),
+                        ),
                       ),
                     );
                   },
@@ -108,7 +122,7 @@ class _DiscoverShopState extends State<DiscoverShop> {
               ),
             ),
           ),
-          SizedBox(height: 20,)
+          SizedBox(height: 20),
         ],
       ),
 

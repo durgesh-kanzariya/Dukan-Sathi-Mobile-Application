@@ -152,12 +152,6 @@ class _LoginState extends State<Login> {
             Text(msg, style: const TextStyle(color: Colors.red)),
 
 
-            Image.asset(
-              "assets/imgs/2.jpg",
-              height: 100,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
           ],
         ),
       ),

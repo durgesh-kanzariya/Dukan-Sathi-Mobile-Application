@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -5,6 +7,8 @@ import 'package:get/get.dart';
 import 'bottom_nav.dart';
 import 'monthly_spending_lage.dart';
 import 'product_page.dart';
+import 'history.dart';
+import 'cart_page.dart';
 
 class Dashboard extends StatefulWidget {
   final String username;
@@ -104,39 +108,36 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                 ),
-
               ],
             ),
 
             Positioned(
-  top: 100,
-  left: 20,
-  right: 100,
-  child: Container(
-    padding: const EdgeInsets.all(16),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const SizedBox(height: 15),
-        Align(
-          alignment: Alignment.centerRight,
-          child: ElevatedButton(
-            onPressed: () {
-              Get.to(MonthlySpendingLage());
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF567751),
-              foregroundColor: Colors.white,
+              top: 100,
+              left: 20,
+              right: 100,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 15),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Get.to(MonthlySpendingLage());
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF567751),
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text("More →"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            child: const Text("More →"),
-          ),
-        ),
-      ],
-    ),
-  ),
-),
-
-
 
             SizedBox(height: 10), // space below stack
             Padding(
@@ -155,7 +156,9 @@ class _DashboardState extends State<Dashboard> {
                   Text("Best Bakery :  • Ready for Pickup"),
                   Text("Raj General Store :  • Preparing"),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.to(History());
+                    },
                     child: Text("View All in history →"),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
@@ -248,7 +251,9 @@ class _DashboardState extends State<Dashboard> {
                     ),
                     ListTile(
                       trailing: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.to(CardPage());
+                        },
                         child: Text("Add To All Card →"),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF567751),
@@ -263,6 +268,8 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
             ),
+            
+            SizedBox(height: 60),
           ],
         ),
       ),
