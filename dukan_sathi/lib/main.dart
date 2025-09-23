@@ -1,4 +1,4 @@
-import 'onboarding_page.dart';
+import 'package:dukan_sathi/admin/dashboard_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,7 +15,7 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: const Color.fromARGB(255, 250, 244, 232),
       ),
-      home: OnboardingPage(),
+      home: AdminDashboardScreen(),
     );
   }
 }
