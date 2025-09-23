@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 
+// NOTE: The separate shopkeeper_bottom_nav.dart file is no longer needed with this approach.
+
 // A simple data model for an order
 enum OrderStatus { New, Preparing }
 
@@ -28,8 +30,6 @@ class AdminDashboardScreen extends StatefulWidget {
 }
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
-  int _selectedIndex = 0; // To track the selected nav item
-
   // --- Mock Data ---
   final List<Order> newOrders = [
     Order(customerName: 'Parvez B.', timeAgo: '3 mins ago', itemCount: 5, totalPrice: 75.00, status: OrderStatus.New),
@@ -46,77 +46,102 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFDFBF5), // Soft cream background
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildHeader(),
-            _buildPerformanceCard(),
-            // --- LAYOUT FIX: Moved the tabs up to close the gap ---
-            Transform.translate(
-                offset: const Offset(0, -80),
-                child: _buildOrderTabs()
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Handle Scan button tap
-        },
-        backgroundColor: const Color(0xFF5A7D60),
-        child: const Icon(Icons.qr_code_scanner, color: Colors.white),
-        elevation: 2.0,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: _buildBottomNavBar(),
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    return BottomAppBar(
-      shape: const CircularNotchedRectangle(),
-      notchMargin: 8.0,
-      color: const Color(0xFF5A7D60),
-      child: SizedBox(
-        height: 60,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            _buildNavItem(Icons.list_alt, 'Orders', 0),
-            _buildNavItem(Icons.inventory_2_outlined, 'Product', 1),
-            const SizedBox(width: 40), // The space for the FAB
-            _buildNavItem(Icons.history, 'History', 2),
-            _buildNavItem(Icons.store_outlined, 'Shop', 3),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    final isSelected = _selectedIndex == index;
-    final color = isSelected ? Colors.white : Colors.white.withOpacity(0.7);
-
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedIndex = index;
-        });
-      },
-      borderRadius: BorderRadius.circular(20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      backgroundColor: const Color(0xFFFDFBF5),
+      // --- BODY WRAPPED IN A STACK TO ACCOMMODATE CUSTOM NAVBAR ---
+      body: Stack(
         children: [
-          Icon(icon, color: color),
-          const SizedBox(height: 2),
-          Text(label, style: TextStyle(color: color, fontSize: 12, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildHeader(),
+                _buildPerformanceCard(
+                  userName: "Durgesh",
+                  lastMonthSales: "\$50,000,000.00",
+                  currentMonthSales: "\$100,000,000.00",
+                  height: 215, // Optional override
+                ),
+
+                Transform.translate(
+                    offset: const Offset(0, -80),
+                    child: _buildOrderTabs()
+                ),
+                // Add padding at the bottom to ensure content isn't hidden by the navbar
+                const SizedBox(height: 100),
+              ],
+            ),
+          ),
+          // --- CUSTOM NAVBAR POSITIONED AT THE BOTTOM ---
+          _buildCustomBottomNav(),
         ],
       ),
     );
   }
 
-  // --- WIDGET UPDATED WITH YOUR FINAL CODE ---
+  // --- NEW WIDGET FOR THE CUSTOM NAVIGATION BAR ---
+  Widget _buildCustomBottomNav() {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            height: 80,
+            decoration: const BoxDecoration(
+              color: Color(0xFF5A7D60),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                _buildNavItem(icon: Icons.list_alt, label: 'Orders'),
+                _buildNavItem(icon: Icons.inventory_2_outlined, label: 'Product'),
+                const SizedBox(width: 60), // Spacer for the FAB
+                _buildNavItem(icon: Icons.history, label: 'History'),
+                _buildNavItem(icon: Icons.store_outlined, label: 'Shop'),
+              ],
+            ),
+          ),
+          Positioned(
+            top: -30,
+            child: SizedBox(
+              width: 76, // Default FAB size
+              height: 76,
+              child: FloatingActionButton(
+                onPressed: () {},
+                elevation: 0,
+                backgroundColor: const Color(0xFF5A7D60),
+                shape: const CircleBorder(), // Ensures it's a circle
+                child: const Icon(
+                  Icons.qr_code_scanner,
+                  color: Colors.white,
+                  size: 38, // Adjusted for better centering
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+              top: 45,
+              child: Text("Scan", style: TextStyle(color: Colors.white.withOpacity(0.8)))
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem({required IconData icon, required String label}) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Icon(icon, color: Colors.white, size: 28),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+      ],
+    );
+  }
+
+
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 100),
@@ -135,10 +160,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             style: TextStyle(
                 color: Colors.white,
                 fontSize: 30,
-                // fontWeight: FontWeight.bold,
                 letterSpacing: 4,
-                fontFamily: "Abel"
-            ),
+                fontFamily: "Abel"),
           ),
           Container(
             width: 44,
@@ -154,8 +177,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  // --- WIDGET UPDATED WITH YOUR FINAL CODE & SHADOW ---
-  Widget _buildPerformanceCard() {
+  Widget _buildPerformanceCard({
+    required String userName,
+    required String lastMonthSales,
+    required String currentMonthSales,
+    double? height, // optional param
+  }) {
     return Transform.translate(
       offset: const Offset(0, -80),
       child: Padding(
@@ -174,7 +201,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
           child: GlassmorphicContainer(
             width: double.infinity,
-            height: 223,
+            height: height ?? 215, // ← Use a flexible default
             borderRadius: 20,
             blur: 10,
             alignment: Alignment.bottomCenter,
@@ -200,17 +227,30 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [ // Removed MainAxisSize.min for Spacer to work
-                  const Text('Hi, Durgesh', style: TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.w600)),
+                children: [
+                  Text('Hi, $userName',
+                      style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600)),
                   const SizedBox(height: 10),
-                  const Text('Last Month - \$50,000,000.00', style: TextStyle(color: Colors.black54, fontSize: 12, letterSpacing: 1)),
+                  Text('Last Month - $lastMonthSales',
+                      style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 12,
+                          letterSpacing: 1)),
                   const SizedBox(height: 8),
-                  const Text('Current Month Sells', style: TextStyle(color: Colors.black54, fontSize: 14, letterSpacing: 1)),
-                  const Text(
-                    '\$100,000,000.00',
-                    style: TextStyle(color: Color(0xFF5A7D60), fontSize: 32),
+                  const Text('Current Month Sells',
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 14,
+                          letterSpacing: 1)),
+                  Text(
+                    currentMonthSales,
+                    style: const TextStyle(
+                        color: Color(0xFF5A7D60), fontSize: 32),
                   ),
-                  const Spacer(), // Added Spacer to push button to bottom
+                  const Spacer(),
                   Align(
                     alignment: Alignment.bottomRight,
                     child: ElevatedButton(
@@ -218,13 +258,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF5A7D60),
                           shape: const StadiumBorder(),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
-                      ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8)),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text('More', style: TextStyle(color: Colors.white)),
-                          Icon(Icons.arrow_forward, color: Colors.white, size: 16),
+                          Icon(Icons.arrow_forward,
+                              color: Colors.white, size: 16),
                         ],
                       ),
                     ),
@@ -237,6 +278,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       ),
     );
   }
+
 
   Widget _buildOrderTabs() {
     return DefaultTabController(
@@ -269,7 +311,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   Widget _buildOrderList(List<Order> orders) {
     if (orders.isEmpty) {
-      return const Center(child: Text("No orders in this category.", style: TextStyle(color: Colors.black54)));
+      return const Center(
+          child: Text("No orders in this category.",
+              style: TextStyle(color: Colors.black54)));
     }
     return ListView.builder(
       padding: const EdgeInsets.all(20),
@@ -280,7 +324,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 }
-
 
 class OrderCard extends StatelessWidget {
   final Order order;
@@ -294,20 +337,26 @@ class OrderCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.all(10.0), // Updated Padding
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(order.customerName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                Text(order.timeAgo, style: const TextStyle(color: Colors.black54, fontSize: 14)),
+                Text(order.customerName,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 18)),
+                Text(order.timeAgo,
+                    style: const TextStyle(color: Colors.black54, fontSize: 14)),
               ],
             ),
             const SizedBox(height: 8),
             Row(
               children: [
-                Text('${order.itemCount} items - \$${order.totalPrice.toStringAsFixed(2)}', style: const TextStyle(color: Colors.black54, fontSize: 16)),
+                Text(
+                    '${order.itemCount} items - \$${order.totalPrice.toStringAsFixed(2)}',
+                    style:
+                    const TextStyle(color: Colors.black54, fontSize: 16)),
               ],
             ),
             const SizedBox(height: 16),
@@ -330,7 +379,8 @@ class OrderCard extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.grey.shade200,
               foregroundColor: Colors.black87,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
             child: const Text('Decline'),
@@ -343,7 +393,8 @@ class OrderCard extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF5A7D60),
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
             child: const Text('Accept'),
