@@ -238,7 +238,7 @@ class _SignUpState extends State<SignUp> {
               ),
               child: const Text("Don’t have an account? Create "),
               onPressed: () {
-                Get.to(Login());
+                Get.off(Login());
               },
             ),
 

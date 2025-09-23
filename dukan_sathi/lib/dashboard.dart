@@ -69,17 +69,21 @@ class _DashboardState extends State<Dashboard> {
                   left: 40,
                   right: 40,
                   child: Container(
+                    width: double.infinity,
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: Offset(0, 10),
-                        ),
-                      ],
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
+                      // boxShadow: [
+                      //   BoxShadow(
+                      //     color: Colors.black.withOpacity(0.1),
+                      //     blurRadius: 8,
+                      //     offset: Offset(0, 10),
+                      //   ),
+                      // ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,43 +107,111 @@ class _DashboardState extends State<Dashboard> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 40),
                       ],
+                    ),
+                  ),
+                ),
+
+                // Positioned(
+                //   top: 218,
+                //   left: 40,
+                //   child: Container(
+                //     height: 70,
+                //     width: 280,
+                //     padding: EdgeInsets.all(16),
+                //     decoration: BoxDecoration(
+                //       color: Colors.white.withOpacity(0.6),
+                //       borderRadius: BorderRadius.only(
+                //         bottomLeft: Radius.circular(20),
+                //         bottomRight: Radius.circular(20),
+                //       ),
+                //       boxShadow: [
+                //         BoxShadow(
+                //           color: Colors.black.withOpacity(0.1),
+                //           blurRadius: 8,
+                //           offset: Offset(0, 10),
+                //         ),
+                //       ],
+                //     ),
+                //     child: ListTile(
+                //       trailing: ElevatedButton(
+                //         style: ElevatedButton.styleFrom(
+                //           backgroundColor: Color(0xFF567751),
+                //           foregroundColor: Colors.white,
+                //         ),
+                //         onPressed: () {
+                //           Get.to(MonthlySpendingLage());
+                //         },
+                //         child: Text(
+                //           "More →",
+                //           style: TextStyle(color: Colors.white),
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
+                Positioned(
+                  top: 80,
+                  left: 40,
+                  right: 40,
+                  child: IgnorePointer(
+                    // 👈 ye add karo
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.6),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Hi, Kishan",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text("Last Month - ₹50,000"),
+                          SizedBox(height: 4),
+                          Text("Current Month Spending"),
+                          SizedBox(height: 4),
+                          Text(
+                            "₹1,00,00,000.00",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          ListTile(
+                            trailing: ElevatedButton(
+                              onPressed: () {
+                                print("hello");
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF567751),
+                                foregroundColor: Colors.white,
+                              ),
+                              child: Text(
+                                "More →",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
 
-            Positioned(
-              top: 100,
-              left: 20,
-              right: 100,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 15),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Get.to(MonthlySpendingLage());
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF567751),
-                          foregroundColor: Colors.white,
-                        ),
-                        child: const Text("More →"),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            SizedBox(height: 10), // space below stack
+            SizedBox(height: 130), // space below stack
             Padding(
               padding: EdgeInsets.all(8.0),
               child: Text(
@@ -268,7 +340,7 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
             ),
-            
+
             SizedBox(height: 60),
           ],
         ),

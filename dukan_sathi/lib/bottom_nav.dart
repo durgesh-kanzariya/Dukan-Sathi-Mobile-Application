@@ -25,7 +25,7 @@ class _BottomNavState extends State<BottomNav> {
       children: [
         Container(
           height: 80,
-          decoration: const BoxDecoration(color: Color(0xFF5D7B6C)),
+          decoration: const BoxDecoration(color: Color(0xFF567751)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
@@ -36,7 +36,7 @@ class _BottomNavState extends State<BottomNav> {
                 children: <Widget>[
                   IconButton(
                     onPressed: () {
-                      Get.to(
+                      Get.off(
                         Dashboard(username: "kishan", password: "1234567"),
                       );
                     },
@@ -57,7 +57,7 @@ class _BottomNavState extends State<BottomNav> {
                 children: <Widget>[
                   IconButton(
                     onPressed: () {
-                      Get.to(DiscoverShop());
+                      Get.off(DiscoverShop());
                     },
                     icon: const Icon(Icons.store_outlined, color: Colors.white),
                     iconSize: 28,
@@ -79,7 +79,7 @@ class _BottomNavState extends State<BottomNav> {
                 children: <Widget>[
                   IconButton(
                     onPressed: () {
-                      Get.to(History());
+                      Get.off(History());
                     },
                     icon: const Icon(
                       Icons.history_outlined,
@@ -98,10 +98,10 @@ class _BottomNavState extends State<BottomNav> {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
+                children: [
                   IconButton(
                     onPressed: () {
-                      Get.to(QuickOrder());
+                      Get.off(QuickOrder());
                     },
                     icon: const Icon(
                       Icons.format_list_bulleted,
@@ -121,11 +121,27 @@ class _BottomNavState extends State<BottomNav> {
 
         // Floating Action Button
         Positioned(
-          top: -30,
-          child: FloatingActionButton(
-            onPressed: () {},
-            backgroundColor: const Color(0xFF5D7B6C),
-            child: const Icon(Icons.add, color: Colors.white),
+          top: -40,
+          child: InkWell(
+            child: Container(
+              height: 100,
+              width: 90,
+              decoration: BoxDecoration(
+                color: Color(0xFF567751),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(300),
+                  topRight: Radius.circular(300),
+                ),
+              ),
+              child: Column(
+                children: [
+                  SizedBox(height: 20),
+                  Icon(Icons.add, color: Colors.white, size: 50),
+                  SizedBox(height: 10),
+                  Text("Cart", style: TextStyle(color: Colors.white)),
+                ],
+              ),
+            ),
           ),
         ),
       ],

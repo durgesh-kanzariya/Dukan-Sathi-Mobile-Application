@@ -71,6 +71,7 @@ class _MonthlySpendingLageState extends State<MonthlySpendingLage> {
               ),
             ],
           ),
+          
           SizedBox(height: 5),
 
 

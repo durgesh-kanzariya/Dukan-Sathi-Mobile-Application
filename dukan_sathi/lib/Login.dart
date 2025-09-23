@@ -146,12 +146,23 @@ class _LoginState extends State<Login> {
               ),
               child: const Text("Don’t have an account? Create "),
               onPressed: () {
-                Get.to(SignUp());
+                Get.off(SignUp());
               },
             ),
             Text(msg, style: const TextStyle(color: Colors.red)),
 
 
+           Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+               Image.asset(
+              "assets/imgs/2.jpg",
+              height: 200,
+              // width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+            ],
+           ),
           ],
         ),
       ),
