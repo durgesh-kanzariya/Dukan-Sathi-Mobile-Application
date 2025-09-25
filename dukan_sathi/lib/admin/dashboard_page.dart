@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 
-// NOTE: The separate shopkeeper_bottom_nav.dart file is no longer needed with this approach.
-
-// A simple data model for an order
+// Data models (can be moved to their own file later)
 enum OrderStatus { New, Preparing }
 
 class Order {
@@ -13,7 +11,8 @@ class Order {
   final double totalPrice;
   final OrderStatus status;
 
-  Order({
+  const Order({
+    // Added const to the constructor
     required this.customerName,
     required this.timeAgo,
     required this.itemCount,
@@ -22,125 +21,53 @@ class Order {
   });
 }
 
-class AdminDashboardScreen extends StatefulWidget {
+// --- MOCK DATA MOVED OUTSIDE THE CLASS TO FIX THE ERROR ---
+final List<Order> newOrders = const [
+  Order(
+    customerName: 'Parvez B.',
+    timeAgo: '3 mins ago',
+    itemCount: 5,
+    totalPrice: 75.00,
+    status: OrderStatus.New,
+  ),
+  Order(
+    customerName: 'Sarah M.',
+    timeAgo: '7 mins ago',
+    itemCount: 3,
+    totalPrice: 45.50,
+    status: OrderStatus.New,
+  ),
+];
+
+final List<Order> preparingOrders = const [
+  Order(
+    customerName: 'John D.',
+    timeAgo: '12 mins ago',
+    itemCount: 8,
+    totalPrice: 120.25,
+    status: OrderStatus.Preparing,
+  ),
+];
+// --- END MOCK DATA ---
+
+// THIS WIDGET IS NOW JUST THE CONTENT FOR THE DASHBOARD
+class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({Key? key}) : super(key: key);
 
   @override
-  _AdminDashboardScreenState createState() => _AdminDashboardScreenState();
-}
-
-class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
-  // --- Mock Data ---
-  final List<Order> newOrders = [
-    Order(customerName: 'Parvez B.', timeAgo: '3 mins ago', itemCount: 5, totalPrice: 75.00, status: OrderStatus.New),
-    Order(customerName: 'Sarah M.', timeAgo: '7 mins ago', itemCount: 3, totalPrice: 45.50, status: OrderStatus.New),
-    Order(customerName: 'John D.', timeAgo: '12 mins ago', itemCount: 8, totalPrice: 120.25, status: OrderStatus.New),
-  ];
-
-  final List<Order> preparingOrders = [
-    Order(customerName: 'Parvez B.', timeAgo: '3 mins ago', itemCount: 5, totalPrice: 75.00, status: OrderStatus.Preparing),
-    Order(customerName: 'Sarah M.', timeAgo: '7 mins ago', itemCount: 3, totalPrice: 45.50, status: OrderStatus.Preparing),
-  ];
-  // --- End Mock Data ---
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFDFBF5),
-      // --- BODY WRAPPED IN A STACK TO ACCOMMODATE CUSTOM NAVBAR ---
-      body: Stack(
+    // This widget no longer has a Scaffold. It's just the page content.
+    return SingleChildScrollView(
+      child: Column(
         children: [
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildHeader(),
-                _buildPerformanceCard(
-                  userName: "Durgesh",
-                  lastMonthSales: "\$50,000,000.00",
-                  currentMonthSales: "\$100,000,000.00",
-                  height: 215, // Optional override
-                ),
-
-                Transform.translate(
-                    offset: const Offset(0, -80),
-                    child: _buildOrderTabs()
-                ),
-                // Add padding at the bottom to ensure content isn't hidden by the navbar
-                const SizedBox(height: 100),
-              ],
-            ),
-          ),
-          // --- CUSTOM NAVBAR POSITIONED AT THE BOTTOM ---
-          _buildCustomBottomNav(),
+          _buildHeader(),
+          _buildPerformanceCard(),
+          // --- FIX: Passed the context down to the helper method ---
+          _buildOrderTabs(context),
         ],
       ),
     );
   }
-
-  // --- NEW WIDGET FOR THE CUSTOM NAVIGATION BAR ---
-  Widget _buildCustomBottomNav() {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            height: 80,
-            decoration: const BoxDecoration(
-              color: Color(0xFF5A7D60),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                _buildNavItem(icon: Icons.list_alt, label: 'Orders'),
-                _buildNavItem(icon: Icons.inventory_2_outlined, label: 'Product'),
-                const SizedBox(width: 60), // Spacer for the FAB
-                _buildNavItem(icon: Icons.history, label: 'History'),
-                _buildNavItem(icon: Icons.store_outlined, label: 'Shop'),
-              ],
-            ),
-          ),
-          Positioned(
-            top: -30,
-            child: SizedBox(
-              width: 76, // Default FAB size
-              height: 76,
-              child: FloatingActionButton(
-                onPressed: () {},
-                elevation: 0,
-                backgroundColor: const Color(0xFF5A7D60),
-                shape: const CircleBorder(), // Ensures it's a circle
-                child: const Icon(
-                  Icons.qr_code_scanner,
-                  color: Colors.white,
-                  size: 38, // Adjusted for better centering
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-              top: 45,
-              child: Text("Scan", style: TextStyle(color: Colors.white.withOpacity(0.8)))
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem({required IconData icon, required String label}) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Icon(icon, color: Colors.white, size: 28),
-        const SizedBox(height: 4),
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
-      ],
-    );
-  }
-
 
   Widget _buildHeader() {
     return Container(
@@ -158,10 +85,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           const Text(
             'DUKAN SATHI',
             style: TextStyle(
-                color: Colors.white,
-                fontSize: 30,
-                letterSpacing: 4,
-                fontFamily: "Abel"),
+              color: Colors.white,
+              fontSize: 30,
+              letterSpacing: 4,
+              fontFamily: "Abel",
+            ),
           ),
           Container(
             width: 44,
@@ -177,12 +105,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Widget _buildPerformanceCard({
-    required String userName,
-    required String lastMonthSales,
-    required String currentMonthSales,
-    double? height, // optional param
-  }) {
+  Widget _buildPerformanceCard() {
     return Transform.translate(
       offset: const Offset(0, -80),
       child: Padding(
@@ -201,7 +124,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
           child: GlassmorphicContainer(
             width: double.infinity,
-            height: height ?? 215, // ← Use a flexible default
+            height: 223,
             borderRadius: 20,
             blur: 10,
             alignment: Alignment.bottomCenter,
@@ -228,27 +151,35 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Hi, $userName',
-                      style: const TextStyle(
-                          color: Colors.black87,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600)),
+                  const Text(
+                    'Hi, Durgesh',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   const SizedBox(height: 10),
-                  Text('Last Month - $lastMonthSales',
-                      style: const TextStyle(
-                          color: Colors.black54,
-                          fontSize: 12,
-                          letterSpacing: 1)),
+                  const Text(
+                    'Last Month - \$50,000,000.00',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 12,
+                      letterSpacing: 1,
+                    ),
+                  ),
                   const SizedBox(height: 8),
-                  const Text('Current Month Sells',
-                      style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 14,
-                          letterSpacing: 1)),
-                  Text(
-                    currentMonthSales,
-                    style: const TextStyle(
-                        color: Color(0xFF5A7D60), fontSize: 32),
+                  const Text(
+                    'Current Month Sells',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const Text(
+                    '\$100,000,000.00',
+                    style: TextStyle(color: Color(0xFF5A7D60), fontSize: 32),
                   ),
                   const Spacer(),
                   Align(
@@ -256,16 +187,22 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF5A7D60),
-                          shape: const StadiumBorder(),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8)),
+                        backgroundColor: const Color(0xFF5A7D60),
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                      ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text('More', style: TextStyle(color: Colors.white)),
-                          Icon(Icons.arrow_forward,
-                              color: Colors.white, size: 16),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: Colors.white,
+                            size: 16,
+                          ),
                         ],
                       ),
                     ),
@@ -279,32 +216,35 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-
-  Widget _buildOrderTabs() {
-    return DefaultTabController(
-      length: 2,
-      child: Column(
-        children: [
-          const TabBar(
-            labelColor: Color(0xFF5A7D60),
-            unselectedLabelColor: Colors.black45,
-            indicatorColor: Color(0xFF5A7D60),
-            indicatorSize: TabBarIndicatorSize.label,
-            tabs: [
-              Tab(text: 'New'),
-              Tab(text: 'Preparing'),
-            ],
-          ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.5,
-            child: TabBarView(
-              children: [
-                _buildOrderList(newOrders),
-                _buildOrderList(preparingOrders),
+  // --- FIX: Added BuildContext as a parameter ---
+  Widget _buildOrderTabs(BuildContext context) {
+    return Transform.translate(
+      offset: const Offset(0, -80),
+      child: DefaultTabController(
+        length: 2,
+        child: Column(
+          children: [
+            const TabBar(
+              labelColor: Color(0xFF5A7D60),
+              unselectedLabelColor: Colors.black45,
+              indicatorColor: Color(0xFF5A7D60),
+              indicatorSize: TabBarIndicatorSize.label,
+              tabs: [
+                Tab(text: 'New'),
+                Tab(text: 'Preparing'),
               ],
             ),
-          ),
-        ],
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.4,
+              child: TabBarView(
+                children: [
+                  _buildOrderList(newOrders),
+                  _buildOrderList(preparingOrders),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -312,11 +252,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget _buildOrderList(List<Order> orders) {
     if (orders.isEmpty) {
       return const Center(
-          child: Text("No orders in this category.",
-              style: TextStyle(color: Colors.black54)));
+        child: Text(
+          "No orders in this category.",
+          style: TextStyle(color: Colors.black54),
+        ),
+      );
     }
     return ListView.builder(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       itemCount: orders.length,
       itemBuilder: (context, index) {
         return OrderCard(order: orders[index]);
@@ -343,20 +286,26 @@ class OrderCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(order.customerName,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 18)),
-                Text(order.timeAgo,
-                    style: const TextStyle(color: Colors.black54, fontSize: 14)),
+                Text(
+                  order.customerName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                Text(
+                  order.timeAgo,
+                  style: const TextStyle(color: Colors.black54, fontSize: 14),
+                ),
               ],
             ),
             const SizedBox(height: 8),
             Row(
               children: [
                 Text(
-                    '${order.itemCount} items - \$${order.totalPrice.toStringAsFixed(2)}',
-                    style:
-                    const TextStyle(color: Colors.black54, fontSize: 16)),
+                  '${order.itemCount} items - \$${order.totalPrice.toStringAsFixed(2)}',
+                  style: const TextStyle(color: Colors.black54, fontSize: 16),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -380,7 +329,8 @@ class OrderCard extends StatelessWidget {
               backgroundColor: Colors.grey.shade200,
               foregroundColor: Colors.black87,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+                borderRadius: BorderRadius.circular(8),
+              ),
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
             child: const Text('Decline'),
@@ -394,7 +344,8 @@ class OrderCard extends StatelessWidget {
               backgroundColor: const Color(0xFF5A7D60),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+                borderRadius: BorderRadius.circular(8),
+              ),
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
             child: const Text('Accept'),
@@ -420,4 +371,3 @@ class OrderCard extends StatelessWidget {
     );
   }
 }
-
