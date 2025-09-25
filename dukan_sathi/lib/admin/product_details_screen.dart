@@ -1,3 +1,4 @@
+import 'package:dukan_sathi/admin/edit_product_screen.dart';
 import 'package:flutter/material.dart';
 import 'products_screen.dart'; // We need the Product model from here
 
@@ -17,7 +18,7 @@ class ProductDetailsScreen extends StatelessWidget {
           children: [
             _buildHeader(context),
             _buildProductImage(),
-            _buildDetailsCard(),
+            _buildDetailsCard(context), // Pass context to the card builder
           ],
         ),
       ),
@@ -91,7 +92,7 @@ class ProductDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailsCard() {
+  Widget _buildDetailsCard(BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 40),
       padding: const EdgeInsets.all(24),
@@ -125,14 +126,14 @@ class ProductDetailsScreen extends StatelessWidget {
           const SizedBox(height: 8),
           ...product.variants.map((variant) => _buildVariantRow(variant)),
           const SizedBox(height: 30),
-          _buildEditButton(),
+          _buildEditButton(context), // Pass context to the button builder
         ],
       ),
     );
   }
 
   Widget _buildPriceHeader() {
-    // CHANGE 1: Added a "Stock" header
+    // Added a "Stock" header
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -178,7 +179,7 @@ class ProductDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildVariantRow(ProductVariant variant) {
-    // CHANGE 2: Added the stock quantity display
+    // Added the stock quantity display
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -230,11 +231,19 @@ class ProductDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEditButton() {
+  Widget _buildEditButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {},
+        // CHANGE: Added navigation logic to the onPressed callback
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EditProductScreen(product: product),
+            ),
+          );
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFB3C5B5),
           foregroundColor: const Color(0xFF2E4431),
