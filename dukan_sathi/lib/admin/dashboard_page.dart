@@ -1,6 +1,7 @@
 import 'package:dukan_sathi/admin/shopkeeper_order_details.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
+import 'monthly_sells_screen.dart';
 
 // Data models (can be moved to their own file later)
 enum OrderStatus { New, Preparing }
@@ -38,6 +39,13 @@ final List<Order> newOrders = const [
     totalPrice: 45.50,
     status: OrderStatus.New,
   ),
+  Order(
+    customerName: 'Jenil M.',
+    timeAgo: '7 mins ago',
+    itemCount: 3,
+    totalPrice: 45.50,
+    status: OrderStatus.New,
+  ),
 ];
 
 final List<Order> preparingOrders = const [
@@ -57,16 +65,17 @@ class AdminDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // This widget no longer has a Scaffold. It's just the page content.
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildHeader(),
-          _buildPerformanceCard(),
-          // --- FIX: Passed the context down to the helper method ---
-          _buildOrderTabs(context),
-        ],
-      ),
+    // CHANGE 1: The layout is now a Column to create a fixed header area.
+    // The SingleChildScrollView has been removed from the top level.
+    return Column(
+      children: [
+        _buildHeader(),
+        _buildPerformanceCard(context),
+        // CHANGE 2: The order tabs are wrapped in an Expanded widget.
+        // This makes the tab section fill the remaining vertical space,
+        // and its content (the list) will be scrollable.
+        Expanded(child: _buildOrderTabs(context)),
+      ],
     );
   }
 
@@ -106,110 +115,108 @@ class AdminDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPerformanceCard() {
+  Widget _buildPerformanceCard(BuildContext context) {
     return Transform.translate(
       offset: const Offset(0, -80),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 20,
-                spreadRadius: 2,
-                offset: const Offset(0, 8),
-              ),
+        child: GlassmorphicContainer(
+          width: double.infinity,
+          height: 241,
+          borderRadius: 40,
+          blur: 15,
+          alignment: Alignment.center,
+          border: 1,
+          linearGradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFFFFFFFF).withOpacity(0.3),
+              const Color(0xFFFFFFFF).withOpacity(0.5),
             ],
           ),
-          child: GlassmorphicContainer(
-            width: double.infinity,
-            height: 223,
-            borderRadius: 20,
-            blur: 10,
-            alignment: Alignment.bottomCenter,
-            border: 2,
-            linearGradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.3),
-                Colors.white.withOpacity(0.1),
-              ],
-              stops: const [0.1, 1],
-            ),
-            borderGradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.5),
-                Colors.white.withOpacity(0.1),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Hi, Durgesh',
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
+          borderGradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white.withOpacity(0.3),
+              Colors.white.withOpacity(0.1),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(25, 20, 25, 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Hi, Durgesh',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w600,
                   ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Last Month - \$50,000,000.00',
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 12,
-                      letterSpacing: 1,
-                    ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Last Month - \$50,000,000.00',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 17,
+                    letterSpacing: 1,
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Current Month Sells',
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14,
-                      letterSpacing: 1,
-                    ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Current Month Sells',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 17,
+                    letterSpacing: 1,
                   ),
-                  const Text(
-                    '\$100,000,000.00',
-                    style: TextStyle(color: Color(0xFF5A7D60), fontSize: 32),
+                ),
+                const Text(
+                  '\$100,000,000.00',
+                  style: TextStyle(
+                    color: Color(0xFF5A7D60),
+                    fontSize: 36,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Abel',
                   ),
-                  const Spacer(),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF5A7D60),
-                        shape: const StadiumBorder(),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                ),
+                const Spacer(),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MonthlySellsScreen(),
                         ),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('More', style: TextStyle(color: Colors.white)),
-                          Icon(
-                            Icons.arrow_forward,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                        ],
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF4C6A52),
+                      shape: const StadiumBorder(),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
                       ),
                     ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('More', style: TextStyle(color: Colors.white)),
+                        Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -217,7 +224,6 @@ class AdminDashboardScreen extends StatelessWidget {
     );
   }
 
-  // --- FIX: Added BuildContext as a parameter ---
   Widget _buildOrderTabs(BuildContext context) {
     return Transform.translate(
       offset: const Offset(0, -80),
@@ -235,8 +241,9 @@ class AdminDashboardScreen extends StatelessWidget {
                 Tab(text: 'Preparing'),
               ],
             ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.4,
+            // CHANGE 3: The TabBarView is wrapped in Expanded so it knows
+            // to fill the available space provided by its parent.
+            Expanded(
               child: TabBarView(
                 children: [
                   _buildOrderList(newOrders),
@@ -260,7 +267,9 @@ class AdminDashboardScreen extends StatelessWidget {
       );
     }
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      // CHANGE 4: Padding is added to the bottom of the list to ensure
+      // the last item can be scrolled above the navigation bar.
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
       itemCount: orders.length,
       itemBuilder: (context, index) {
         return OrderCard(order: orders[index]);

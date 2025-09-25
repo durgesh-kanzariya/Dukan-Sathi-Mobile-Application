@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
   flutter_launcher_icons: ^0.14.4
   glassmorphism: ^3.0.0
+  intl: ^0.20.2
   mobile_scanner: ^5.1.1
 
 dev_dependencies:
