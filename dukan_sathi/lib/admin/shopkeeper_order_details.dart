@@ -133,7 +133,13 @@ class ShopkeeperOrderDetailsScreen extends StatelessWidget {
           ),
           const Text(
             'Order details',
-            style: TextStyle(color: Colors.white70, fontSize: 18),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w300,
+              fontStyle: FontStyle.normal,
+              letterSpacing: 2,
+            ),
           ),
         ],
       ),
@@ -142,7 +148,7 @@ class ShopkeeperOrderDetailsScreen extends StatelessWidget {
 
   Widget _buildOrderSummary() {
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.fromLTRB(30, 16, 20, 0),
       child: Column(
         children: [
           _buildSummaryRow('Order id:', mockOrder.orderId),
@@ -180,7 +186,7 @@ class ShopkeeperOrderDetailsScreen extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: Color(0xFF5A7D60),
               ),
             ),
           ),
@@ -271,7 +277,7 @@ class ShopkeeperOrderDetailsScreen extends StatelessWidget {
 
   Widget _buildTotalPrice() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 16.0),
+      padding: const EdgeInsets.fromLTRB(30, 0, 30, 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
