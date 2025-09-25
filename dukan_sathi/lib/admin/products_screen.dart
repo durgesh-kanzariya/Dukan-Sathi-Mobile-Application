@@ -40,6 +40,27 @@ final List<Product> mockProducts = [
     imageUrl: 'https://placehold.co/200x200/6F4E37/FFFFFF/png?text=Pastry',
     isSoldOut: true,
   ),
+  const Product(
+    name: 'Vanilla Muffin',
+    price: 5.00,
+    imageUrl: 'https://placehold.co/200x200/F3E5AB/000000/png?text=Muffin',
+  ),
+  const Product(
+    name: 'Blueberry Bagel',
+    price: 8.00,
+    imageUrl: 'https://placehold.co/200x200/4682B4/FFFFFF/png?text=Bagel',
+  ),
+  const Product(
+    name: 'Croissant',
+    price: 6.00,
+    imageUrl: 'https://placehold.co/200x200/EDDBC7/000000/png?text=Croissant',
+  ),
+  const Product(
+    name: 'Red Velvet Cupcake',
+    price: 7.00,
+    imageUrl: 'https://placehold.co/200x200/9B1C31/FFFFFF/png?text=Cupcake',
+    isSoldOut: true,
+  ),
 ];
 // --- END MOCK DATA ---
 
@@ -48,23 +69,11 @@ class ProductsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // CHANGE 1: The layout is changed to a Column with an Expanded child.
-    // This makes the header fixed and the content below it scrollable.
     return Column(
       children: [
         _buildHeader(),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildAddProductButton(),
-                _buildProductsList(),
-                // Padding at the bottom for scroll space behind the navbar.
-                const SizedBox(height: 100),
-              ],
-            ),
-          ),
-        ),
+        _buildAddProductButton(),
+        Expanded(child: _buildProductsList()),
       ],
     );
   }
@@ -120,7 +129,7 @@ class ProductsScreen extends StatelessWidget {
 
   Widget _buildAddProductButton() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+      padding: const EdgeInsets.fromLTRB(20.0, 24.0, 20.0, 16.0),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
@@ -147,42 +156,56 @@ class ProductsScreen extends StatelessWidget {
 
   Widget _buildProductsList() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(16),
+      // CHANGE 1: The bottom margin is increased to lift the container
+      // above the bottom navigation bar.
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 85),
       decoration: BoxDecoration(
-        color: const Color(0xFFB3C5B5).withOpacity(0.5),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF5A7D60).withOpacity(0.9),
+            const Color(0xFFB3C5B5).withOpacity(0.7),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // CHANGE 2: The Padding widget was removed from the Text
-          // and a SizedBox is used below it for better control over spacing.
-          Center(
-            child: const Text(
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12.0),
+            child: Text(
               'Products list',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF2E4431),
+                color: Colors.white,
               ),
             ),
           ),
-          Divider(thickness: 2, color: Colors.white),
-          const SizedBox(height: 0), // Reduced space before the grid
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: mockProducts.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 0.8,
+          const Divider(
+            color: Colors.white70,
+            thickness: 1,
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+          ),
+          Expanded(
+            child: GridView.builder(
+              // CHANGE 2: The bottom padding inside the grid is reduced because
+              // the container's margin is now creating the necessary space.
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              itemCount: mockProducts.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.8,
+              ),
+              itemBuilder: (context, index) {
+                return _ProductCard(product: mockProducts[index]);
+              },
             ),
-            itemBuilder: (context, index) {
-              return _ProductCard(product: mockProducts[index]);
-            },
           ),
         ],
       ),
@@ -220,7 +243,6 @@ class _ProductCard extends StatelessWidget {
                   Image.network(
                     product.imageUrl,
                     fit: BoxFit.cover,
-                    // Error and loading builders for robustness
                     errorBuilder: (context, error, stackTrace) =>
                         const Icon(Icons.error),
                     loadingBuilder: (context, child, loadingProgress) {

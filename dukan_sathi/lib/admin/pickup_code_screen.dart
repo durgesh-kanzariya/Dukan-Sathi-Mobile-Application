@@ -14,36 +14,27 @@ class _PickupCodeScreenState extends State<PickupCodeScreen> {
     detectionSpeed: DetectionSpeed.normal,
     facing: CameraFacing.back,
   );
-  bool isScanCompleted = false; // To prevent multiple dialogs
+  bool isScanCompleted = false; // To prevent multiple scans
 
   // Function to show the success dialog
   void _showSuccessDialog(String code) {
-    // Ensure we only show the dialog once per scan session
-    if (!isScanCompleted) {
-      isScanCompleted = true;
-
-      showDialog(
-        context: context,
-        barrierDismissible: false, // User must tap button to close
-        builder: (context) => AlertDialog(
-          title: const Text('Scan Successful'),
-          content: Text('Order Code: $code'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                isScanCompleted = false; // Reset for next scan
-                Navigator.of(context).pop(); // Close the dialog
-                Navigator.of(context).pop(); // Go back from the scan screen
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      ).then((_) {
-        // After dialog is closed, allow scanning again
-        isScanCompleted = false;
-      });
-    }
+    showDialog(
+      context: context,
+      barrierDismissible: false, // User must tap button to close
+      builder: (context) => AlertDialog(
+        title: const Text('Scan Successful'),
+        content: Text('Order Code: $code'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+              Navigator.of(context).pop(); // Go back from the scan screen
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -61,28 +52,28 @@ class _PickupCodeScreenState extends State<PickupCodeScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(height: 40),
-                    // Replaced QRView with MobileScanner
                     AspectRatio(
                       aspectRatio: 1.0,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(24),
-                        // Using a Stack to create a custom overlay
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
                             MobileScanner(
                               controller: controller,
                               onDetect: (capture) {
-                                final List<Barcode> barcodes = capture.barcodes;
-                                if (barcodes.isNotEmpty) {
-                                  final String? code = barcodes.first.rawValue;
+                                // CHANGE: Added logic to stop the camera and prevent re-scans
+                                if (!isScanCompleted) {
+                                  isScanCompleted = true;
+                                  final String? code =
+                                      capture.barcodes.first.rawValue;
                                   if (code != null) {
+                                    controller.stop(); // Stop the camera
                                     _showSuccessDialog(code);
                                   }
                                 }
                               },
                             ),
-                            // Custom overlay to mimic the design
                             Container(
                               decoration: BoxDecoration(
                                 border: Border.all(
