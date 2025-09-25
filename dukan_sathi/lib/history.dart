@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'bottom_nav.dart';
 import 'package:get/get.dart';
 import 'order_details.dart';
+import 'profile.dart';
 
 class History extends StatefulWidget {
   const History({super.key});
@@ -45,7 +46,9 @@ class _HistoryState extends State<History> {
                       shape: const CircleBorder(),
                       padding: const EdgeInsets.all(10),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.to(Profile());
+                    },
                     child: const Icon(Icons.person),
                   ),
                 ),

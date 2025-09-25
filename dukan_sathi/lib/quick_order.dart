@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'cart_page.dart';
 import 'bottom_nav.dart';
 import 'package:get/get.dart';
+import 'profile.dart';
+
+
+
+
 
 class QuickOrder extends StatefulWidget {
   const QuickOrder({super.key});
@@ -46,7 +51,9 @@ class _QuickOrderState extends State<QuickOrder> {
                         shape: CircleBorder(),
                         padding: EdgeInsets.all(10),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.to(Profile());
+                      },
                       child: Icon(Icons.person),
                     ),
                   ),
@@ -223,23 +230,22 @@ class _QuickOrderState extends State<QuickOrder> {
 
                   SizedBox(height: 40),
                   ListTile(
-              trailing: ElevatedButton(
-                onPressed: () {
-                  Get.to(CardPage());
-                },
-                style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF567751),
-                          foregroundColor: Colors.white,
-                        ),
-                child: Text("Add All to Cart →"),
-              ),
-            ),
+                    trailing: ElevatedButton(
+                      onPressed: () {
+                        Get.to(CardPage());
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF567751),
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Text("Add All to Cart →"),
+                    ),
+                  ),
                 ],
               ),
             ),
 
             SizedBox(height: 70),
-
           ],
         ),
       ),

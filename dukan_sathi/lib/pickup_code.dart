@@ -62,9 +62,9 @@ class _PickupCodeState extends State<PickupCode> {
                 ),
               ],
             ),
-        
+
             SizedBox(height: 50),
-        
+
            Center(
              child: Card(
               color: Color(0xFFACBF92),

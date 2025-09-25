@@ -1,8 +1,10 @@
 import 'package:dukan_sathi/bottom_nav.dart';
+import 'package:dukan_sathi/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'shop_productpage.dart';
+import 'product_page.dart';
 
 class DiscoverShop extends StatefulWidget {
   const DiscoverShop({super.key});
@@ -47,7 +49,9 @@ class _DiscoverShopState extends State<DiscoverShop> {
                       shape: const CircleBorder(),
                       padding: const EdgeInsets.all(10),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.to(Profile());
+                    },
                     child: const Icon(Icons.person),
                   ),
                 ),
@@ -85,8 +89,7 @@ class _DiscoverShopState extends State<DiscoverShop> {
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Container(
-                decoration: BoxDecoration(
-                ),
+                decoration: BoxDecoration(),
                 child: ListView.builder(
                   itemCount: 10,
                   itemBuilder: (context, index) {
@@ -97,15 +100,14 @@ class _DiscoverShopState extends State<DiscoverShop> {
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [
-        Color(0xFF567751), // The darker green color
-        Color(0xFFF9F3E7), // The lighter off-white color
-      ],
-      
-    ),
-    borderRadius: BorderRadius.circular(20),
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xFF567751), // The darker green color
+                              Color(0xFFF9F3E7), // The lighter off-white color
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),

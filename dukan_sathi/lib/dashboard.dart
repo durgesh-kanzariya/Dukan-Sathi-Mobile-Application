@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:dukan_sathi/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,7 @@ import 'monthly_spending_lage.dart';
 import 'product_page.dart';
 import 'history.dart';
 import 'cart_page.dart';
+import 'profile.dart';
 
 class Dashboard extends StatefulWidget {
   final String username;
@@ -58,7 +60,9 @@ class _DashboardState extends State<Dashboard> {
                         shape: CircleBorder(),
                         padding: EdgeInsets.all(10),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.to(Profile());
+                      },
                       child: Icon(Icons.person),
                     ),
                   ),
@@ -112,98 +116,23 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ),
 
-                // Positioned(
-                //   top: 218,
-                //   left: 40,
-                //   child: Container(
-                //     height: 70,
-                //     width: 280,
-                //     padding: EdgeInsets.all(16),
-                //     decoration: BoxDecoration(
-                //       color: Colors.white.withOpacity(0.6),
-                //       borderRadius: BorderRadius.only(
-                //         bottomLeft: Radius.circular(20),
-                //         bottomRight: Radius.circular(20),
-                //       ),
-                //       boxShadow: [
-                //         BoxShadow(
-                //           color: Colors.black.withOpacity(0.1),
-                //           blurRadius: 8,
-                //           offset: Offset(0, 10),
-                //         ),
-                //       ],
-                //     ),
-                //     child: ListTile(
-                //       trailing: ElevatedButton(
-                //         style: ElevatedButton.styleFrom(
-                //           backgroundColor: Color(0xFF567751),
-                //           foregroundColor: Colors.white,
-                //         ),
-                //         onPressed: () {
-                //           Get.to(MonthlySpendingLage());
-                //         },
-                //         child: Text(
-                //           "More →",
-                //           style: TextStyle(color: Colors.white),
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // ),
+
                 Positioned(
-                  top: 80,
+                  top: 190,
                   left: 40,
                   right: 40,
-                  child: IgnorePointer(
-                    // 👈 ye add karo
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.6),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20),
-                        ),
+                  child: ListTile(
+                    trailing: ElevatedButton(
+                      onPressed: () {
+                        print("hello");
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF567751),
+                        foregroundColor: Colors.white,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Hi, Kishan",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text("Last Month - ₹50,000"),
-                          SizedBox(height: 4),
-                          Text("Current Month Spending"),
-                          SizedBox(height: 4),
-                          Text(
-                            "₹1,00,00,000.00",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          ListTile(
-                            trailing: ElevatedButton(
-                              onPressed: () {
-                                print("hello");
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF567751),
-                                foregroundColor: Colors.white,
-                              ),
-                              child: Text(
-                                "More →",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        "More →",
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
@@ -225,6 +154,12 @@ class _DashboardState extends State<Dashboard> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Divider(
+                    color: Colors.black, // Line color
+                    thickness: 1, // Line thickness
+                    indent: 20, // Empty space before line
+                    endIndent: 20,
+                  ),
                   Text("Best Bakery :  • Ready for Pickup"),
                   Text("Raj General Store :  • Preparing"),
                   ElevatedButton(
