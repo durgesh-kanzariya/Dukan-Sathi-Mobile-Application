@@ -5,30 +5,33 @@ import 'product_details_screen.dart'; // Import the new details screen
 // --- DATA MODELS ---
 // I've expanded these models to include the data needed for the details page.
 
+// Model for a single product variant (e.g., 1 KG, 500 GM)
 class ProductVariant {
   final String name;
   final double buyPrice;
   final double sellPrice;
+  final int stock; // ADDED: Stock quantity for this variant
 
   const ProductVariant({
     required this.name,
     required this.buyPrice,
     required this.sellPrice,
+    required this.stock, // ADDED: Required in the constructor
   });
 }
 
+// Model for a complete product
 class Product {
   final String name;
   final String imageUrl;
   final bool isSoldOut;
   final List<ProductVariant> variants;
 
-  // The 'price' field is removed as pricing is now handled by variants.
   const Product({
     required this.name,
     required this.imageUrl,
-    required this.variants,
     this.isSoldOut = false,
+    required this.variants,
   });
 
   // Helper to get the lowest price for display on the card
@@ -40,25 +43,81 @@ class Product {
 final List<Product> mockProducts = [
   const Product(
     name: 'Chocolate Cake',
-    imageUrl: 'https://placehold.co/400x300/5A3825/FFFFFF/png?text=Cake',
+    imageUrl: 'https://placehold.co/400x400/5A3825/FFFFFF/png?text=Cake',
     variants: [
-      ProductVariant(name: '1.5 KG', buyPrice: 50, sellPrice: 75),
-      ProductVariant(name: '1 KG', buyPrice: 35, sellPrice: 50),
-      ProductVariant(name: '500 GM', buyPrice: 20, sellPrice: 25),
+      ProductVariant(
+        name: '1.5 KG',
+        buyPrice: 50.00,
+        sellPrice: 75.00,
+        stock: 12,
+      ),
+      ProductVariant(
+        name: '1 KG',
+        buyPrice: 35.00,
+        sellPrice: 50.00,
+        stock: 20,
+      ),
+      ProductVariant(
+        name: '500 GM',
+        buyPrice: 20.00,
+        sellPrice: 25.00,
+        stock: 35,
+      ),
     ],
   ),
   const Product(
     name: 'Strawberry Cake',
-    imageUrl: 'https://placehold.co/400x300/DE3163/FFFFFF/png?text=Cake',
+    imageUrl: 'https://placehold.co/400x400/DE3163/FFFFFF/png?text=Cake',
     isSoldOut: true,
-    variants: [ProductVariant(name: '1 KG', buyPrice: 30, sellPrice: 40)],
+    variants: [
+      ProductVariant(name: '1 KG', buyPrice: 30.00, sellPrice: 40.00, stock: 0),
+    ],
   ),
   const Product(
     name: 'Wheat Bread',
-    imageUrl: 'https://placehold.co/400x300/AF8F6D/FFFFFF/png?text=Bread',
-    variants: [ProductVariant(name: 'Loaf', buyPrice: 8, sellPrice: 10)],
+    imageUrl: 'https://placehold.co/400x400/AF8F6D/FFFFFF/png?text=Bread',
+    variants: [
+      ProductVariant(name: 'Loaf', buyPrice: 8.00, sellPrice: 10.00, stock: 50),
+    ],
   ),
-  // ... more products
+  const Product(
+    name: 'Chocolate Pastry',
+    imageUrl: 'https://placehold.co/400x400/6F4E37/FFFFFF/png?text=Pastry',
+    isSoldOut: true,
+    variants: [
+      ProductVariant(name: 'Single', buyPrice: 2.00, sellPrice: 3.00, stock: 0),
+    ],
+  ),
+  const Product(
+    name: 'Croissant',
+    imageUrl: 'https://placehold.co/400x400/D2B48C/FFFFFF/png?text=Croissant',
+    variants: [
+      ProductVariant(
+        name: 'Single',
+        buyPrice: 4.00,
+        sellPrice: 6.00,
+        stock: 150,
+      ),
+    ],
+  ),
+  const Product(
+    name: 'Red Velvet Cupcake',
+    imageUrl: 'https://placehold.co/400x400/9B1C31/FFFFFF/png?text=Cupcake',
+    variants: [
+      ProductVariant(
+        name: 'Single',
+        buyPrice: 5.00,
+        sellPrice: 7.00,
+        stock: 85,
+      ),
+      ProductVariant(
+        name: 'Box of 4',
+        buyPrice: 18.00,
+        sellPrice: 25.00,
+        stock: 20,
+      ),
+    ],
+  ),
 ];
 
 // --- WIDGETS ---
@@ -291,7 +350,10 @@ class _ProductCard extends StatelessWidget {
 
   Widget _buildSoldOutOverlay() {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(15),
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(15),
+        topRight: Radius.circular(15),
+      ),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
         child: Container(

@@ -77,7 +77,7 @@ class ProductDetailsScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: ClipRRect(
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
@@ -97,7 +97,7 @@ class ProductDetailsScreen extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: const Color(0xFFD3E0D4),
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(20),
         ),
@@ -132,12 +132,13 @@ class ProductDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildPriceHeader() {
+    // CHANGE 1: Added a "Stock" header
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Expanded(flex: 2, child: Container()), // Spacer
+        Expanded(flex: 3, child: Container()), // Spacer
         const Expanded(
-          flex: 1,
+          flex: 2,
           child: Text(
             'Buy',
             textAlign: TextAlign.center,
@@ -149,9 +150,21 @@ class ProductDetailsScreen extends StatelessWidget {
           ),
         ),
         const Expanded(
-          flex: 1,
+          flex: 2,
           child: Text(
             'Sell',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black54,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const Expanded(
+          flex: 2,
+          child: Text(
+            'Stock',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
@@ -165,12 +178,13 @@ class ProductDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildVariantRow(ProductVariant variant) {
+    // CHANGE 2: Added the stock quantity display
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
@@ -188,7 +202,7 @@ class ProductDetailsScreen extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: 1,
+            flex: 2,
             child: Text(
               '\$${variant.buyPrice.toStringAsFixed(2)}',
               textAlign: TextAlign.center,
@@ -196,9 +210,17 @@ class ProductDetailsScreen extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: 1,
+            flex: 2,
             child: Text(
               '\$${variant.sellPrice.toStringAsFixed(2)}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              variant.stock.toString(),
               textAlign: TextAlign.center,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
