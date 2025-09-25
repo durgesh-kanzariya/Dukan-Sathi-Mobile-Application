@@ -1,3 +1,4 @@
+import 'package:dukan_sathi/admin/shopkeeper_order_details.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 
@@ -312,7 +313,28 @@ class OrderCard extends StatelessWidget {
             if (order.status == OrderStatus.New)
               _buildNewOrderButtons()
             else
-              _buildPreparingOrderButton(),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ShopkeeperOrderDetailsScreen(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF5A7D60),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: const Text('View Order Details'),
+                ),
+              ),
           ],
         ),
       ),
@@ -352,22 +374,6 @@ class OrderCard extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildPreparingOrderButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF5A7D60),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          padding: const EdgeInsets.symmetric(vertical: 12),
-        ),
-        child: const Text('View Order Details'),
-      ),
     );
   }
 }
