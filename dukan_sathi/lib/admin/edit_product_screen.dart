@@ -42,7 +42,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   // --- LOGIC METHODS ---
 
-  // CHANGE 1: Added the logic to pick an image from the gallery
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -103,6 +102,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     );
   }
 
+  // CHANGE: The header is updated for design consistency.
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 50, left: 10, right: 20, bottom: 20),
@@ -113,24 +113,42 @@ class _EditProductScreenState extends State<EditProductScreen> {
           bottomRight: Radius.circular(30),
         ),
       ),
-      child: Row(
+      // The header is now a Column to accommodate the title and subtitle.
+      child: Column(
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          const Expanded(
-            child: Text(
-              'Edit Product',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
               ),
+              const Expanded(
+                child: Text(
+                  'DUKAN SATHI',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    letterSpacing: 4,
+                    fontFamily: "Abel",
+                  ),
+                ),
+              ),
+              const SizedBox(width: 48), // Balances the IconButton
+            ],
+          ),
+          const SizedBox(height: 8),
+          // The page title is now a styled subtitle.
+          const Text(
+            'Edit product',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w300,
+              fontStyle: FontStyle.normal,
+              letterSpacing: 2,
             ),
           ),
-          const SizedBox(width: 48),
         ],
       ),
     );
@@ -147,8 +165,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
             ),
-            // CHANGE 2: The image displayed is now conditional.
-            // It shows the new image if one is picked, otherwise the original.
             child: _imageFile == null
                 ? Image.network(
                     widget.product.imageUrl,
@@ -169,7 +185,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
               backgroundColor: Colors.black.withOpacity(0.5),
               child: IconButton(
                 icon: const Icon(Icons.edit, color: Colors.white, size: 20),
-                // CHANGE 3: The button now calls the _pickImage method.
                 onPressed: _pickImage,
               ),
             ),
@@ -235,20 +250,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
             isPrimary: true,
           ),
           const SizedBox(height: 24),
-          const Divider(color: Colors.white, thickness: 2),
-          const SizedBox(height: 3),
-          Center(
-            child: const Text(
-              'Variant list',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2E4431),
-              ),
+          const Divider(color: Colors.grey),
+          const SizedBox(height: 16),
+          const Text(
+            'Variant list',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2E4431),
             ),
           ),
-          const SizedBox(height: 3),
-          const Divider(color: Colors.white, thickness: 2),
+          const SizedBox(height: 8),
           _buildVariantListHeader(),
           _buildVariantList(),
           const SizedBox(height: 24),

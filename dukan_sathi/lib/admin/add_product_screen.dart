@@ -1,7 +1,7 @@
-import 'dart:io'; // Required for using the File class
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // 1. Import the package
-import 'products_screen.dart';
+import 'package:image_picker/image_picker.dart';
+import 'products_screen.dart'; // We need the data models
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({Key? key}) : super(key: key);
@@ -11,16 +11,15 @@ class AddProductScreen extends StatefulWidget {
 }
 
 class _AddProductScreenState extends State<AddProductScreen> {
-  // --- STATE VARIABLES ---
+  // --- STATE & CONTROLLERS ---
   final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _variantNameController = TextEditingController();
   final TextEditingController _buyPriceController = TextEditingController();
   final TextEditingController _sellPriceController = TextEditingController();
   final TextEditingController _stockController = TextEditingController();
-  final List<ProductVariant> _variants = [];
 
-  // 2. Add a variable to hold the selected image file
-  File? _selectedImage;
+  final List<ProductVariant> _variants = [];
+  XFile? _imageFile;
 
   @override
   void dispose() {
@@ -34,16 +33,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   // --- LOGIC METHODS ---
 
-  // 3. Create a method to handle picking an image
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    // Open the gallery to pick an image
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
-    if (pickedFile != null) {
-      // If an image is selected, update the state to display it
+    if (image != null) {
       setState(() {
-        _selectedImage = File(pickedFile.path);
+        _imageFile = image;
       });
     }
   }
@@ -59,11 +55,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
         sellPrice: double.tryParse(_sellPriceController.text) ?? 0.0,
         stock: int.tryParse(_stockController.text) ?? 0,
       );
-
       setState(() {
         _variants.add(newVariant);
       });
-
       _variantNameController.clear();
       _buyPriceController.clear();
       _sellPriceController.clear();
@@ -78,7 +72,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     });
   }
 
-  // --- UI BUILDER METHODS ---
+  // --- UI BUILD METHODS ---
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +83,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           _buildHeader(context),
           Expanded(
             child: SingleChildScrollView(
-              child: Column(children: [_buildImagePicker(), _buildAddForm()]),
+              child: Column(children: [_buildProductImage(), _buildAddForm()]),
             ),
           ),
         ],
@@ -107,61 +101,92 @@ class _AddProductScreenState extends State<AddProductScreen> {
           bottomRight: Radius.circular(30),
         ),
       ),
-      child: Row(
+      child: Column(
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          const Expanded(
-            child: Text(
-              'Add New Product',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
               ),
+              const Expanded(
+                child: Text(
+                  'DUKAN SATHI',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    letterSpacing: 4,
+                    fontFamily: "Abel",
+                  ),
+                ),
+              ),
+              const SizedBox(width: 48), // Balances the IconButton
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Add product',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w300,
+              fontStyle: FontStyle.normal,
+              letterSpacing: 2,
             ),
           ),
-          const SizedBox(width: 48),
         ],
       ),
     );
   }
 
-  Widget _buildImagePicker() {
+  // CHANGE: The image picker UI has been redesigned for a better user experience.
+  Widget _buildProductImage() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-      child: GestureDetector(
-        // 4. Call the _pickImage method on tap
-        onTap: _pickImage,
-        child: ClipRRect(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _pickImage,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
-          child: Container(
-            height: 250,
-            width: double.infinity,
-            color: Colors.grey[300],
-            // 5. Conditionally display the selected image or the placeholder
-            child: _selectedImage != null
-                ? Image.file(_selectedImage!, fit: BoxFit.cover)
-                : const Center(
-                    child: Column(
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+            child: Container(
+              height: 250,
+              width: double.infinity,
+              color: _imageFile == null
+                  ? Colors.grey.shade200
+                  : Colors.transparent,
+              child: _imageFile == null
+                  // If no image is selected, show the placeholder UI
+                  ? Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.add_a_photo_outlined,
+                          Icons.add_a_photo_outlined, // A more descriptive icon
                           size: 50,
-                          color: Colors.grey,
+                          color: Colors.grey.shade600,
                         ),
-                        SizedBox(height: 8),
-                        Text('Tap to upload image'),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Upload Image',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black54,
+                          ),
+                        ),
                       ],
-                    ),
-                  ),
+                    )
+                  // If an image has been picked, display it
+                  : Image.file(File(_imageFile!.path), fit: BoxFit.cover),
+            ),
           ),
         ),
       ),
@@ -169,7 +194,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Widget _buildAddForm() {
-    // ... (The rest of the form remains unchanged)
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 40),
       padding: const EdgeInsets.all(24),
@@ -190,7 +214,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           const SizedBox(height: 16),
           _buildTextField(
             controller: _variantNameController,
-            hint: 'Variant Name (e.g., 1 KG)',
+            hint: 'Variant Name',
           ),
           const SizedBox(height: 16),
           Row(
@@ -198,7 +222,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               Expanded(
                 child: _buildTextField(
                   controller: _buyPriceController,
-                  hint: 'Buy Price',
+                  hint: 'Buy price',
                   keyboardType: TextInputType.number,
                 ),
               ),
@@ -206,7 +230,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               Expanded(
                 child: _buildTextField(
                   controller: _sellPriceController,
-                  hint: 'Sell Price',
+                  hint: 'Sell price',
                   keyboardType: TextInputType.number,
                 ),
               ),
@@ -220,25 +244,30 @@ class _AddProductScreenState extends State<AddProductScreen> {
           ),
           const SizedBox(height: 24),
           _buildActionButton(
-            text: 'Add Variant',
+            text: 'Add variant',
             onPressed: _addVariant,
             isPrimary: true,
           ),
           const SizedBox(height: 24),
-          const Divider(color: Colors.grey),
-          const SizedBox(height: 16),
-          const Text(
-            'Variant list',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2E4431),
+          const Divider(color: Colors.white, thickness: 2),
+          const SizedBox(height: 3),
+          Center(
+            child: const Text(
+              'Variant list',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2E4431),
+              ),
             ),
           ),
+          const SizedBox(height: 3),
+          const Divider(color: Colors.white, thickness: 2),
+          _buildVariantListHeader(),
           _buildVariantList(),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           _buildActionButton(
-            text: 'Save Product',
+            text: 'Create Product',
             onPressed: () {
               // TODO: Add logic to save the new product
               Navigator.of(context).pop();
@@ -274,6 +303,37 @@ class _AddProductScreenState extends State<AddProductScreen> {
     );
   }
 
+  Widget _buildVariantListHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Expanded(flex: 3, child: SizedBox()),
+          _buildHeaderCell('Buy'),
+          _buildHeaderCell('Sell'),
+          _buildHeaderCell('Stock'),
+          const SizedBox(width: 40),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderCell(String title) {
+    return Expanded(
+      flex: 2,
+      child: Text(
+        title,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+          color: Colors.grey.shade700,
+        ),
+      ),
+    );
+  }
+
   Widget _buildVariantList() {
     if (_variants.isEmpty) {
       return const Padding(
@@ -289,26 +349,71 @@ class _AddProductScreenState extends State<AddProductScreen> {
       itemBuilder: (context, index) {
         final variant = _variants[index];
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2.0),
+          padding: const EdgeInsets.symmetric(vertical: 6.0),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 flex: 3,
-                child: Text(
-                  variant.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Text(
+                    variant.name,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
                 ),
               ),
               Expanded(
-                flex: 4,
+                flex: 2,
                 child: Text(
-                  'Buy: \$${variant.buyPrice.toStringAsFixed(2)} - Sell: \$${variant.sellPrice.toStringAsFixed(2)}',
+                  '\$${variant.buyPrice.toStringAsFixed(2)}',
                   textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
-                onPressed: () => _removeVariant(index),
+              Expanded(
+                flex: 2,
+                child: Text(
+                  '\$${variant.sellPrice.toStringAsFixed(2)}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Text(
+                  '${variant.stock}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 40,
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                  onPressed: () => _removeVariant(index),
+                ),
               ),
             ],
           ),
