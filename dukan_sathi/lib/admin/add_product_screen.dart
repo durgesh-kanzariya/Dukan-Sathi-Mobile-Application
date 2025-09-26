@@ -1,34 +1,26 @@
 import 'dart:io'; // Required for using the File class
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // Required for image picking
-import 'products_screen.dart'; // We need the data models from here
+import 'package:image_picker/image_picker.dart'; // 1. Import the package
+import 'products_screen.dart';
 
-class EditProductScreen extends StatefulWidget {
-  final Product product;
-
-  const EditProductScreen({Key? key, required this.product}) : super(key: key);
+class AddProductScreen extends StatefulWidget {
+  const AddProductScreen({Key? key}) : super(key: key);
 
   @override
-  _EditProductScreenState createState() => _EditProductScreenState();
+  _AddProductScreenState createState() => _AddProductScreenState();
 }
 
-class _EditProductScreenState extends State<EditProductScreen> {
-  // --- STATE & CONTROLLERS ---
-  late TextEditingController _productNameController;
+class _AddProductScreenState extends State<AddProductScreen> {
+  // --- STATE VARIABLES ---
+  final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _variantNameController = TextEditingController();
   final TextEditingController _buyPriceController = TextEditingController();
   final TextEditingController _sellPriceController = TextEditingController();
   final TextEditingController _stockController = TextEditingController();
+  final List<ProductVariant> _variants = [];
 
-  late List<ProductVariant> _variants;
-  XFile? _imageFile; // State variable to hold the new image file
-
-  @override
-  void initState() {
-    super.initState();
-    _productNameController = TextEditingController(text: widget.product.name);
-    _variants = List<ProductVariant>.from(widget.product.variants);
-  }
+  // 2. Add a variable to hold the selected image file
+  File? _selectedImage;
 
   @override
   void dispose() {
@@ -42,14 +34,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   // --- LOGIC METHODS ---
 
-  // CHANGE 1: Added the logic to pick an image from the gallery
+  // 3. Create a method to handle picking an image
   Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    final picker = ImagePicker();
+    // Open the gallery to pick an image
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    if (image != null) {
+    if (pickedFile != null) {
+      // If an image is selected, update the state to display it
       setState(() {
-        _imageFile = image;
+        _selectedImage = File(pickedFile.path);
       });
     }
   }
@@ -84,7 +78,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     });
   }
 
-  // --- UI BUILD METHODS ---
+  // --- UI BUILDER METHODS ---
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +89,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           _buildHeader(context),
           Expanded(
             child: SingleChildScrollView(
-              child: Column(children: [_buildProductImage(), _buildEditForm()]),
+              child: Column(children: [_buildImagePicker(), _buildAddForm()]),
             ),
           ),
         ],
@@ -121,7 +115,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           ),
           const Expanded(
             child: Text(
-              'Edit Product',
+              'Add New Product',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -136,50 +130,46 @@ class _EditProductScreenState extends State<EditProductScreen> {
     );
   }
 
-  Widget _buildProductImage() {
+  Widget _buildImagePicker() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-      child: Stack(
-        alignment: Alignment.bottomRight,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-            // CHANGE 2: The image displayed is now conditional.
-            // It shows the new image if one is picked, otherwise the original.
-            child: _imageFile == null
-                ? Image.network(
-                    widget.product.imageUrl,
-                    fit: BoxFit.cover,
-                    height: 250,
-                    width: double.infinity,
-                  )
-                : Image.file(
-                    File(_imageFile!.path),
-                    fit: BoxFit.cover,
-                    height: 250,
-                    width: double.infinity,
+      child: GestureDetector(
+        // 4. Call the _pickImage method on tap
+        onTap: _pickImage,
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          child: Container(
+            height: 250,
+            width: double.infinity,
+            color: Colors.grey[300],
+            // 5. Conditionally display the selected image or the placeholder
+            child: _selectedImage != null
+                ? Image.file(_selectedImage!, fit: BoxFit.cover)
+                : const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add_a_photo_outlined,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(height: 8),
+                        Text('Tap to upload image'),
+                      ],
+                    ),
                   ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: CircleAvatar(
-              backgroundColor: Colors.black.withOpacity(0.5),
-              child: IconButton(
-                icon: const Icon(Icons.edit, color: Colors.white, size: 20),
-                // CHANGE 3: The button now calls the _pickImage method.
-                onPressed: _pickImage,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildEditForm() {
+  Widget _buildAddForm() {
+    // ... (The rest of the form remains unchanged)
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 40),
       padding: const EdgeInsets.all(24),
@@ -200,7 +190,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           const SizedBox(height: 16),
           _buildTextField(
             controller: _variantNameController,
-            hint: 'Variant Name',
+            hint: 'Variant Name (e.g., 1 KG)',
           ),
           const SizedBox(height: 16),
           Row(
@@ -208,7 +198,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
               Expanded(
                 child: _buildTextField(
                   controller: _buyPriceController,
-                  hint: 'Buy price',
+                  hint: 'Buy Price',
                   keyboardType: TextInputType.number,
                 ),
               ),
@@ -216,7 +206,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
               Expanded(
                 child: _buildTextField(
                   controller: _sellPriceController,
-                  hint: 'Sell price',
+                  hint: 'Sell Price',
                   keyboardType: TextInputType.number,
                 ),
               ),
@@ -230,32 +220,27 @@ class _EditProductScreenState extends State<EditProductScreen> {
           ),
           const SizedBox(height: 24),
           _buildActionButton(
-            text: 'Add variant',
+            text: 'Add Variant',
             onPressed: _addVariant,
             isPrimary: true,
           ),
           const SizedBox(height: 24),
-          const Divider(color: Colors.white, thickness: 2),
-          const SizedBox(height: 3),
-          Center(
-            child: const Text(
-              'Variant list',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2E4431),
-              ),
+          const Divider(color: Colors.grey),
+          const SizedBox(height: 16),
+          const Text(
+            'Variant list',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2E4431),
             ),
           ),
-          const SizedBox(height: 3),
-          const Divider(color: Colors.white, thickness: 2),
-          _buildVariantListHeader(),
           _buildVariantList(),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           _buildActionButton(
-            text: 'Update details',
+            text: 'Save Product',
             onPressed: () {
-              // TODO: Add logic to save all changes
+              // TODO: Add logic to save the new product
               Navigator.of(context).pop();
             },
             isPrimary: false,
@@ -289,37 +274,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
     );
   }
 
-  Widget _buildVariantListHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Expanded(flex: 3, child: SizedBox()),
-          _buildHeaderCell('Buy'),
-          _buildHeaderCell('Sell'),
-          _buildHeaderCell('Stock'),
-          const SizedBox(width: 40),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeaderCell(String title) {
-    return Expanded(
-      flex: 2,
-      child: Text(
-        title,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
-          color: Colors.grey.shade700,
-        ),
-      ),
-    );
-  }
-
   Widget _buildVariantList() {
     if (_variants.isEmpty) {
       return const Padding(
@@ -335,71 +289,26 @@ class _EditProductScreenState extends State<EditProductScreen> {
       itemBuilder: (context, index) {
         final variant = _variants[index];
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6.0),
+          padding: const EdgeInsets.symmetric(vertical: 2.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 flex: 3,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Text(
-                    variant.name,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
-                    ),
-                  ),
+                child: Text(
+                  variant.name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               Expanded(
-                flex: 2,
+                flex: 4,
                 child: Text(
-                  '\$${variant.buyPrice.toStringAsFixed(2)}',
+                  'Buy: \$${variant.buyPrice.toStringAsFixed(2)} - Sell: \$${variant.sellPrice.toStringAsFixed(2)}',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
                 ),
               ),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  '\$${variant.sellPrice.toStringAsFixed(2)}',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  '${variant.stock}',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 40,
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  onPressed: () => _removeVariant(index),
-                ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                onPressed: () => _removeVariant(index),
               ),
             ],
           ),

@@ -1,26 +1,23 @@
 import 'dart:ui';
+import 'package:dukan_sathi/admin/add_product_screen.dart'; // <-- 1. IMPORT the new screen
 import 'package:flutter/material.dart';
-import 'product_details_screen.dart'; // Import the new details screen
+import 'product_details_screen.dart';
 
 // --- DATA MODELS ---
-// I've expanded these models to include the data needed for the details page.
-
-// Model for a single product variant (e.g., 1 KG, 500 GM)
 class ProductVariant {
   final String name;
   final double buyPrice;
   final double sellPrice;
-  final int stock; // ADDED: Stock quantity for this variant
+  final int stock;
 
   const ProductVariant({
     required this.name,
     required this.buyPrice,
     required this.sellPrice,
-    required this.stock, // ADDED: Required in the constructor
+    required this.stock,
   });
 }
 
-// Model for a complete product
 class Product {
   final String name;
   final String imageUrl;
@@ -34,7 +31,6 @@ class Product {
     required this.variants,
   });
 
-  // Helper to get the lowest price for display on the card
   double get lowestPrice =>
       variants.map((v) => v.sellPrice).reduce((a, b) => a < b ? a : b);
 }
@@ -73,6 +69,7 @@ final List<Product> mockProducts = [
       ProductVariant(name: '1 KG', buyPrice: 30.00, sellPrice: 40.00, stock: 0),
     ],
   ),
+  // ... (rest of the mock data remains the same)
   const Product(
     name: 'Wheat Bread',
     imageUrl: 'https://placehold.co/400x400/AF8F6D/FFFFFF/png?text=Bread',
@@ -126,18 +123,17 @@ class ProductsScreen extends StatelessWidget {
   const ProductsScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    // The main layout remains the same
     return Column(
       children: [
         _buildHeader(),
-        _buildAddProductButton(),
+        _buildAddProductButton(context), // <-- 2. PASS context
         Expanded(child: _buildProductsList()),
       ],
     );
   }
 
-  // Header and Add Button are unchanged...
   Widget _buildHeader() {
+    // ... (header code remains the same)
     return Container(
       padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 20),
       decoration: const BoxDecoration(
@@ -192,13 +188,20 @@ class ProductsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAddProductButton() {
+  Widget _buildAddProductButton(BuildContext context) {
+    // <-- 2. RECEIVE context
     return Padding(
       padding: const EdgeInsets.fromLTRB(20.0, 24.0, 20.0, 16.0),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () {},
+          // <-- 3. UPDATE onPressed
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddProductScreen()),
+            );
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFB3C5B5),
             foregroundColor: const Color(0xFF2E4431),
@@ -218,6 +221,7 @@ class ProductsScreen extends StatelessWidget {
   }
 
   Widget _buildProductsList() {
+    // ... (product list code remains the same)
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 85),
       decoration: BoxDecoration(
@@ -262,7 +266,6 @@ class ProductsScreen extends StatelessWidget {
                 childAspectRatio: 0.8,
               ),
               itemBuilder: (context, index) {
-                // The card now uses the updated Product model
                 return _ProductCard(product: mockProducts[index]);
               },
             ),
@@ -279,10 +282,9 @@ class _ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // CHANGE: The card is wrapped in a GestureDetector to handle taps.
+    // ... (product card code remains the same)
     return GestureDetector(
       onTap: () {
-        // This is the navigation logic.
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -330,7 +332,6 @@ class _ProductCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    // Displaying the lowest price on the card.
                     Text(
                       '\$${product.lowestPrice.toStringAsFixed(2)}',
                       style: const TextStyle(
@@ -349,8 +350,9 @@ class _ProductCard extends StatelessWidget {
   }
 
   Widget _buildSoldOutOverlay() {
+    // ... (sold out overlay code remains the same)
     return ClipRRect(
-      borderRadius: BorderRadius.only(
+      borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(15),
         topRight: Radius.circular(15),
       ),
