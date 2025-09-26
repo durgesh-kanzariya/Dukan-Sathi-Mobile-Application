@@ -83,7 +83,56 @@ class _EditProductScreenState extends State<EditProductScreen> {
     });
   }
 
-  // --- UI BUILD METHODS ---
+  // CHANGE 1: Added a new method to handle validation and submission.
+  void _validateAndSubmit() {
+    final List<String> errors = [];
+
+    // Check for common errors
+    if (_productNameController.text.isEmpty) {
+      errors.add('- Product name cannot be empty.');
+    }
+    // Note: We don't check for an image here since one already exists.
+    if (_variants.isEmpty) {
+      errors.add('- A product must have at least one variant.');
+    }
+
+    // If there are errors, show a dialog
+    if (errors.isNotEmpty) {
+      _showErrorDialog(errors);
+    } else {
+      // If everything is valid, proceed to save (and then navigate back)
+      // TODO: Add actual logic to save the updated product data
+      Navigator.of(context).pop();
+    }
+  }
+
+  // CHANGE 2: Created a helper widget to show the validation errors.
+  void _showErrorDialog(List<String> errors) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'Incomplete Information',
+          style: TextStyle(fontSize: 25),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: errors
+              .map((error) => Text(error, style: TextStyle(fontSize: 16)))
+              .toList(),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- UI BUILD METHODS (Mostly unchanged) ---
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +151,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
     );
   }
 
-  // CHANGE: The header is updated for design consistency.
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 50, left: 10, right: 20, bottom: 20),
@@ -113,7 +161,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
           bottomRight: Radius.circular(30),
         ),
       ),
-      // The header is now a Column to accommodate the title and subtitle.
       child: Column(
         children: [
           Row(
@@ -134,11 +181,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ),
                 ),
               ),
-              const SizedBox(width: 48), // Balances the IconButton
+              const SizedBox(width: 48),
             ],
           ),
           const SizedBox(height: 8),
-          // The page title is now a styled subtitle.
           const Text(
             'Edit product',
             style: TextStyle(
@@ -264,12 +310,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
           _buildVariantListHeader(),
           _buildVariantList(),
           const SizedBox(height: 24),
+          // CHANGE 3: The "Update details" button now calls the validation method.
           _buildActionButton(
             text: 'Update details',
-            onPressed: () {
-              // TODO: Add logic to save all changes
-              Navigator.of(context).pop();
-            },
+            onPressed: _validateAndSubmit,
             isPrimary: false,
           ),
         ],

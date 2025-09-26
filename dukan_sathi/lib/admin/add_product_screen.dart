@@ -72,7 +72,58 @@ class _AddProductScreenState extends State<AddProductScreen> {
     });
   }
 
-  // --- UI BUILD METHODS ---
+  // CHANGE 1: Added a new method to handle validation and submission.
+  void _validateAndSubmit() {
+    final List<String> errors = [];
+
+    // Check for common errors
+    if (_productNameController.text.isEmpty) {
+      errors.add('- Product name cannot be empty.');
+    }
+    if (_imageFile == null) {
+      errors.add('- Please select a product image.');
+    }
+    if (_variants.isEmpty) {
+      errors.add('- Please add at least one variant.');
+    }
+
+    // If there are errors, show a dialog
+    if (errors.isNotEmpty) {
+      _showErrorDialog(errors);
+    } else {
+      // If everything is valid, proceed to save (and then navigate back)
+      // TODO: Add actual logic to save the new product data
+      Navigator.of(context).pop();
+    }
+  }
+
+  // CHANGE 2: Created a helper widget to show the validation errors.
+  void _showErrorDialog(List<String> errors) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'Incomplete Information',
+          style: TextStyle(fontSize: 25),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: errors
+              .map((error) => Text(error, style: TextStyle(fontSize: 16)))
+              .toList(),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- UI BUILD METHODS (Mostly unchanged) ---
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +191,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
     );
   }
 
-  // CHANGE: The image picker UI has been redesigned for a better user experience.
   Widget _buildProductImage() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -164,12 +214,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   ? Colors.grey.shade200
                   : Colors.transparent,
               child: _imageFile == null
-                  // If no image is selected, show the placeholder UI
                   ? Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.add_a_photo_outlined, // A more descriptive icon
+                          Icons.add_a_photo_outlined,
                           size: 50,
                           color: Colors.grey.shade600,
                         ),
@@ -184,7 +233,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         ),
                       ],
                     )
-                  // If an image has been picked, display it
                   : Image.file(File(_imageFile!.path), fit: BoxFit.cover),
             ),
           ),
@@ -251,8 +299,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
           const SizedBox(height: 24),
           const Divider(color: Colors.white, thickness: 2),
           const SizedBox(height: 3),
-          Center(
-            child: const Text(
+          const Center(
+            child: Text(
               'Variant list',
               style: TextStyle(
                 fontSize: 20,
@@ -266,12 +314,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
           _buildVariantListHeader(),
           _buildVariantList(),
           const SizedBox(height: 24),
+          // CHANGE 3: The "Create Product" button now calls the validation method.
           _buildActionButton(
             text: 'Create Product',
-            onPressed: () {
-              // TODO: Add logic to save the new product
-              Navigator.of(context).pop();
-            },
+            onPressed: _validateAndSubmit,
             isPrimary: false,
           ),
         ],
