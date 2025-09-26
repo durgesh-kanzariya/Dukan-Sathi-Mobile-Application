@@ -1,79 +1,138 @@
+import 'package:dukan_sathi/admin/new_order_details_screen.dart';
 import 'package:dukan_sathi/admin/shopkeeper_order_details.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'monthly_sells_screen.dart';
 
-// Data models (can be moved to their own file later)
+// --- DATA MODELS ---
+// CHANGE 1: The data models are now more detailed and will be used across screens.
 enum OrderStatus { New, Preparing }
 
-class Order {
-  final String customerName;
-  final String timeAgo;
-  final int itemCount;
-  final double totalPrice;
-  final OrderStatus status;
+class OrderItem {
+  final String imageUrl;
+  final String name;
+  final String variant;
+  final double price;
+  final int quantity;
 
-  const Order({
-    // Added const to the constructor
-    required this.customerName,
-    required this.timeAgo,
-    required this.itemCount,
-    required this.totalPrice,
-    required this.status,
+  const OrderItem({
+    required this.imageUrl,
+    required this.name,
+    required this.variant,
+    required this.price,
+    required this.quantity,
   });
 }
 
-// --- MOCK DATA MOVED OUTSIDE THE CLASS TO FIX THE ERROR ---
+class Order {
+  final String orderId;
+  final String customerName;
+  final String timeAgo;
+  final OrderStatus status;
+  final String date;
+  final String address;
+  final List<OrderItem> items;
+
+  const Order({
+    required this.orderId,
+    required this.customerName,
+    required this.timeAgo,
+    required this.status,
+    required this.date,
+    required this.address,
+    required this.items,
+  });
+
+  // Helper properties
+  double get totalPrice =>
+      items.fold(0, (sum, item) => sum + (item.price * item.quantity));
+  int get itemCount => items.length;
+}
+
+// --- MOCK DATA ---
+// CHANGE 2: The mock data is now more realistic, with unique details for each order.
 final List<Order> newOrders = const [
   Order(
+    orderId: '9876543210',
     customerName: 'Parvez B.',
     timeAgo: '3 mins ago',
-    itemCount: 5,
-    totalPrice: 75.00,
     status: OrderStatus.New,
+    date: '26/09/2025',
+    address: '123 Crystal Mall, Rajkot',
+    items: [
+      OrderItem(
+        imageUrl: 'https://placehold.co/100x100/AF8F6D/FFFFFF/png?text=Bread',
+        name: 'Wheat Bread',
+        variant: 'Loaf',
+        price: 10.00,
+        quantity: 2,
+      ),
+      OrderItem(
+        imageUrl:
+            'https://placehold.co/100x100/D2B48C/FFFFFF/png?text=Croissant',
+        name: 'Croissant',
+        variant: 'Single',
+        price: 6.00,
+        quantity: 3,
+      ),
+    ],
   ),
   Order(
+    orderId: '5432109876',
     customerName: 'Sarah M.',
     timeAgo: '7 mins ago',
-    itemCount: 3,
-    totalPrice: 45.50,
     status: OrderStatus.New,
-  ),
-  Order(
-    customerName: 'Jenil M.',
-    timeAgo: '7 mins ago',
-    itemCount: 3,
-    totalPrice: 45.50,
-    status: OrderStatus.New,
+    date: '26/09/2025',
+    address: '456 Kalawad Road, Rajkot',
+    items: [
+      OrderItem(
+        imageUrl: 'https://placehold.co/100x100/9B1C31/FFFFFF/png?text=Cupcake',
+        name: 'Red Velvet Cupcake',
+        variant: 'Box of 4',
+        price: 25.00,
+        quantity: 1,
+      ),
+    ],
   ),
 ];
 
 final List<Order> preparingOrders = const [
   Order(
+    orderId: '812463187642',
     customerName: 'John D.',
     timeAgo: '12 mins ago',
-    itemCount: 8,
-    totalPrice: 120.25,
     status: OrderStatus.Preparing,
+    date: '26/09/2025',
+    address: '789 University Road, Rajkot',
+    items: [
+      OrderItem(
+        imageUrl: 'https://placehold.co/100x100/5A3825/FFFFFF/png?text=Cake',
+        name: 'Chocolate Cake',
+        variant: '1.5 KG',
+        price: 75.00,
+        quantity: 1,
+      ),
+      OrderItem(
+        imageUrl: 'https://placehold.co/100x100/6F4E37/FFFFFF/png?text=Pastry',
+        name: 'Chocolate Pastry',
+        variant: 'Single',
+        price: 3.00,
+        quantity: 5,
+      ),
+    ],
   ),
 ];
-// --- END MOCK DATA ---
+// --- END MOCK DATA & MODELS ---
 
-// THIS WIDGET IS NOW JUST THE CONTENT FOR THE DASHBOARD
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // CHANGE 1: The layout is now a Column to create a fixed header area.
-    // The SingleChildScrollView has been removed from the top level.
     return Column(
       children: [
         _buildHeader(),
         _buildPerformanceCard(context),
-        // CHANGE 2: The order tabs are wrapped in an Expanded widget.
-        // This makes the tab section fill the remaining vertical space,
-        // and its content (the list) will be scrollable.
         Expanded(child: _buildOrderTabs(context)),
       ],
     );
@@ -241,8 +300,6 @@ class AdminDashboardScreen extends StatelessWidget {
                 Tab(text: 'Preparing'),
               ],
             ),
-            // CHANGE 3: The TabBarView is wrapped in Expanded so it knows
-            // to fill the available space provided by its parent.
             Expanded(
               child: TabBarView(
                 children: [
@@ -267,9 +324,7 @@ class AdminDashboardScreen extends StatelessWidget {
       );
     }
     return ListView.builder(
-      // CHANGE 4: Padding is added to the bottom of the list to ensure
-      // the last item can be scrolled above the navigation bar.
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 95),
       itemCount: orders.length,
       itemBuilder: (context, index) {
         return OrderCard(order: orders[index]);
@@ -293,30 +348,56 @@ class OrderCard extends StatelessWidget {
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  order.customerName,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+            GestureDetector(
+              onTap: () {
+                // CHANGE 3: The navigation logic now passes the specific 'order' object.
+                if (order.status == OrderStatus.New) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NewOrderDetailsScreen(order: order),
+                    ),
+                  );
+                }
+              },
+              child: Container(
+                color: Colors.transparent,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          order.customerName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        Text(
+                          order.timeAgo,
+                          style: const TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Text(
+                          '${order.itemCount} items - \$${order.totalPrice.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            color: Colors.black54,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                Text(
-                  order.timeAgo,
-                  style: const TextStyle(color: Colors.black54, fontSize: 14),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Text(
-                  '${order.itemCount} items - \$${order.totalPrice.toStringAsFixed(2)}',
-                  style: const TextStyle(color: Colors.black54, fontSize: 16),
-                ),
-              ],
+              ),
             ),
             const SizedBox(height: 16),
             if (order.status == OrderStatus.New)
@@ -326,10 +407,12 @@ class OrderCard extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
+                    // CHANGE 4: The navigation logic now passes the specific 'order' object.
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ShopkeeperOrderDetailsScreen(),
+                        builder: (context) =>
+                            ShopkeeperOrderDetailsScreen(order: order),
                       ),
                     );
                   },
@@ -355,7 +438,9 @@ class OrderCard extends StatelessWidget {
       children: [
         Expanded(
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              // TODO: Add logic to decline the order
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.grey.shade200,
               foregroundColor: Colors.black87,
@@ -370,7 +455,9 @@ class OrderCard extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              // TODO: Add logic to accept the order
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF5A7D60),
               foregroundColor: Colors.white,
