@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'profile_screen.dart'; // Import the new profile screen
 
 class ShopDetailsScreen extends StatefulWidget {
   const ShopDetailsScreen({Key? key}) : super(key: key);
@@ -208,6 +209,7 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
     );
   }
 
+  // CHANGE: The header's profile icon is now a tappable CircleAvatar.
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 20),
@@ -232,17 +234,21 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
                   fontFamily: "Abel",
                 ),
               ),
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.person,
-                  color: Color(0xFF5A7D60),
-                  size: 28,
+              // This GestureDetector makes the avatar tappable.
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfileScreen(),
+                    ),
+                  );
+                },
+                child: const CircleAvatar(
+                  radius: 22,
+                  backgroundColor: Colors.white,
+                  // You can replace this with a NetworkImage once you have user data
+                  child: Icon(Icons.person, color: Color(0xFF5A7D60), size: 28),
                 ),
               ),
             ],
@@ -334,7 +340,6 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
     );
   }
 
-  // CHANGE: The internal structure of this widget has been adjusted to control its height.
   Widget _buildPhoneNumberField() {
     return Container(
       decoration: BoxDecoration(
@@ -392,7 +397,6 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
     );
   }
 
-  // CHANGE: The internal structure of this widget has been adjusted to control its height.
   Widget _buildTimeField(
     TextEditingController controller,
     String label,
