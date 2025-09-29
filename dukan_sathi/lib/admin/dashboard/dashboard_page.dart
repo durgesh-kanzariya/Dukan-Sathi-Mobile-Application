@@ -1,8 +1,8 @@
-import 'package:dukan_sathi/admin/new_order_details_screen.dart';
-import 'package:dukan_sathi/admin/shopkeeper_order_details.dart';
+import 'package:dukan_sathi/admin/order/new_order_details_screen.dart';
+import 'package:dukan_sathi/admin/order/shopkeeper_order_details.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
-import 'monthly_sells_screen.dart';
+import '../sells/monthly_sells_screen.dart';
 
 // --- DATA MODELS ---
 // CHANGE 1: The data models are now more detailed and will be used across screens.

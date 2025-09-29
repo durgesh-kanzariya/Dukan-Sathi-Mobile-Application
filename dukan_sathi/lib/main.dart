@@ -1,4 +1,4 @@
-import 'package:dukan_sathi/admin/shopkeeper_main_screen.dart';
+import 'package:dukan_sathi/admin/dashboard/shopkeeper_main_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {

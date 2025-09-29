@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'dashboard_page.dart'; // CHANGE 1: Import dashboard to get the Order model.
+import '../dashboard/dashboard_page.dart'; // CHANGE 1: Import dashboard to get the Order model.
 
 // CHANGE 2: The local data models have been removed from this file.
 
-class NewOrderDetailsScreen extends StatelessWidget {
+class ShopkeeperOrderDetailsScreen extends StatelessWidget {
   // CHANGE 3: The screen now requires an 'Order' object to be passed to it.
   final Order order;
 
   // CHANGE 4: The hardcoded mockOrder has been removed.
-  const NewOrderDetailsScreen({Key? key, required this.order})
+  const ShopkeeperOrderDetailsScreen({Key? key, required this.order})
     : super(key: key);
 
   @override
@@ -22,7 +22,7 @@ class NewOrderDetailsScreen extends StatelessWidget {
             _buildOrderSummary(),
             _buildItemList(),
             _buildTotalPrice(),
-            _buildActionButtons(), // This now builds the Accept/Decline buttons
+            _buildActionButtons(),
             const SizedBox(height: 20),
           ],
         ),
@@ -66,7 +66,7 @@ class NewOrderDetailsScreen extends StatelessWidget {
             ],
           ),
           const Text(
-            'New Order details', // Updated title
+            'Order details',
             style: TextStyle(
               color: Colors.white,
               fontSize: 22,
@@ -80,13 +80,18 @@ class NewOrderDetailsScreen extends StatelessWidget {
     );
   }
 
-  // CHANGE 5: All widgets below now use 'order' from the widget constructor.
+  // CHANGE 5: All widgets below now use 'order' from the widget constructor
+  // instead of the old 'mockOrder'.
   Widget _buildOrderSummary() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(30, 16, 20, 0),
       child: Column(
         children: [
           _buildSummaryRow('Order id:', order.orderId),
+          _buildSummaryRow(
+            'Order status:',
+            order.status == OrderStatus.Preparing ? 'Preparing' : 'New',
+          ), // Handle enum
           _buildSummaryRow('Customer name:', order.customerName),
           _buildSummaryRow('Date:', order.date),
           _buildSummaryRow('Address:', order.address, isAddress: true),
@@ -240,10 +245,10 @@ class NewOrderDetailsScreen extends StatelessWidget {
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                // TODO: Add logic to decline the order
+                // TODO: Add logic to cancel the order
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade200,
+                backgroundColor: Colors.grey.shade300,
                 foregroundColor: Colors.black87,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -254,14 +259,14 @@ class NewOrderDetailsScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              child: const Text('Decline'),
+              child: const Text('Cancel Order'),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                // TODO: Add logic to accept the order
+                // TODO: Add logic to set order as ready
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF5A7D60),
@@ -275,7 +280,7 @@ class NewOrderDetailsScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              child: const Text('Accept Order'),
+              child: const Text('Ready for pickup'),
             ),
           ),
         ],

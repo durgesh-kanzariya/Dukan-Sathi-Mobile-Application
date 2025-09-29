@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dashboard_page.dart';
-import '../widgets/bottom_navbar.dart';
-import 'products_screen.dart';
-import 'history_screen.dart';
-import 'shop_details_screen.dart'; // CHANGE 1: Import the new shop details screen
-import 'pickup_code_screen.dart';
+import '../../widgets/bottom_navbar.dart';
+import '../product/products_screen.dart';
+import '../order/history_screen.dart';
+import '../misc/shop_details_screen.dart'; // CHANGE 1: Import the new shop details screen
+import '../misc/pickup_code_screen.dart';
 
 class ShopkeeperMainScreen extends StatefulWidget {
   const ShopkeeperMainScreen({Key? key}) : super(key: key);

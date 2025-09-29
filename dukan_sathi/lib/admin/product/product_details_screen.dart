@@ -1,4 +1,4 @@
-import 'package:dukan_sathi/admin/edit_product_screen.dart';
+import 'package:dukan_sathi/admin/product/edit_product_screen.dart';
 import 'package:flutter/material.dart';
 import 'products_screen.dart'; // We need the Product model from here
 

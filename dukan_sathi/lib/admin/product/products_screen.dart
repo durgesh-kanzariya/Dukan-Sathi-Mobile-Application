@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:dukan_sathi/admin/add_product_screen.dart'; // <-- 1. IMPORT the new screen
+import 'package:dukan_sathi/admin/product/add_product_screen.dart'; // <-- 1. IMPORT the new screen
 import 'package:flutter/material.dart';
 import 'product_details_screen.dart';
 
