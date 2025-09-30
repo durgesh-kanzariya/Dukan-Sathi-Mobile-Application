@@ -24,7 +24,7 @@ class _BottomNavState extends State<BottomNav> {
       clipBehavior: Clip.none,
       children: [
         Container(
-          height: 80,
+          height: 70,
           decoration: const BoxDecoration(color: Color(0xFF567751)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,

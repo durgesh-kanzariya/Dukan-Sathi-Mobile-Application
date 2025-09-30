@@ -15,6 +15,7 @@ void main() {
 
 
 
+
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
@@ -25,7 +26,7 @@ class MainApp extends StatelessWidget {
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false, //this is portion to remove a banner
         home: Home(),
-        // home : MonthlySpendingLage(),
+        // home : MonthlySpendingPage(),
         // home : Login(),
         // home : DiscoverShop(),
       ),
