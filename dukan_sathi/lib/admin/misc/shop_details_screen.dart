@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:dukan_sathi/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'profile_screen.dart'; // Import the new profile screen
@@ -137,7 +138,7 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildHeader(context),
+        const CustomAppBar(title: 'Shop Details'),
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),

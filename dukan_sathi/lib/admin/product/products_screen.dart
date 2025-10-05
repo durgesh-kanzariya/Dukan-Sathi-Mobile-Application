@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:dukan_sathi/admin/product/add_product_screen.dart'; // <-- 1. IMPORT the new screen
+import 'package:dukan_sathi/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'product_details_screen.dart';
 
@@ -125,7 +126,7 @@ class ProductsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildHeader(),
+        const CustomAppBar(title: 'Product details'),
         _buildAddProductButton(context), // <-- 2. PASS context
         Expanded(child: _buildProductsList()),
       ],

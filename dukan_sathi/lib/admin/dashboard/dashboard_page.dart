@@ -1,11 +1,12 @@
+import 'package:dukan_sathi/admin/misc/profile_screen.dart';
 import 'package:dukan_sathi/admin/order/new_order_details_screen.dart';
 import 'package:dukan_sathi/admin/order/shopkeeper_order_details.dart';
+import 'package:dukan_sathi/admin/misc/profile_screen.dart'; // 1. Import the Profile Screen
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import '../sells/monthly_sells_screen.dart';
 
 // --- DATA MODELS ---
-// CHANGE 1: The data models are now more detailed and will be used across screens.
 enum OrderStatus { New, Preparing }
 
 class OrderItem {
@@ -50,7 +51,6 @@ class Order {
 }
 
 // --- MOCK DATA ---
-// CHANGE 2: The mock data is now more realistic, with unique details for each order.
 final List<Order> newOrders = const [
   Order(
     orderId: '9876543210',
@@ -131,14 +131,15 @@ class AdminDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildHeader(),
+        _buildHeader(context), // Pass context to the header
         _buildPerformanceCard(context),
         Expanded(child: _buildOrderTabs(context)),
       ],
     );
   }
 
-  Widget _buildHeader() {
+  // 2. The header now accepts a BuildContext to handle navigation.
+  Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 100),
       decoration: const BoxDecoration(
@@ -160,14 +161,19 @@ class AdminDashboardScreen extends StatelessWidget {
               fontFamily: "Abel",
             ),
           ),
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
-              shape: BoxShape.circle,
+          // 3. The icon is now a tappable CircleAvatar that navigates to the ProfileScreen.
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+            child: const CircleAvatar(
+              radius: 22,
+              backgroundColor: Colors.white,
+              child: Icon(Icons.person, color: Color(0xFF5A7D60), size: 28),
             ),
-            child: const Icon(Icons.person, color: Color(0xFF5A7D60), size: 28),
           ),
         ],
       ),
@@ -350,7 +356,6 @@ class OrderCard extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () {
-                // CHANGE 3: The navigation logic now passes the specific 'order' object.
                 if (order.status == OrderStatus.New) {
                   Navigator.push(
                     context,
@@ -407,7 +412,6 @@ class OrderCard extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // CHANGE 4: The navigation logic now passes the specific 'order' object.
                     Navigator.push(
                       context,
                       MaterialPageRoute(

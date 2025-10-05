@@ -1,3 +1,4 @@
+import 'package:dukan_sathi/admin/dashboard/shopkeeper_main_screen.dart';
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 
@@ -35,7 +36,7 @@ with us.""",
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const LoginPage()),
+                    MaterialPageRoute(builder: (_) => const ShopkeeperMainScreen()),
                   );
                 },
 
