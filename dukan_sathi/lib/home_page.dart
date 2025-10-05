@@ -25,7 +25,7 @@ class _HomeState extends State<Home> {
               crossAxisAlignment: CrossAxisAlignment.center,
               spacing: 20,
               children: [
-                Image.asset("assets/imgs/one.jpg"),
+                Image.asset("assets/imgs/one.png"),
                 Padding(
                   padding: EdgeInsetsGeometry.fromLTRB(100, 0, 60, 0),
                   child: Text(
@@ -66,7 +66,7 @@ class _HomeState extends State<Home> {
                   ),
                 ),
 
-                SizedBox(height: 20,),
+                SizedBox(height: 20),
 
                 // Text("Hello Kishan"),
               ],

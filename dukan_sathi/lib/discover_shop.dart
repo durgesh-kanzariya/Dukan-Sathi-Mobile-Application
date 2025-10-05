@@ -83,11 +83,41 @@ class _DiscoverShopState extends State<DiscoverShop> {
             ],
           ),
 
-          const SizedBox(height: 5), // adjust for overlap
-          // List of shops
+          const SizedBox(height: 10),
+  
+          Positioned(
+                top: 180,
+                left: 90,
+                child: Center(
+                  child: Text(
+                    "Your favorite shops",
+                    style: TextStyle(color: Colors.black, fontSize: 20),
+                  ),
+                ),
+              ),
+
+                Positioned(
+      top: 240, // just below the text
+      left: 80,
+      right: 80,
+      child: Padding(
+        padding:EdgeInsetsGeometry.fromLTRB(30, 1, 30, 0),
+        child: Divider(
+          color: Colors.black.withOpacity(0.5),
+          thickness:2,
+          
+        ),
+      ),
+    ),
+
+
+
+
+
+
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: EdgeInsets.all(20.0),
               child: Container(
                 decoration: BoxDecoration(),
                 child: ListView.builder(
@@ -97,24 +127,24 @@ class _DiscoverShopState extends State<DiscoverShop> {
                       onTap: () {
                         Get.to(ShopProductpage());
                       },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFF567751), // The darker green color
-                              Color(0xFFF9F3E7), // The lighter off-white color
-                            ],
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Color(0xFF567751), Color(0xFFF9F3E7)],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: const ListTile(
-                            leading: Icon(Icons.person_2_rounded),
-                            title: Text('Bakry Shop'),
-                            subtitle: Text('Best Bakry'),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: const ListTile(
+                              leading: Icon(Icons.person_2_rounded),
+                              title: Text('Bakry Shop'),
+                              subtitle: Text('Best Bakry'),
+                            ),
                           ),
                         ),
                       ),
@@ -124,7 +154,7 @@ class _DiscoverShopState extends State<DiscoverShop> {
               ),
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 30),
         ],
       ),
 

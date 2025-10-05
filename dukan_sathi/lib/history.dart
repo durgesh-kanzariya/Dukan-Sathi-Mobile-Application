@@ -71,7 +71,7 @@ class _HistoryState extends State<History> {
 
           //this is body part
           Container(
-            height: 400,
+            height: 470,
             width: 320,
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -91,108 +91,90 @@ class _HistoryState extends State<History> {
               ],
             ),
 
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: InkWell(
-                    onTap: () {
-                      Get.to(OrderDetails());
-                    },
-                    child: Container(
-                      width: 300,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.6), // start color
-                            Colors.white.withOpacity(0.6),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("Order Id  : 812463187642"),
-                          ),
-
-                          Divider(
-                            color: Colors.white, // line ka color
-                            thickness: 2, // line ki motai
-                            indent: 20, // left side se gap
-                            endIndent: 20, // right side se gap
-                          ),
-                          SizedBox(height: 10),
-                          Padding(
-                            padding: EdgeInsetsGeometry.fromLTRB(8, 0, 1, 0),
-                            child: Text("Shop Name  : Best Bakery"),
-                          ),
-                          Padding(
-                            padding: EdgeInsetsGeometry.fromLTRB(8, 0, 1, 0),
-                            child: Text("Order Satatus : Ready For Pickup"),
-                          ),
-                          Padding(
-                            padding: EdgeInsetsGeometry.fromLTRB(8, 0, 1, 0),
-                            child: Text("Total Prize : 100"),
-                          ),
-                          Padding(
-                            padding: EdgeInsetsGeometry.fromLTRB(8, 0, 1, 0),
-                            child: Text("Date : 19/09/2025"),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                Container(
-                  width: 300,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white.withOpacity(0.6), // start color
-                        Colors.white.withOpacity(0.6),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
+            child: Expanded(
+              child: ListView.builder(
+                  itemCount: 5,
+                itemBuilder: (context, index) {
+                  return Column(
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text("Order Id  : 812463187642"),
-                      ),
-                      Divider(
-                        color: Colors.white, // line ka color
-                        thickness: 2, // line ki motai
-                        indent: 20, // left side se gap
-                        endIndent: 20, // right side se gap
-                      ),
-                      SizedBox(height: 10),
-
-                      Padding(
-                        padding: EdgeInsetsGeometry.fromLTRB(8, 0, 1, 0),
-                        child: Text("Shop Name  : Best Bakery"),
-                      ),
-                      Padding(
-                        padding: EdgeInsetsGeometry.fromLTRB(8, 0, 1, 0),
-                        child: Text("Order Satatus : Ready For Pickup"),
-                      ),
-                      Padding(
-                        padding: EdgeInsetsGeometry.fromLTRB(8, 0, 1, 0),
-                        child: Text("Total Prize : 100"),
-                      ),
-                      Padding(
-                        padding: EdgeInsetsGeometry.fromLTRB(8, 0, 1, 0),
-                        child: Text("Date : 19/09/2025"),
+                        child: InkWell(
+                          onTap: () {
+                            Get.to(OrderDetails());
+                          },
+                          child: Container(
+                            width: 300,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.white.withOpacity(0.6), // start color
+                                  Colors.white.withOpacity(0.6),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text("Order Id  : 812463187642"),
+                                ),
+              
+                                Divider(
+                                  color: Colors.white, // line ka color
+                                  thickness: 2, // line ki motai
+                                  indent: 20, // left side se gap
+                                  endIndent: 20, // right side se gap
+                                ),
+                                SizedBox(height: 10),
+                                Padding(
+                                  padding: EdgeInsetsGeometry.fromLTRB(
+                                    8,
+                                    0,
+                                    1,
+                                    0,
+                                  ),
+                                  child: Text("Shop Name  : Best Bakery"),
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsGeometry.fromLTRB(
+                                    8,
+                                    0,
+                                    1,
+                                    0,
+                                  ),
+                                  child: Text("Order Satatus : Ready For Pickup"),
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsGeometry.fromLTRB(
+                                    8,
+                                    0,
+                                    1,
+                                    0,
+                                  ),
+                                  child: Text("Total Prize : 100"),
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsGeometry.fromLTRB(
+                                    8,
+                                    0,
+                                    1,
+                                    0,
+                                  ),
+                                  child: Text("Date : 19/09/2025"),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ],
-                  ),
-                ),
-              ],
+                  );
+                },
+              
+              ),
             ),
           ),
         ],

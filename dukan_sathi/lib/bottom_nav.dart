@@ -24,7 +24,7 @@ class _BottomNavState extends State<BottomNav> {
       clipBehavior: Clip.none,
       children: [
         Container(
-          height: 70,
+          height:65,
           decoration: const BoxDecoration(color: Color(0xFF567751)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -125,7 +125,7 @@ class _BottomNavState extends State<BottomNav> {
           child: InkWell(
             child: Container(
               height: 100,
-              width: 90,
+              width: 80,
               decoration: BoxDecoration(
                 color: Color(0xFF567751),
                 borderRadius: BorderRadius.only(
@@ -135,7 +135,7 @@ class _BottomNavState extends State<BottomNav> {
               ),
               child: Column(
                 children: [
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   Icon(Icons.add, color: Colors.white, size: 50),
                   SizedBox(height: 10),
                   Text("Cart", style: TextStyle(color: Colors.white)),

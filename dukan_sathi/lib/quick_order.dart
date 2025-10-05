@@ -16,6 +16,7 @@ class QuickOrder extends StatefulWidget {
 }
 
 class _QuickOrderState extends State<QuickOrder> {
+  int i=0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,134 +102,92 @@ class _QuickOrderState extends State<QuickOrder> {
                 children: [
                   SizedBox(height: 5),
 
-                  Padding(
-                    padding: EdgeInsetsGeometry.all(10),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Card(
-                        elevation: 10,
-                        color: Colors.white.withOpacity(0.3),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text("Cookie -  250"),
-
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Card(
-                                        elevation: 5,
-                                        color: const Color.fromARGB(
-                                          255,
-                                          212,
-                                          206,
-                                          206,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            IconButton(
-                                              onPressed: () {},
-                                              icon: Icon(
-                                                Icons.add,
-                                                color: Colors.black,
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: 3,
+                      itemBuilder: (context, index) {
+                      return Column(
+                        children: [
+                          Padding(
+                      padding: EdgeInsetsGeometry.all(8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Card(
+                          elevation: 10,
+                          color: Colors.white.withOpacity(0.9),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Text("Cookie -  250"),
+                    
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Card(
+                                          elevation: 5,
+                                          color: Colors.white,
+                                          child: Row(
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    if(i<10){
+                                                    i++;
+                                                    }
+                                                  });
+                                                },
+                                                icon: Icon(
+                                                  Icons.add_circle_rounded,
+                                                  color: Colors.black,
+                                                ),
                                               ),
-                                            ),
-                                            Text("1"),
-                                            IconButton(
-                                              onPressed: () {},
-                                              icon: Icon(
-                                                Icons.remove,
-                                                color: Colors.black,
+                                              SizedBox(width: 10,),
+                                              SizedBox(
+                                                width: 20,
+                                                child: Text("${i}")),
+                                              IconButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    if(i>0 && i<=10){
+                                                    i--;
+                                                    }
+                                                  });
+                                                },
+                                                icon: Icon(
+                                                  Icons.remove_circle_rounded,
+                                                  color: Colors.black,
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(Icons.delete),
-                                      ),
-                                    ],
+                                        IconButton(
+                                          onPressed: () {},
+                                          icon: Icon(Icons.delete),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-
-                  SizedBox(height: 4),
-
-                  // this is second card
-                  Padding(
-                    padding: EdgeInsetsGeometry.all(10),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Card(
-                        elevation: 10,
-                        color: Colors.white.withOpacity(0.3),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text("Cookie -  250"),
-
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Card(
-                                        elevation: 5,
-                                        color: const Color.fromARGB(
-                                          255,
-                                          212,
-                                          206,
-                                          206,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            IconButton(
-                                              onPressed: () {},
-                                              icon: Icon(
-                                                Icons.add,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                            Text("1"),
-                                            IconButton(
-                                              onPressed: () {},
-                                              icon: Icon(
-                                                Icons.remove,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(Icons.delete),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+                    
+                        ],
+                      );
+                    },
                     ),
                   ),
 
-                  SizedBox(height: 40),
+                
+                  SizedBox(height: 10),
                   ListTile(
                     trailing: ElevatedButton(
                       onPressed: () {
@@ -241,6 +200,7 @@ class _QuickOrderState extends State<QuickOrder> {
                       child: Text("Add All to Cart →"),
                     ),
                   ),
+                  SizedBox(height: 10),
                 ],
               ),
             ),
