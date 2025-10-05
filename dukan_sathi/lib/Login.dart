@@ -83,10 +83,8 @@ class _LoginState extends State<Login> {
                             : null,
                       ),
                     ),
-                    const SizedBox(height: 10),
-
-
-                    //-----------------  this is for the forget password -----------------------
+                    const SizedBox(height: 50),
+                    
                     // Container(
                     //   alignment: Alignment.centerRight,
                     //   child: const Padding(

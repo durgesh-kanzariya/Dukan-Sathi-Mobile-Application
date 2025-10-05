@@ -71,14 +71,26 @@ class _DashboardState extends State<Dashboard> {
                 left: 40,
                 right: 40,
                 child: Container(
+                  height: 190,
                   width: double.infinity,
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.6),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
-                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(
+                          0.15,
+                        ), // Black with 15% opacity (soft look)
+                        blurRadius: 50, // How far the shadow extends and blurs
+                        spreadRadius:
+                            1, // Expands or contracts the size of the box
+                        offset: Offset(
+                          0,
+                          4,
+                        ), // Shifts the shadow (x, y) - 4px down
+                      ),
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,31 +120,40 @@ class _DashboardState extends State<Dashboard> {
               ),
 
               Positioned(
-                top: 100,
-                left: 40,
-                right: 40,
-                child: ListTile(
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      Get.to(MonthlySpendingLage());
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF567751),
-                      foregroundColor: Colors.white,
+                top: 210,
+                left: 225,
+                right: 50,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Get.to(MonthlySpendingLage());
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF567751),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Text(
-                      "More →",
-                      style: TextStyle(color: Colors.white),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 10,
                     ),
+                    elevation: 5,
+                  ),
+                  child: const Row(
+                    children: [
+                      Text("More"),
+                      SizedBox(width: 5),
+                      Icon(Icons.arrow_forward, size: 16),
+                    ],
                   ),
                 ),
               ),
             ],
           ),
 
-          SizedBox(height: 55), // space below stack
+          SizedBox(height: 80), // space below stack
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsetsGeometry.fromLTRB(20, 10, 10, 5),
             child: Text(
               "Order & Status",
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -162,6 +183,13 @@ class _DashboardState extends State<Dashboard> {
                     backgroundColor: Color(0xFF567751),
                   ),
                 ),
+
+                Divider(
+                  color: Colors.black, // Line color
+                  thickness: 1, // Line thickness
+                  indent: 20, // Empty space before line
+                  endIndent: 20,
+                ),
               ],
             ),
           ),
@@ -169,7 +197,7 @@ class _DashboardState extends State<Dashboard> {
             padding: EdgeInsets.all(25.0),
             child: SingleChildScrollView(
               child: Container(
-                height: 260,
+                height: 230,
                 width: 300,
                 // color: Colors.green.withOpacity(0.5),
                 decoration: BoxDecoration(
@@ -187,9 +215,10 @@ class _DashboardState extends State<Dashboard> {
                 ),
                 child: SingleChildScrollView(
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: EdgeInsets.all(15.0),
+                        padding:EdgeInsetsGeometry.symmetric(horizontal: 10,vertical: 5).flipped,
                         child: Text(
                           "QUICK ORDER LIST",
                           style: TextStyle(
@@ -200,7 +229,7 @@ class _DashboardState extends State<Dashboard> {
                           ),
                         ),
                       ),
-                                
+
                       SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,21 +248,6 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                             ),
-                                Center(
-                            child: Card(
-                              child: Padding(
-                                padding: EdgeInsets.all(10.0),
-                                child: Text(
-                                  "Cookie - 250g",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-              
                             Center(
                               child: Card(
                                 child: Padding(
@@ -248,7 +262,7 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                             ),
-                                
+
                             Center(
                               child: Card(
                                 child: Padding(
@@ -266,7 +280,7 @@ class _DashboardState extends State<Dashboard> {
                           ],
                         ),
                       ),
-                                
+
                       ListTile(
                         trailing: ElevatedButton(
                           onPressed: () {
