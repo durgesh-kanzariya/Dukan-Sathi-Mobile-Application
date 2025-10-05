@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:dukan_sathi/admin/misc/profile_screen.dart';
 import 'package:dukan_sathi/admin/order/new_order_details_screen.dart';
 import 'package:dukan_sathi/admin/order/shopkeeper_order_details.dart';
@@ -51,6 +53,56 @@ class Order {
 
 // --- MOCK DATA ---
 final List<Order> newOrders = const [
+  Order(
+    orderId: '9876543210',
+    customerName: 'Parvez B.',
+    timeAgo: '3 mins ago',
+    status: OrderStatus.New,
+    date: '26/09/2025',
+    address: '123 Crystal Mall, Rajkot',
+    items: [
+      OrderItem(
+        imageUrl: 'https://placehold.co/100x100/AF8F6D/FFFFFF/png?text=Bread',
+        name: 'Wheat Bread',
+        variant: 'Loaf',
+        price: 10.00,
+        quantity: 2,
+      ),
+      OrderItem(
+        imageUrl:
+            'https://placehold.co/100x100/D2B48C/FFFFFF/png?text=Croissant',
+        name: 'Croissant',
+        variant: 'Single',
+        price: 6.00,
+        quantity: 3,
+      ),
+    ],
+  ),
+  Order(
+    orderId: '9876543210',
+    customerName: 'Parvez B.',
+    timeAgo: '3 mins ago',
+    status: OrderStatus.New,
+    date: '26/09/2025',
+    address: '123 Crystal Mall, Rajkot',
+    items: [
+      OrderItem(
+        imageUrl: 'https://placehold.co/100x100/AF8F6D/FFFFFF/png?text=Bread',
+        name: 'Wheat Bread',
+        variant: 'Loaf',
+        price: 10.00,
+        quantity: 2,
+      ),
+      OrderItem(
+        imageUrl:
+            'https://placehold.co/100x100/D2B48C/FFFFFF/png?text=Croissant',
+        name: 'Croissant',
+        variant: 'Single',
+        price: 6.00,
+        quantity: 3,
+      ),
+    ],
+  ),
   Order(
     orderId: '9876543210',
     customerName: 'Parvez B.',
@@ -180,107 +232,116 @@ class AdminDashboardScreen extends StatelessWidget {
   }
 
   Widget _buildPerformanceCard(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Transform.translate(
       offset: const Offset(0, -80),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: GlassmorphicContainer(
-          width: double.infinity,
-          height: 241,
-          borderRadius: 40,
-          blur: 15,
-          alignment: Alignment.center,
-          border: 1,
-          linearGradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFFFFFFFF).withOpacity(0.3),
-              const Color(0xFFFFFFFF).withOpacity(0.5),
-            ],
-          ),
-          borderGradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.white.withOpacity(0.3),
-              Colors.white.withOpacity(0.1),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(25, 20, 25, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Hi, Durgesh',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                    fontWeight: FontWeight.w600,
-                  ),
+        // --- REPLACEMENT FOR GlassmorphicContainer ---
+        // This combination of widgets creates the same effect but with a dynamic height.
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(40),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              // The container handles the background gradient and border.
+              // Since no height is specified, it will grow to fit the Column inside.
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [
+                    const Color(0xFFFFFFFF).withOpacity(0.18),
+                    const Color(0xFFFFFFFF).withOpacity(0.8),
+                  ],
                 ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Last Month - \$50,000,000.00',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 17,
-                    letterSpacing: 1,
-                  ),
+                border: Border.all(
+                  width: 1,
+                  color: Colors.white.withOpacity(0.2),
                 ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Current Month Sells',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 17,
-                    letterSpacing: 1,
-                  ),
-                ),
-                const Text(
-                  '\$100,000,000.00',
-                  style: TextStyle(
-                    color: Color(0xFF5A7D60),
-                    fontSize: 36,
-                    fontWeight: FontWeight.w400,
-                    fontFamily: 'Abel',
-                  ),
-                ),
-                const Spacer(),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MonthlySellsScreen(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF4C6A52),
-                      shape: const StadiumBorder(),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(25, 20, 25, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize
+                      .min, // This is key! It tells the Column to be only as tall as its children.
+                  children: [
+                    Text(
+                      'Hi, Durgesh',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: screenWidth * 0.06,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('More', style: TextStyle(color: Colors.white)),
-                        Icon(
-                          Icons.arrow_forward,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ],
+                    const SizedBox(height: 5),
+                    const Text(
+                      'Last Month - \$50,000,000.00',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 17,
+                        letterSpacing: 1,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 5),
+                    const Text(
+                      'Current Month Sells',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 17,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        '\$100,000,000.00',
+                        style: TextStyle(
+                          color: Color(0xFF5A7D60),
+                          fontSize: 36,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'Abel',
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MonthlySellsScreen(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF4C6A52),
+                          shape: const StadiumBorder(),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('More', style: TextStyle(color: Colors.white)),
+                            Icon(
+                              Icons.arrow_forward,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -455,7 +516,7 @@ class OrderCard extends StatelessWidget {
             child: const Text('Decline'),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 10),
         Expanded(
           child: ElevatedButton(
             onPressed: () {

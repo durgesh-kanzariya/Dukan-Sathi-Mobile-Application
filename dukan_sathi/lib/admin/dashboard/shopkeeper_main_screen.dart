@@ -3,7 +3,7 @@ import 'dashboard_page.dart';
 import '../../widgets/bottom_navbar.dart';
 import '../product/products_screen.dart';
 import '../order/history_screen.dart';
-import '../misc/shop_details_screen.dart'; // CHANGE 1: Import the new shop details screen
+import '../misc/shop_details_screen.dart';
 import '../misc/pickup_code_screen.dart';
 
 class ShopkeeperMainScreen extends StatefulWidget {
@@ -16,12 +16,11 @@ class ShopkeeperMainScreen extends StatefulWidget {
 class _ShopkeeperMainScreenState extends State<ShopkeeperMainScreen> {
   int _selectedIndex = 0;
 
-  // CHANGE 2: Replace the placeholder ShopScreen with the new ShopDetailsScreen
   static const List<Widget> _pages = <Widget>[
     AdminDashboardScreen(),
     ProductsScreen(),
     HistoryScreen(),
-    ShopDetailsScreen(), // The new screen is now part of the main navigation
+    ShopDetailsScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -39,20 +38,31 @@ class _ShopkeeperMainScreenState extends State<ShopkeeperMainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // --- 1. CHECK IF KEYBOARD IS VISIBLE ---
+    // We check the 'viewInsets' which tells us about system UI like the keyboard.
+    // If the bottom inset is greater than 0, the keyboard is visible.
+    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+
     return Scaffold(
-      // The body is now wrapped in a Container to ensure the background color is consistent
       body: Container(
         color: const Color(0xFFFDFBF5),
         child: Stack(
           children: [
             IndexedStack(index: _selectedIndex, children: _pages),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: ShopkeeperBottomNav(
-                selectedIndex: _selectedIndex,
-                onItemTapped: _onItemTapped,
+
+            // --- 2. CONDITIONALLY SHOW THE NAVBAR ---
+            // The Visibility widget will hide its child when 'visible' is false.
+            // So, when the keyboard is visible, the navbar will be hidden.
+            Visibility(
+              visible: !isKeyboardVisible,
+              child: Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: ShopkeeperBottomNav(
+                  selectedIndex: _selectedIndex,
+                  onItemTapped: _onItemTapped,
+                ),
               ),
             ),
           ],
