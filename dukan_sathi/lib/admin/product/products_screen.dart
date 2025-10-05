@@ -132,63 +132,7 @@ class ProductsScreen extends StatelessWidget {
       ],
     );
   }
-
-  Widget _buildHeader() {
-    // ... (header code remains the same)
-    return Container(
-      padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 20),
-      decoration: const BoxDecoration(
-        color: Color(0xFF5A7D60),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'DUKAN SATHI',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 30,
-                  letterSpacing: 4,
-                  fontFamily: "Abel",
-                ),
-              ),
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.person,
-                  color: Color(0xFF5A7D60),
-                  size: 28,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Products',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.w300,
-              fontStyle: FontStyle.normal,
-              letterSpacing: 2,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
+  
   Widget _buildAddProductButton(BuildContext context) {
     // <-- 2. RECEIVE context
     return Padding(

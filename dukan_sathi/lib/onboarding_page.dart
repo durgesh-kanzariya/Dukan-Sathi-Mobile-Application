@@ -1,6 +1,5 @@
 import 'package:dukan_sathi/admin/dashboard/shopkeeper_main_screen.dart';
 import 'package:flutter/material.dart';
-import 'login_page.dart';
 
 class OnboardingPage extends StatelessWidget {
   const OnboardingPage({super.key});
