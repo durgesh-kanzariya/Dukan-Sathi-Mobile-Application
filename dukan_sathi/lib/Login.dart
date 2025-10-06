@@ -1,3 +1,4 @@
+import 'package:dukan_sathi/admin/dashboard/shopkeeper_main_screen.dart';
 import 'package:flutter/material.dart';
 import 'dashboard.dart';
 import 'sign_up.dart';
@@ -9,8 +10,6 @@ class Login extends StatefulWidget {
   @override
   State<Login> createState() => _LoginState();
 }
-
-
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
@@ -27,7 +26,6 @@ class _LoginState extends State<Login> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-
             Image.asset(
               "assets/imgs/1.png",
               height: 110,
@@ -38,10 +36,7 @@ class _LoginState extends State<Login> {
             const Text("Hello", style: TextStyle(fontSize: 70)),
             const Text(
               "Sign In To Your Account ",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.normal,
-              ),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
             ),
             const SizedBox(height: 20),
 
@@ -84,24 +79,13 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     const SizedBox(height: 50),
-                    
-                    // Container(
-                    //   alignment: Alignment.centerRight,
-                    //   child: const Padding(
-                    //     padding: EdgeInsets.all(5),
-                    //     child: Text("Forget Password?"),
-                    //   ),
-                    // ),
 
                     Container(
                       alignment: Alignment.centerRight,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          const Text(
-                            "Sign In",
-                            style: TextStyle(fontSize: 20),
-                          ),
+                          const Text("Sign In", style: TextStyle(fontSize: 20)),
                           const SizedBox(width: 10),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
@@ -110,24 +94,31 @@ class _LoginState extends State<Login> {
                             ),
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
+                                // 🟢 START: Logic changed here
                                 if (usernameController.text == "kishan") {
-                                  // Get.offAll(Test());
-                                  Get.offAll(() => Dashboard(
-                                        username: usernameController.text,
-                                        password: passwordController.text,
-                                      ));
+                                  // User side navigation
+                                  Get.offAll(
+                                    () => Dashboard(
+                                      username: usernameController.text,
+                                      password: passwordController.text,
+                                    ),
+                                  );
+                                } else if (usernameController.text ==
+                                    "durgesh") {
+                                  // Admin panel navigation
+                                  Get.offAll(
+                                    () => const ShopkeeperMainScreen(),
+                                  );
                                 } else {
+                                  // Invalid user
                                   setState(() {
                                     msg = "Invalid Username/Password";
-
                                   });
                                 }
+                                // 🟢 END: Logic changed here
                               }
                             },
-                            child: const Icon(
-                              Icons.arrow_forward,
-                              size: 25,
-                            ),
+                            child: const Icon(Icons.arrow_forward, size: 25),
                           ),
                         ],
                       ),
@@ -140,7 +131,7 @@ class _LoginState extends State<Login> {
             const SizedBox(height: 15),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFF9F3E7),
+                backgroundColor: const Color(0xFFF9F3E7),
                 foregroundColor: Colors.black,
                 shadowColor: Colors.transparent,
               ),
@@ -151,18 +142,16 @@ class _LoginState extends State<Login> {
             ),
             Text(msg, style: const TextStyle(color: Colors.red)),
 
-
-           Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-               Image.asset(
-              "assets/imgs/2.jpg",
-              height: 200,
-              // width: double.infinity,
-              fit: BoxFit.cover,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Image.asset(
+                  "assets/imgs/2.jpg",
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+              ],
             ),
-            ],
-           ),
           ],
         ),
       ),
