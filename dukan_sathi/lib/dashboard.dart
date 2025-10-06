@@ -235,7 +235,7 @@ Widget _buildPerformanceCard(BuildContext context) {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Hi, Durgesh',
+                    'Hi, Kishan',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: screenWidth * 0.06,

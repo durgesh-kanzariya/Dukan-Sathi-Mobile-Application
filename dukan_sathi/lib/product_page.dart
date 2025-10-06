@@ -1,12 +1,15 @@
 import 'package:dukan_sathi/discover_shop.dart';
-import 'package:dukan_sathi/shop_productpage.dart';
 import 'package:flutter/material.dart';
-import 'dashboard.dart';
 import 'package:get/get.dart';
-
 import 'bottom_nav.dart';
+
 import 'monthly_spending_lage.dart';
+import 'dashboard.dart';
+import 'shop_productpage.dart';
 import 'product_page.dart';
+import 'history.dart';
+import 'quick_order.dart';
+import 'cart_page.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
@@ -17,14 +20,17 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
   int quantity = 1;
+  final int maxQuantity = 99;
 
   @override
   Widget build(BuildContext context) {
+    final cardWidth = MediaQuery.of(context).size.width - 80; // adaptive width
+
     return Scaffold(
       body: Column(
         children: [
           Stack(
-            clipBehavior: Clip.none, // allow overflow
+            clipBehavior: Clip.none,
             children: [
               Container(
                 height: 150,
@@ -55,22 +61,26 @@ class _ProductPageState extends State<ProductPage> {
                 ),
               ),
 
-              /// Product Card
               Positioned(
                 top: 100,
                 left: 40,
                 right: 40,
                 child: Container(
-                  width: 400,
+                  width: cardWidth,
                   decoration: BoxDecoration(
                     color: Colors.green.shade100,
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: const [
                       BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                        offset: Offset(0, 4),
+                        color: Color(0x33000000),
+                        blurRadius: 12,
+                        spreadRadius: 1,
+                        offset: Offset(0, 6),
+                      ),
+                      BoxShadow(
+                        color: Color(0x1A000000),
+                        blurRadius: 30,
+                        offset: Offset(0, 15),
                       ),
                     ],
                   ),
@@ -78,14 +88,13 @@ class _ProductPageState extends State<ProductPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Image Section
                       ClipRRect(
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(10),
                           topRight: Radius.circular(10),
                         ),
                         child: Image.asset(
-                          "assets/imgs/image1.png", // replace with your image path
+                          "assets/imgs/image1.png",
                           height: 160,
                           fit: BoxFit.cover,
                         ),
@@ -96,7 +105,6 @@ class _ProductPageState extends State<ProductPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Title and Price
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: const [
@@ -119,10 +127,9 @@ class _ProductPageState extends State<ProductPage> {
                             ),
                             const SizedBox(height: 12),
 
-                            /// Sizes Row
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
+                              children: const [
                                 Text("1.5 KG"),
                                 Text("1 KG"),
                                 Text("500 GM"),
@@ -131,10 +138,8 @@ class _ProductPageState extends State<ProductPage> {
 
                             const SizedBox(height: 16),
 
-                            /// Quantity + quick order
                             Row(
                               children: [
-                                // Quantity Controls
                                 Container(
                                   decoration: BoxDecoration(
                                     color: Colors.white,
@@ -149,24 +154,43 @@ class _ProductPageState extends State<ProductPage> {
                                   child: Row(
                                     children: [
                                       IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            if (quantity > 1) quantity--;
-                                          });
-                                        },
-                                        icon: const Icon(Icons.remove),
+                                        onPressed: quantity > 1
+                                            ? () {
+                                                setState(() {
+                                                  quantity--;
+                                                });
+                                              }
+                                            : null,
+                                        icon: Icon(
+                                          Icons.remove_circle_rounded,
+                                          color: quantity > 1
+                                              ? null
+                                              : Colors.grey.shade400,
+                                        ),
                                       ),
-                                      Text(
-                                        "$quantity",
-                                        style: const TextStyle(fontSize: 16),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                        ),
+                                        child: Text(
+                                          "$quantity",
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
                                       ),
                                       IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            quantity++;
-                                          });
-                                        },
-                                        icon: const Icon(Icons.add),
+                                        onPressed: quantity < maxQuantity
+                                            ? () {
+                                                setState(() {
+                                                  quantity++;
+                                                });
+                                              }
+                                            : null,
+                                        icon: Icon(
+                                          Icons.add_circle_rounded,
+                                          color: quantity < maxQuantity
+                                              ? null
+                                              : Colors.grey.shade400,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -176,13 +200,16 @@ class _ProductPageState extends State<ProductPage> {
                                 Expanded(
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color(0xFFACBF92),
+                                      backgroundColor: const Color(0xFFACBF92),
                                       foregroundColor: Colors.black,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                     ),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      // pass to quick order screen if needed
+                                      Get.to(() => QuickOrder());
+                                    },
                                     child: const Text(
                                       "Add to quick order list",
                                     ),
@@ -191,29 +218,59 @@ class _ProductPageState extends State<ProductPage> {
                               ],
                             ),
 
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16),
 
-                            // Add to cart button
-                            SizedBox(
-                              width: double.infinity,
+                           Container(
+                              width: 250,
+                              height: 55,
                               child: ElevatedButton(
+                                onPressed: () {
+                                  Get.to(
+                                    () => CardPage(),
+                                  );
+                                },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFFACBF92),
+                                  backgroundColor: const Color(0xFFACBF92),
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                 ),
-                                onPressed: () {},
-                                child: const Text(
+                                child: Text(
                                   "Add to Cart",
                                   style: TextStyle(fontSize: 16),
                                 ),
                               ),
                             ),
+
+                            // InkWell(
+                            //   onTap: (){
+                            //      Get.to(() => CardPage());
+                            //   },
+                            //   child: SizedBox(
+                            //     width: double.infinity,
+                            //     child: ElevatedButton(
+                            //       style: ElevatedButton.styleFrom(
+                            //         backgroundColor: const Color(0xFFACBF92),
+                            //         foregroundColor: Colors.white,
+                            //         padding: const EdgeInsets.symmetric(
+                            //           vertical: 14,
+                            //         ),
+                            //         shape: RoundedRectangleBorder(
+                            //           borderRadius: BorderRadius.circular(16),
+                            //         ),
+                            //       ),
+                            //       onPressed: () {
+                            //         // Navigate to CartPage and pass data via Get.arguments
+                            //         Get.to(CardPage());
+                            //       },
+                            //       child: Text(
+                            //         "Add to Cart",
+                            //         style: TextStyle(fontSize: 16),
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
@@ -226,7 +283,6 @@ class _ProductPageState extends State<ProductPage> {
         ],
       ),
 
-      /// Custom Bottom Footer
       bottomNavigationBar: BottomNav(),
     );
   }

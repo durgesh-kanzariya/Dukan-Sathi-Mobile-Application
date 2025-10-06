@@ -17,7 +17,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //using a SafeArea To Remove the debug banner
+    //using a SafeArea To Remov e the debug banner
     return SafeArea(
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false, //this is portion to remove a banner
