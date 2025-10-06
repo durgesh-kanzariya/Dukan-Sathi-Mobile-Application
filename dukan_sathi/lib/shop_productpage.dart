@@ -1,10 +1,7 @@
 import 'package:dukan_sathi/discover_shop.dart';
 import 'package:flutter/material.dart';
-import 'dashboard.dart';
 import 'package:get/get.dart';
-
 import 'bottom_nav.dart';
-import 'monthly_spending_lage.dart';
 import 'product_page.dart';
 
 class ShopProductpage extends StatefulWidget {
@@ -87,7 +84,11 @@ class _ShopProductpageState extends State<ShopProductpage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        trailing: Image.asset("assets/imgs/hart.png",height: 20,width: 20,)
+                        trailing: Image.asset(
+                          "assets/imgs/hart.png",
+                          height: 20,
+                          width: 20,
+                        ),
                       ),
 
                       SizedBox(height: 8),
@@ -143,7 +144,7 @@ class _ShopProductpageState extends State<ShopProductpage> {
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                       Padding(
-                        padding:EdgeInsetsGeometry.fromLTRB(30, 2, 30, 2),
+                        padding: EdgeInsetsGeometry.fromLTRB(30, 2, 30, 2),
                         child: Divider(color: Colors.white, thickness: 2),
                       ),
 

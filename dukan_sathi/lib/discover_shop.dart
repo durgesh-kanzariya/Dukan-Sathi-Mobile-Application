@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'shop_productpage.dart';
-import 'product_page.dart';
 
 class DiscoverShop extends StatefulWidget {
   const DiscoverShop({super.key});

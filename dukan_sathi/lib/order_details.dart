@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'bottom_nav.dart';
 import 'package:get/get.dart';
 import 'history.dart';
-import 'pickup_code.dart';
 
 class OrderDetails extends StatefulWidget {
   const OrderDetails({super.key});

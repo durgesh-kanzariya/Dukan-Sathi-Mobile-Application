@@ -1,11 +1,7 @@
 import 'package:dukan_sathi/discover_shop.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import 'monthly_spending_lage.dart';
 import 'dashboard.dart';
-import 'shop_productpage.dart';
-import 'product_page.dart';
 import 'history.dart';
 import 'quick_order.dart';
 import 'cart_page.dart';
