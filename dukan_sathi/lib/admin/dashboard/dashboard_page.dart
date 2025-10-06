@@ -170,6 +170,30 @@ final List<Order> preparingOrders = const [
       ),
     ],
   ),
+  Order(
+    orderId: '812463187642',
+    customerName: 'durgesh D.',
+    timeAgo: '12 mins ago',
+    status: OrderStatus.Preparing,
+    date: '26/09/2025',
+    address: '789 University Road, Rajkot',
+    items: [
+      OrderItem(
+        imageUrl: 'https://placehold.co/100x100/5A3825/FFFFFF/png?text=Cake',
+        name: 'Chocolate Cake',
+        variant: '1.5 KG',
+        price: 75.00,
+        quantity: 1,
+      ),
+      OrderItem(
+        imageUrl: 'https://placehold.co/100x100/6F4E37/FFFFFF/png?text=Pastry',
+        name: 'Chocolate Pastry',
+        variant: 'Single',
+        price: 3.00,
+        quantity: 5,
+      ),
+    ],
+  ),
 ];
 // --- END MOCK DATA & MODELS ---
 

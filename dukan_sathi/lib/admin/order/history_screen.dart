@@ -22,26 +22,28 @@ class HistoricalOrder {
 }
 
 // --- MOCK DATA ---
+// UPDATED: The orderIds now match the ones in the dashboard's mock data
+// to ensure the lookup is successful.
 final List<HistoricalOrder> orderHistory = [
   const HistoricalOrder(
-    orderId: '812463187642',
-    customerName: 'Parvez B.',
+    orderId: '812463187642', // This ID belongs to John D.
+    customerName: 'John D.',
     status: 'Ready for pickup',
-    totalPrice: 100.00,
+    totalPrice: 90.00,
     date: '31/08/2025',
   ),
   const HistoricalOrder(
-    orderId: '987654321012',
+    orderId: '5432109876', // This ID belongs to Sarah M.
     customerName: 'Sarah M.',
     status: 'Picked Up',
-    totalPrice: 76.00,
+    totalPrice: 25.00,
     date: '30/08/2025',
   ),
   const HistoricalOrder(
-    orderId: '543210987654',
-    customerName: 'John D.',
-    status: 'Cancelled',
-    totalPrice: 25.00,
+    orderId: '9876543210', // This ID belongs to Parvez B.
+    customerName: 'Parvez B.',
+    status: 'Picked Up',
+    totalPrice: 38.00,
     date: '29/08/2025',
   ),
 ];
@@ -52,6 +54,10 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Combine all orders from the dashboard into a single list to search from.
+    // In a real app, this data would come from a database.
+    final List<Order> allOrders = [...newOrders, ...preparingOrders];
+
     return Column(
       children: [
         const CustomAppBar(title: 'History'),
@@ -76,32 +82,27 @@ class HistoryScreen extends StatelessWidget {
                 final historicalOrder = orderHistory[index];
                 return InkWell(
                   onTap: () {
-                    final detailedOrder = Order(
-                      orderId: historicalOrder.orderId,
-                      customerName: historicalOrder.customerName,
-                      timeAgo: 'from history',
-                      status: OrderStatus.Preparing,
-                      date: historicalOrder.date,
-                      address: '123 Dukan Sathi Lane, Rajkot',
-                      items: const [
-                        OrderItem(
-                          imageUrl:
-                              'https://placehold.co/100x100/AF8F6D/FFFFFF/png?text=Item',
-                          name: 'Placeholder Item 1',
-                          variant: 'Variant A',
-                          price: 50.00,
-                          quantity: 2,
-                        ),
-                      ],
+                    // Find the full order details from the master list using the orderId.
+                    final detailedOrder = allOrders.firstWhere(
+                      (order) => order.orderId == historicalOrder.orderId,
+                      // Fallback in case an order is not found (should not happen with mock data)
+                      orElse: () => Order(
+                        orderId: historicalOrder.orderId,
+                        customerName: historicalOrder.customerName,
+                        timeAgo: 'N/A',
+                        status: OrderStatus.New,
+                        date: historicalOrder.date,
+                        address: 'Address not found',
+                        items: [],
+                      ),
                     );
 
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        // UPDATED: Pass 'showActions: false' to hide the buttons.
                         builder: (context) => ShopkeeperOrderDetailsScreen(
                           order: detailedOrder,
-                          showActions: false,
+                          showActions: false, // Buttons are hidden for history
                         ),
                       ),
                     );
