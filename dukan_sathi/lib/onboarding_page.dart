@@ -40,7 +40,6 @@ with us.""",
                     ),
                   );
                 },
-
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF5F7D5D),
                   foregroundColor: Colors.white,
