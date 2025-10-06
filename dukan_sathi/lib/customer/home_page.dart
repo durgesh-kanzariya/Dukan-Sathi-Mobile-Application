@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'Login.dart';
+import '/Login.dart';
 import 'package:get/get.dart';
 
 class Home extends StatefulWidget {

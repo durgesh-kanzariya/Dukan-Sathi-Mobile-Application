@@ -1,7 +1,7 @@
-import 'package:dukan_sathi/admin/dashboard/shopkeeper_main_screen.dart';
+import 'package:dukan_sathi/shopkeeper/dashboard/shopkeeper_main_screen.dart';
 import 'package:flutter/material.dart';
-import 'dashboard.dart';
-import 'sign_up.dart';
+import 'customer/dashboard.dart';
+import 'customer/sign_up.dart';
 import 'package:get/get.dart';
 
 class Login extends StatefulWidget {
@@ -89,7 +89,7 @@ class _LoginState extends State<Login> {
                           const SizedBox(width: 10),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
+                              backgroundColor: Color(0xFF5F7D5D),
                               foregroundColor: Colors.white,
                             ),
                             onPressed: () {

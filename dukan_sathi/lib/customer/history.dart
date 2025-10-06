@@ -1,11 +1,11 @@
 import 'dart:ui'; // Required for ImageFilter.blur
-import 'package:dukan_sathi/admin/misc/profile_screen.dart';
+import 'package:dukan_sathi/shopkeeper/misc/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 // Import the OrderDetails screen and its data models
 import 'order_details.dart';
-import 'bottom_nav.dart';
+import '/bottom_nav.dart';
 import 'profile.dart';
 
 // --- MOCK DATA ---

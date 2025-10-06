@@ -1,7 +1,7 @@
-import 'package:dukan_sathi/discover_shop.dart';
+import 'package:dukan_sathi/customer/discover_shop.dart';
 import 'package:flutter/material.dart';
 import 'cart_page.dart';
-import 'bottom_nav.dart';
+import '/bottom_nav.dart';
 import 'package:get/get.dart';
 import 'profile.dart';
 

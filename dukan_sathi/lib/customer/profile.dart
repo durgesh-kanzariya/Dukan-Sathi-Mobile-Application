@@ -2,10 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'bottom_nav.dart';
+import '/bottom_nav.dart';
 import 'change_password.dart';
 import 'history.dart';
-import 'login.dart';
+import '/login.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});

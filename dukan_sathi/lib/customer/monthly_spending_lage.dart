@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dashboard.dart';
 import 'package:get/get.dart';
-import 'bottom_nav.dart';
+import '/bottom_nav.dart';
 
 class MonthlySpendingLage extends StatefulWidget {
   const MonthlySpendingLage({super.key});

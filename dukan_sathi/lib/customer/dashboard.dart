@@ -1,7 +1,7 @@
 import 'dart:ui'; // For ImageFilter.blur
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'bottom_nav.dart';
+import '../bottom_nav.dart';
 import 'monthly_spending_lage.dart';
 import 'history.dart';
 import 'cart_page.dart';

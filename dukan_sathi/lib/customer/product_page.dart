@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'bottom_nav.dart';
+import '/bottom_nav.dart';
 import 'shop_productpage.dart';
 import 'quick_order.dart';
 import 'cart_page.dart';

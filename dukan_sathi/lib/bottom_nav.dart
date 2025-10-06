@@ -1,10 +1,10 @@
-import 'package:dukan_sathi/discover_shop.dart';
+import 'package:dukan_sathi/customer/discover_shop.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dashboard.dart';
-import 'history.dart';
-import 'quick_order.dart';
-import 'cart_page.dart';
+import '/customer/dashboard.dart';
+import '/customer/history.dart';
+import '/customer/quick_order.dart';
+import '/customer/cart_page.dart';
 
 class BottomNav extends StatefulWidget {
   const BottomNav({super.key});

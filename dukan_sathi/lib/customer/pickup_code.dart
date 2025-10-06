@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'bottom_nav.dart';
+import '/bottom_nav.dart';
 
 class PickupCode extends StatelessWidget {
   const PickupCode({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dashboard.dart';
-import 'bottom_nav.dart';
+import '../bottom_nav.dart';
 
 class CardPage extends StatefulWidget {
   const CardPage({super.key});

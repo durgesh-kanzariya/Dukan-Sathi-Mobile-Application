@@ -1,4 +1,4 @@
-import 'package:dukan_sathi/admin/misc/profile_screen.dart';
+import 'package:dukan_sathi/shopkeeper/misc/profile_screen.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget {

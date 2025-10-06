@@ -1,7 +1,7 @@
 import 'dart:ui';
-import 'package:dukan_sathi/admin/misc/profile_screen.dart';
-import 'package:dukan_sathi/admin/order/new_order_details_screen.dart';
-import 'package:dukan_sathi/admin/order/shopkeeper_order_details.dart';
+import 'package:dukan_sathi/shopkeeper/misc/profile_screen.dart';
+import 'package:dukan_sathi/shopkeeper/order/new_order_details_screen.dart';
+import 'package:dukan_sathi/shopkeeper/order/shopkeeper_order_details.dart';
 import 'package:flutter/material.dart';
 import '../sells/monthly_sells_screen.dart';
 

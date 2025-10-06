@@ -1,5 +1,5 @@
 import 'package:dukan_sathi/bottom_nav.dart';
-import 'package:dukan_sathi/profile.dart';
+import 'package:dukan_sathi/customer/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';

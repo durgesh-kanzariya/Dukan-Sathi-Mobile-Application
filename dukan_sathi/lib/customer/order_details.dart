@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'bottom_nav.dart';
+import '/bottom_nav.dart';
 import 'pickup_code.dart';
 
 // --- DATA MODELS ---
