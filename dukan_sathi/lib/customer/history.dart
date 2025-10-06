@@ -78,7 +78,7 @@ class History extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFF5F7D5D), // Dark green top
+                    Color(0xFF5A7D60), // Dark green top
                     Color(0xFFDADBCF), // Creamy white bottom
                   ],
                 ),
@@ -110,10 +110,10 @@ class History extends StatelessWidget {
   /// Your original header widget for "Dukan Sathi"
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.only(top: 40, bottom: 20),
+      padding: const EdgeInsets.only(top: 40, bottom: 10),
       //... (header code remains the same)
       decoration: const BoxDecoration(
-        color: Color(0xFF567751),
+        color: Color(0xFF5A7D60),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(50),
           bottomRight: Radius.circular(50),
@@ -154,8 +154,12 @@ class History extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           const Text(
-            "HISTORY",
-            style: TextStyle(color: Colors.white, fontSize: 20),
+            "History",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 26,
+              fontWeight: FontWeight.w400,
+            ),
           ),
         ],
       ),

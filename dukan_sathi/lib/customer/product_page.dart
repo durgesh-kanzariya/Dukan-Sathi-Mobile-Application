@@ -30,7 +30,7 @@ class _ProductPageState extends State<ProductPage> {
                 height: 150,
                 width: double.infinity,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF567751),
+                  color: Color(0xFF5A7D60),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(50),
                     bottomRight: Radius.circular(50),

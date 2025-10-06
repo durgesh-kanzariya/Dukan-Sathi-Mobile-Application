@@ -27,7 +27,7 @@ class _QuickOrderState extends State<QuickOrder> {
                   height: 180,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Color(0xFF567751),
+                    color: Color(0xFF5A7D60),
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(50),
                       bottomRight: Radius.circular(50),
@@ -89,7 +89,7 @@ class _QuickOrderState extends State<QuickOrder> {
               width: 340,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF567751), Color(0xFFF9F3E7)],
+                  colors: [Color(0xFF5A7D60), Color(0xFFF9F3E7)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -197,7 +197,7 @@ class _QuickOrderState extends State<QuickOrder> {
                         Get.to(CardPage());
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF567751),
+                        backgroundColor: const Color(0xFF5A7D60),
                         foregroundColor: Colors.white,
                       ),
                       child: Text("Add All to Cart →"),

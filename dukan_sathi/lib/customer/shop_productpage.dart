@@ -24,7 +24,7 @@ class _ShopProductpageState extends State<ShopProductpage> {
                 height: 180,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Color(0xFF567751),
+                  color: Color(0xFF5A7D60),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(50),
                     bottomRight: Radius.circular(50),
@@ -116,7 +116,7 @@ class _ShopProductpageState extends State<ShopProductpage> {
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
-                      Color(0xFF567751), // dark green
+                      Color(0xFF5A7D60), // dark green
                       Color(0xFFF9F3E7), // cream white
                     ],
                     begin: Alignment.topLeft,

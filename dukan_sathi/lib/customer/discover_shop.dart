@@ -26,7 +26,7 @@ class _DiscoverShopState extends State<DiscoverShop> {
                 height: 180,
                 width: double.infinity,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF567751),
+                  color: Color(0xFF5A7D60),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(50),
                     bottomRight: Radius.circular(50),
@@ -83,36 +83,30 @@ class _DiscoverShopState extends State<DiscoverShop> {
           ),
 
           const SizedBox(height: 10),
-  
+
           Positioned(
-                top: 180,
-                left: 90,
-                child: Center(
-                  child: Text(
-                    "Your favorite shops",
-                    style: TextStyle(color: Colors.black, fontSize: 20),
-                  ),
-                ),
+            top: 180,
+            left: 90,
+            child: Center(
+              child: Text(
+                "Your favorite shops",
+                style: TextStyle(color: Colors.black, fontSize: 20),
               ),
+            ),
+          ),
 
-                Positioned(
-      top: 240, // just below the text
-      left: 80,
-      right: 80,
-      child: Padding(
-        padding:EdgeInsetsGeometry.fromLTRB(30, 1, 30, 0),
-        child: Divider(
-          color: Colors.black.withOpacity(0.5),
-          thickness:2,
-          
-        ),
-      ),
-    ),
-
-
-
-
-
+          Positioned(
+            top: 240, // just below the text
+            left: 80,
+            right: 80,
+            child: Padding(
+              padding: EdgeInsetsGeometry.fromLTRB(30, 1, 30, 0),
+              child: Divider(
+                color: Colors.black.withOpacity(0.5),
+                thickness: 2,
+              ),
+            ),
+          ),
 
           Expanded(
             child: Padding(
@@ -133,7 +127,7 @@ class _DiscoverShopState extends State<DiscoverShop> {
                             gradient: LinearGradient(
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
-                              colors: [Color(0xFF567751), Color(0xFFF9F3E7)],
+                              colors: [Color(0xFF5A7D60), Color(0xFFF9F3E7)],
                             ),
                             borderRadius: BorderRadius.circular(20),
                           ),

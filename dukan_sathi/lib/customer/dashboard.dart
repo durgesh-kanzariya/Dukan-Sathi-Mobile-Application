@@ -32,7 +32,7 @@ class _DashboardState extends State<Dashboard> {
                 height: 180,
                 width: double.infinity,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF567751),
+                  color: Color(0xFF5A7D60),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(50),
                     bottomRight: Radius.circular(50),
@@ -88,7 +88,7 @@ class _DashboardState extends State<Dashboard> {
                   onPressed: () => Get.to(History()),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: const Color(0xFF567751),
+                    backgroundColor: const Color(0xFF5A7D60),
                   ),
                   child: const Text("View All in history →"),
                 ),
@@ -112,7 +112,7 @@ class _DashboardState extends State<Dashboard> {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFF567751), Color(0xFFF9F3E7)],
+                  colors: [Color(0xFF5A7D60), Color(0xFFF9F3E7)],
                 ),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -164,7 +164,7 @@ class _DashboardState extends State<Dashboard> {
                       trailing: ElevatedButton(
                         onPressed: () => Get.to(CardPage()),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF567751),
+                          backgroundColor: const Color(0xFF5A7D60),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
