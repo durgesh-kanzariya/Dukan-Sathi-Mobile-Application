@@ -53,7 +53,7 @@ class _ShopProductpageState extends State<ShopProductpage> {
               ),
 
               Positioned(
-                top: 100,
+                top: 70,
                 left: 40,
                 right: 40,
                 child: Container(
@@ -87,10 +87,7 @@ class _ShopProductpageState extends State<ShopProductpage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        trailing: IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.heart_broken),
-                        ),
+                        trailing: Image.asset("assets/imgs/hart.png",height: 20,width: 20,)
                       ),
 
                       SizedBox(height: 8),
@@ -108,7 +105,7 @@ class _ShopProductpageState extends State<ShopProductpage> {
             ],
           ),
 
-          SizedBox(height: 130),
+          SizedBox(height: 100),
           SingleChildScrollView(
             child: Padding(
               padding: EdgeInsetsGeometry.fromLTRB(10, 0, 10, 0),
@@ -145,7 +142,10 @@ class _ShopProductpageState extends State<ShopProductpage> {
                         "Product List",
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
-                      Divider(color: Colors.white, thickness: 1),
+                      Padding(
+                        padding:EdgeInsetsGeometry.fromLTRB(30, 2, 30, 2),
+                        child: Divider(color: Colors.white, thickness: 2),
+                      ),
 
                       Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -159,7 +159,7 @@ class _ShopProductpageState extends State<ShopProductpage> {
                               },
                               child: Card(
                                 elevation: 10,
-                                shadowColor: Colors.white,
+                                shadowColor: Colors.white.withOpacity(0.5),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [

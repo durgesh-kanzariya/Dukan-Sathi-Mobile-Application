@@ -67,7 +67,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                 left: 150,
                 child: Center(
                   child: Text(
-                    "Profile",
+                    "Change Password",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                 ),

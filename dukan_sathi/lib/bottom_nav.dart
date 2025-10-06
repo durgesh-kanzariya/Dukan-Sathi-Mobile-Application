@@ -8,6 +8,7 @@ import 'shop_productpage.dart';
 import 'product_page.dart';
 import 'history.dart';
 import 'quick_order.dart';
+import 'cart_page.dart';
 
 class BottomNav extends StatefulWidget {
   const BottomNav({super.key});
@@ -24,7 +25,7 @@ class _BottomNavState extends State<BottomNav> {
       clipBehavior: Clip.none,
       children: [
         Container(
-          height:65,
+          height: 65,
           decoration: const BoxDecoration(color: Color(0xFF567751)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -135,8 +136,13 @@ class _BottomNavState extends State<BottomNav> {
               ),
               child: Column(
                 children: [
-                  SizedBox(height: 10),
-                  Icon(Icons.add, color: Colors.white, size: 50),
+                  SizedBox(height: 2),
+                  IconButton(
+                    onPressed: () {
+                      Get.to(CardPage());
+                    },
+                    icon: Icon(Icons.add, color: Colors.white, size: 50),
+                  ),
                   SizedBox(height: 10),
                   Text("Cart", style: TextStyle(color: Colors.white)),
                 ],
