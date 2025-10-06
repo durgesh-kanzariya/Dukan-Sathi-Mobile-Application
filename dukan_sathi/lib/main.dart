@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:dukan_sathi/onboarding_page.dart';
 
 void main() {
