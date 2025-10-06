@@ -24,12 +24,12 @@ dev_dependencies:
 flutter:
   assets:
     - assets/imgs/
+    - assets/images/
   uses-material-design: true
 
 flutter_launcher_icons:
   android: true
   ios: true
-
   image_path: assets/imgs/one.png
   background_color: "#FFFFFF"
 

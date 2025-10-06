@@ -1,4 +1,4 @@
-import 'package:dukan_sathi/admin/dashboard/shopkeeper_main_screen.dart';
+import 'package:dukan_sathi/Login.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingPage extends StatelessWidget {
@@ -35,9 +35,7 @@ with us.""",
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const ShopkeeperMainScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const Login()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
