@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.14.4
+  get: ^4.6.6
 
 dev_dependencies:
   flutter_test:
@@ -18,11 +19,15 @@ dev_dependencies:
 
 flutter:
   assets:
-    - assets/images/
+    - assets/imgs/
   uses-material-design: true
 
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: assets/images/logo_white.png
+
+  image_path: assets/imgs/one.png
   background_color: "#FFFFFF"
+
+
+
