@@ -1,7 +1,7 @@
-import 'package:dukan_sathi/bottom_nav.dart';
-import 'package:dukan_sathi/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'bottom_nav.dart';
+import 'profile.dart';
 
 class ChangePassword extends StatefulWidget {
   const ChangePassword({super.key});
@@ -13,233 +13,247 @@ class ChangePassword extends StatefulWidget {
 class _ChangePasswordState extends State<ChangePassword> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController old = TextEditingController();
-  final TextEditingController np = TextEditingController();
-  final TextEditingController cp = TextEditingController();
+  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
-  bool _oldVisible = false;
-  bool _newVisible = false;
-  bool _confirmVisible = false;
+  bool _isOldPasswordVisible = false;
+  bool _isNewPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
-  String msg = "";
+  @override
+  void dispose() {
+    _oldPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  void _submitForm() {
+    // This will trigger the validators in the TextFormFields
+    final isValid = _formKey.currentState?.validate() ?? false;
+
+    if (isValid) {
+      // If the form is valid, show a success message and go back.
+      // TODO: Add your actual password change logic here.
+      Get.snackbar(
+        "Success",
+        "Your password has been changed successfully.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+      // Use Get.back() to return to the previous screen (Profile page)
+      Get.back();
+    } else {
+      // If the form is not valid, show an error message.
+      Get.snackbar(
+        "Error",
+        "Please correct the errors in the form.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  height: 150,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF567751),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(50),
-                      bottomRight: Radius.circular(50),
-                    ),
-                  ),
+      backgroundColor: const Color(0xFFFDFBF5),
+      body: Column(
+        children: [
+          _buildHeader(),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 20.0,
+                ),
+                child: Form(
+                  key: _formKey,
                   child: Column(
                     children: [
-                      ListTile(
-                        leading: IconButton(
-                          onPressed: () {
-                            Get.to(Profile());
-                          },
-                          icon: const Icon(Icons.arrow_back),
-                          style: IconButton.styleFrom(
-                            foregroundColor: Colors.white,
-                          ),
-                        ),
-                        title: const Text(
-                          "Dukan Sathi",
-                          style: TextStyle(
-                            fontSize: 30,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                      _buildPasswordField(
+                        controller: _oldPasswordController,
+                        label: 'Old Password',
+                        isVisible: _isOldPasswordVisible,
+                        onToggleVisibility: () {
+                          setState(
+                            () =>
+                                _isOldPasswordVisible = !_isOldPasswordVisible,
+                          );
+                        },
                       ),
-                    ],
-                  ),
-                ),
-                const Positioned(
-                  top: 80,
-                  left: 90,
-                  child: Center(
-                    child: Text(
-                      "Change Password",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Form(
-              key: _formKey,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Enter Old Password"),
-                    Card(
-                      elevation: 5,
-                      child: TextFormField(
-                        controller: old,
-                        obscureText: !_oldVisible,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 10),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _oldVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _oldVisible = !_oldVisible;
-                              });
-                            },
-                          ),
-                        ),
-                        validator: (value) => value == null || value.length < 6
-                            ? "Password must be 6+ chars"
-                            : null,
+                      const SizedBox(height: 20),
+                      _buildPasswordField(
+                        controller: _newPasswordController,
+                        label: 'New Password',
+                        isVisible: _isNewPasswordVisible,
+                        onToggleVisibility: () {
+                          setState(
+                            () =>
+                                _isNewPasswordVisible = !_isNewPasswordVisible,
+                          );
+                        },
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text("Enter New Password"),
-                    Card(
-                      elevation: 5,
-                      child: TextFormField(
-                        controller: np,
-                        obscureText: !_newVisible,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 10),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _newVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _newVisible = !_newVisible;
-                              });
-                            },
-                          ),
-                        ),
-                        validator: (value) => value == null || value.length < 6
-                            ? "Password must be 6+ chars"
-                            : null,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text("Confirm Password"),
-                    Card(
-                      elevation: 5,
-                      child: TextFormField(
-                        controller: cp,
-                        obscureText: !_confirmVisible,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 10),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _confirmVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _confirmVisible = !_confirmVisible;
-                              });
-                            },
-                          ),
-                        ),
+                      const SizedBox(height: 20),
+                      _buildPasswordField(
+                        controller: _confirmPasswordController,
+                        label: 'Confirm New Password',
+                        isVisible: _isConfirmPasswordVisible,
+                        onToggleVisibility: () {
+                          setState(
+                            () => _isConfirmPasswordVisible =
+                                !_isConfirmPasswordVisible,
+                          );
+                        },
+                        // Custom validator for the confirm password field
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Confirm your password";
-                          } else if (value != np.text) {
-                            return "Passwords do not match";
+                            return 'Please confirm your new password';
+                          }
+                          if (value != _newPasswordController.text) {
+                            return 'Passwords do not match';
                           }
                           return null;
                         },
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Container(
-                    //   alignment: Alignment.centerRight,
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.end,
-                    //     children: [
-                    //       const Text(
-                    //         "Sign In",
-                    //         style: TextStyle(fontSize: 20),
-                    //       ),
-                    //       const SizedBox(width: 10),
-                    //       ElevatedButton(
-                    //         style: ElevatedButton.styleFrom(
-                    //           backgroundColor: Colors.green,
-                    //           foregroundColor: Colors.white,
-                    //         ),
-                    //         onPressed: () {
-                    //           if (_formKey.currentState!.validate()) {
-                    //             ScaffoldMessenger.of(context).showSnackBar(
-                    //               const SnackBar(
-                    //                 content: Text(
-                    //                   "Password changed successfully!",
-                    //                 ),
-                    //                 backgroundColor: Colors.green,
-                    //               ),
-                    //             );
-                    //             Get.offAll(Profile());
-                    //           }
-                    //         },
-                    //         child: const Icon(
-                    //           Icons.arrow_forward,
-                    //           size: 25,
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-
-
-                    Padding(
-                      padding:EdgeInsetsGeometry.symmetric(vertical: 20),
-                      child: ListTile(
-                      trailing: ElevatedButton(
-                          onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  Get.offAll(Profile());
-                                }
-                              }, child: Text("Save Changes → "),
-                       style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF567751),
-                            foregroundColor: Colors.white,
-                          ),
-                      ),
-                                        ),
-                    ),
-                  ],
+                      const SizedBox(height: 40),
+                      _buildSaveChangesButton(),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       bottomNavigationBar: const BottomNav(),
+    );
+  }
+
+  /// The standard, responsive header for the app.
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.only(top: 50, left: 10, right: 20, bottom: 20),
+      decoration: const BoxDecoration(
+        color: Color(0xFF5A7D60),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                // Correctly use Get.back() to navigate to the previous screen
+                onPressed: () => Get.back(),
+              ),
+              const Expanded(
+                child: Text(
+                  'DUKAN SATHI',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    letterSpacing: 4,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 48), // Balances the IconButton
+            ],
+          ),
+          const Text(
+            'Change Password',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w300,
+              letterSpacing: 2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// A reusable and styled password field widget.
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String label,
+    required bool isVisible,
+    required VoidCallback onToggleVisibility,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey.shade700,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          obscureText: !isVisible,
+          decoration: InputDecoration(
+            // hintText: 'Enter your password',
+            fillColor: Colors.white,
+            filled: true,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            prefixIcon: const Icon(Icons.lock_outline),
+            suffixIcon: IconButton(
+              icon: Icon(
+                isVisible ? Icons.visibility : Icons.visibility_off,
+                color: Colors.grey,
+              ),
+              onPressed: onToggleVisibility,
+            ),
+          ),
+          // Default validator
+          validator:
+              validator ??
+              (value) {
+                if (value == null || value.length < 6) {
+                  return 'Password must be at least 6 characters';
+                }
+                return null;
+              },
+        ),
+      ],
+    );
+  }
+
+  /// The primary action button, styled consistently.
+  Widget _buildSaveChangesButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _submitForm,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF5A7D60),
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        child: const Text('Save Changes'),
+      ),
     );
   }
 }

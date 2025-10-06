@@ -71,7 +71,7 @@ class History extends StatelessWidget {
           _buildHeader(),
           Expanded(
             child: Container(
-              margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+              margin: const EdgeInsets.fromLTRB(10, 10, 10, 20),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 gradient: const LinearGradient(
@@ -143,7 +143,7 @@ class History extends StatelessWidget {
                   ),
                   onPressed: () {
                     Get.to(
-                      () => ProfileScreen(),
+                      () => Profile(),
                     ); // Assuming your profile screen is ProfileScreen
                   },
 
