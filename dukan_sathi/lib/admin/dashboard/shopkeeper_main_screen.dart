@@ -45,7 +45,7 @@ class _ShopkeeperMainScreenState extends State<ShopkeeperMainScreen> {
 
     return Scaffold(
       body: Container(
-        color: const Color(0xFFFDFBF5),
+        color: const Color.fromARGB(226, 249, 243, 231),
         child: Stack(
           children: [
             IndexedStack(index: _selectedIndex, children: _pages),

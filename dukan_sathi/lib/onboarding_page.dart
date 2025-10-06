@@ -7,6 +7,7 @@ class OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF9F3E7),
       body: Stack(
         children: [
           Align(

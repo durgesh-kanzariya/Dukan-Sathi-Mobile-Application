@@ -1,5 +1,8 @@
 import 'dart:io';
+import 'package:dukan_sathi/login.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/utils.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -67,7 +70,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 16),
                   _buildActionButton(
                     text: 'Logout',
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.offAll(() => const Login());
+                    },
                     isPrimary: false,
                   ),
                 ],
