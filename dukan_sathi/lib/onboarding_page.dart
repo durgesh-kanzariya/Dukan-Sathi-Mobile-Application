@@ -35,12 +35,14 @@ with us.""",
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const ShopkeeperMainScreen()),
+                    MaterialPageRoute(
+                      builder: (_) => const ShopkeeperMainScreen(),
+                    ),
                   );
                 },
 
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: Color(0xFF5F7D5D),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 100,

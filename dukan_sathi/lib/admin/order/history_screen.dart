@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../widgets/custom_app_bar.dart';
+import 'shopkeeper_order_details.dart';
+import '../dashboard/dashboard_page.dart';
 
 // --- DATA MODEL ---
 class HistoricalOrder {
@@ -71,7 +73,41 @@ class HistoryScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
               itemCount: orderHistory.length,
               itemBuilder: (context, index) {
-                return HistoryCard(order: orderHistory[index]);
+                final historicalOrder = orderHistory[index];
+                return InkWell(
+                  onTap: () {
+                    final detailedOrder = Order(
+                      orderId: historicalOrder.orderId,
+                      customerName: historicalOrder.customerName,
+                      timeAgo: 'from history',
+                      status: OrderStatus.Preparing,
+                      date: historicalOrder.date,
+                      address: '123 Dukan Sathi Lane, Rajkot',
+                      items: const [
+                        OrderItem(
+                          imageUrl:
+                              'https://placehold.co/100x100/AF8F6D/FFFFFF/png?text=Item',
+                          name: 'Placeholder Item 1',
+                          variant: 'Variant A',
+                          price: 50.00,
+                          quantity: 2,
+                        ),
+                      ],
+                    );
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        // UPDATED: Pass 'showActions: false' to hide the buttons.
+                        builder: (context) => ShopkeeperOrderDetailsScreen(
+                          order: detailedOrder,
+                          showActions: false,
+                        ),
+                      ),
+                    );
+                  },
+                  child: HistoryCard(order: historicalOrder),
+                );
               },
             ),
           ),
@@ -103,7 +139,7 @@ class HistoryCard extends StatelessWidget {
       color: Colors.black87,
     );
 
-    final valueStyle = TextStyle(
+    final valueStyle = const TextStyle(
       fontSize: 15,
       fontFamily: 'Abel',
       fontWeight: FontWeight.w400,
@@ -132,7 +168,6 @@ class HistoryCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Order ID Row
                 Row(
                   children: [
                     const Text("Order Id:", style: labelStyle),
@@ -140,9 +175,7 @@ class HistoryCard extends StatelessWidget {
                     Expanded(child: Text(order.orderId, style: valueStyle)),
                   ],
                 ),
-
                 const Divider(thickness: 1, color: Colors.white),
-                // Customer Name
                 Row(
                   children: [
                     const Text("Customer name:", style: labelStyle),
@@ -152,8 +185,6 @@ class HistoryCard extends StatelessWidget {
                     ),
                   ],
                 ),
-
-                // Order Status
                 Row(
                   children: [
                     const Text("Order status:", style: labelStyle),
@@ -168,8 +199,6 @@ class HistoryCard extends StatelessWidget {
                     ),
                   ],
                 ),
-
-                // Total Price
                 Row(
                   children: [
                     const Text("Total price:", style: labelStyle),
@@ -182,8 +211,6 @@ class HistoryCard extends StatelessWidget {
                     ),
                   ],
                 ),
-
-                // Date
                 Row(
                   children: [
                     const Text("Date:", style: labelStyle),

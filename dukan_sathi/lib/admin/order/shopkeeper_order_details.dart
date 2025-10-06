@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import '../dashboard/dashboard_page.dart'; // CHANGE 1: Import dashboard to get the Order model.
-
-// CHANGE 2: The local data models have been removed from this file.
+import '../dashboard/dashboard_page.dart';
 
 class ShopkeeperOrderDetailsScreen extends StatelessWidget {
-  // CHANGE 3: The screen now requires an 'Order' object to be passed to it.
   final Order order;
+  // ADDED: A boolean flag to control the visibility of the action buttons.
+  // It defaults to true, so they will show up unless explicitly told not to.
+  final bool showActions;
 
-  // CHANGE 4: The hardcoded mockOrder has been removed.
-  const ShopkeeperOrderDetailsScreen({Key? key, required this.order})
-    : super(key: key);
+  const ShopkeeperOrderDetailsScreen({
+    Key? key,
+    required this.order,
+    this.showActions = true, // Default value is true
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,8 @@ class ShopkeeperOrderDetailsScreen extends StatelessWidget {
             _buildOrderSummary(),
             _buildItemList(),
             _buildTotalPrice(),
-            _buildActionButtons(),
+            // UPDATED: Conditionally display the buttons based on the showActions flag.
+            if (showActions) _buildActionButtons(),
             const SizedBox(height: 20),
           ],
         ),
@@ -80,8 +83,6 @@ class ShopkeeperOrderDetailsScreen extends StatelessWidget {
     );
   }
 
-  // CHANGE 5: All widgets below now use 'order' from the widget constructor
-  // instead of the old 'mockOrder'.
   Widget _buildOrderSummary() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(30, 16, 20, 0),
@@ -237,6 +238,7 @@ class ShopkeeperOrderDetailsScreen extends StatelessWidget {
     );
   }
 
+  // RESTORED: The action buttons widget is now available to be shown or hidden.
   Widget _buildActionButtons() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
