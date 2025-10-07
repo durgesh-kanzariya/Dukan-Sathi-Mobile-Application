@@ -239,7 +239,7 @@ class AdminDashboardScreen extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
               );
             },
             child: const CircleAvatar(
@@ -260,7 +260,6 @@ class AdminDashboardScreen extends StatelessWidget {
       offset: const Offset(0, -80),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        // --- REPLACEMENT FOR GlassmorphicContainer ---
         // This combination of widgets creates the same effect but with a dynamic height.
         child: ClipRRect(
           borderRadius: BorderRadius.circular(40),

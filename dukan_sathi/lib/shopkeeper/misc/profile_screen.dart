@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dukan_sathi/login.dart';
+import 'package:dukan_sathi/shopkeeper/misc/change_password.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/utils.dart';
@@ -64,7 +65,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 32),
                   _buildActionButton(
                     text: 'Change Password',
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChangePasswordAdmin(),
+                        ),
+                      );
+                    },
                     isPrimary: true,
                   ),
                   const SizedBox(height: 16),
