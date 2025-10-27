@@ -9,6 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  cloud_firestore: ^6.0.3
+  firebase_auth: ^6.1.1
+  firebase_core: ^4.2.0
+  firebase_storage: ^13.0.3
   flutter_launcher_icons: ^0.14.4
   get: ^4.6.6
   glassmorphism: ^3.0.0
