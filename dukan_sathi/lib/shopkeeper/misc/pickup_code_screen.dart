@@ -68,7 +68,7 @@ class _PickupCodeScreenState extends State<PickupCodeScreen> {
                                   final String? code =
                                       capture.barcodes.first.rawValue;
                                   if (code != null) {
-                                    controller.stop(); // Stop the camera
+                                    // controller.stop(); // <-- REMOVED THIS LINE
                                     _showSuccessDialog(code);
                                   }
                                 }
