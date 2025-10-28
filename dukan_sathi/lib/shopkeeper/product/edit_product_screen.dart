@@ -1,11 +1,13 @@
-import 'dart:io'; // Required for using the File class
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // Required for image picking
-import 'products_screen.dart'; // We need the data models from here
+import 'package:get/get.dart'; // Import GetX
+import 'package:image_picker/image_picker.dart';
+// --- NEW IMPORTS ---
+import 'product_model.dart';
+import 'product_controller.dart';
 
 class EditProductScreen extends StatefulWidget {
   final Product product;
-
   const EditProductScreen({Key? key, required this.product}) : super(key: key);
 
   @override
@@ -13,7 +15,9 @@ class EditProductScreen extends StatefulWidget {
 }
 
 class _EditProductScreenState extends State<EditProductScreen> {
-  // --- STATE & CONTROLLERS ---
+  // --- FIND THE CONTROLLER ---
+  final ProductController controller = Get.find<ProductController>();
+
   late TextEditingController _productNameController;
   final TextEditingController _variantNameController = TextEditingController();
   final TextEditingController _buyPriceController = TextEditingController();
@@ -21,7 +25,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   final TextEditingController _stockController = TextEditingController();
 
   late List<ProductVariant> _variants;
-  XFile? _imageFile; // State variable to hold the new image file
+  XFile? _imageFile;
 
   @override
   void initState() {
@@ -40,12 +44,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
     super.dispose();
   }
 
-  // --- LOGIC METHODS ---
-
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
     if (image != null) {
       setState(() {
         _imageFile = image;
@@ -64,16 +65,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
         sellPrice: double.tryParse(_sellPriceController.text) ?? 0.0,
         stock: int.tryParse(_stockController.text) ?? 0,
       );
-
       setState(() {
         _variants.add(newVariant);
       });
-
       _variantNameController.clear();
       _buyPriceController.clear();
       _sellPriceController.clear();
       _stockController.clear();
       FocusScope.of(context).unfocus();
+    } else {
+      Get.snackbar('Error', 'Please fill all variant fields.',
+          snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -83,38 +85,37 @@ class _EditProductScreenState extends State<EditProductScreen> {
     });
   }
 
-  // CHANGE 1: Added a new method to handle validation and submission.
   void _validateAndSubmit() {
-    final List<String> errors = [];
-
-    // Check for common errors
     if (_productNameController.text.isEmpty) {
-      errors.add('- Product name cannot be empty.');
+      _showErrorDialog(['- Product name cannot be empty.']);
+      return;
     }
-    // Note: We don't check for an image here since one already exists.
     if (_variants.isEmpty) {
-      errors.add('- A product must have at least one variant.');
+      _showErrorDialog(['- A product must have at least one variant.']);
+      return;
     }
 
-    // If there are errors, show a dialog
-    if (errors.isNotEmpty) {
-      _showErrorDialog(errors);
-    } else {
-      // If everything is valid, proceed to save (and then navigate back)
-      // TODO: Add actual logic to save the updated product data
-      Navigator.of(context).pop();
-    }
+    // --- CALL CONTROLLER'S UPDATE FUNCTION ---
+    controller.updateProduct(
+      id: widget.product.id,
+      name: _productNameController.text.trim(),
+      variants: _variants,
+      newImageFile: _imageFile,
+      existingImageUrl: widget.product.imageUrl,
+    );
   }
 
-  // CHANGE 2: Created a helper widget to show the validation errors.
+  // --- NEW: CALL CONTROLLER'S DELETE FUNCTION ---
+  void _deleteProduct() {
+    controller.deleteProduct(widget.product.id);
+  }
+
   void _showErrorDialog(List<String> errors) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(
-          'Incomplete Information',
-          style: TextStyle(fontSize: 25),
-        ),
+        title: const Text('Incomplete Information',
+            style: TextStyle(fontSize: 25)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,8 +132,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
       ),
     );
   }
-
-  // --- UI BUILD METHODS (Mostly unchanged) ---
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +166,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Get.back(), // Use Get.back()
               ),
               const Expanded(
                 child: Text(
@@ -181,7 +180,29 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ),
                 ),
               ),
-              const SizedBox(width: 48),
+              // --- ADD DELETE BUTTON ---
+              Obx(
+                () => controller.isDeleting.value
+                    ? const SizedBox(
+                        width: 48,
+                        height: 48,
+                        child: Center(
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        ),
+                      )
+                    : IconButton(
+                        icon: const Icon(Icons.delete_outline,
+                            color: Colors.white, size: 28),
+                        onPressed: _deleteProduct,
+                      ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -211,6 +232,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
             ),
+            // Show new file if it exists, otherwise show network image
             child: _imageFile == null
                 ? Image.network(
                     widget.product.imageUrl,
@@ -296,7 +318,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             isPrimary: true,
           ),
           const SizedBox(height: 24),
-          const Divider(color: Colors.grey),
+          const Divider(color: Colors.white, thickness: 2),
           const SizedBox(height: 16),
           const Text(
             'Variant list',
@@ -310,11 +332,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
           _buildVariantListHeader(),
           _buildVariantList(),
           const SizedBox(height: 24),
-          // CHANGE 3: The "Update details" button now calls the validation method.
-          _buildActionButton(
-            text: 'Update details',
-            onPressed: _validateAndSubmit,
-            isPrimary: false,
+          // --- WRAP BUTTON IN Obx ---
+          Obx(
+            () => _buildActionButton(
+              text: 'Update details',
+              onPressed:
+                  controller.isUpdating.value ? () {} : _validateAndSubmit,
+              isPrimary: false,
+              isLoading: controller.isUpdating.value,
+            ),
           ),
         ],
       ),
@@ -468,6 +494,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     required String text,
     required VoidCallback onPressed,
     required bool isPrimary,
+    bool isLoading = false,
   }) {
     return ElevatedButton(
       onPressed: onPressed,
@@ -480,7 +507,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
-      child: Text(text),
+      child: isLoading
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : Text(text),
     );
   }
 }

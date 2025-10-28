@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'products_screen.dart'; // We need the data models
+// --- NEW IMPORTS ---
+import 'product_model.dart'; // Import the new model
+import 'product_controller.dart'; // Import the controller
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({Key? key}) : super(key: key);
@@ -11,7 +14,10 @@ class AddProductScreen extends StatefulWidget {
 }
 
 class _AddProductScreenState extends State<AddProductScreen> {
-  // --- STATE & CONTROLLERS ---
+  // --- FIND THE CONTROLLER ---
+  // We use Get.find() because the controller was already created by ProductsScreen
+  final ProductController controller = Get.find<ProductController>();
+
   final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _variantNameController = TextEditingController();
   final TextEditingController _buyPriceController = TextEditingController();
@@ -31,8 +37,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
     super.dispose();
   }
 
-  // --- LOGIC METHODS ---
-
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -45,25 +49,30 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   void _addVariant() {
-    if (_variantNameController.text.isNotEmpty &&
-        _buyPriceController.text.isNotEmpty &&
-        _sellPriceController.text.isNotEmpty &&
-        _stockController.text.isNotEmpty) {
-      final newVariant = ProductVariant(
-        name: _variantNameController.text,
-        buyPrice: double.tryParse(_buyPriceController.text) ?? 0.0,
-        sellPrice: double.tryParse(_sellPriceController.text) ?? 0.0,
-        stock: int.tryParse(_stockController.text) ?? 0,
-      );
-      setState(() {
-        _variants.add(newVariant);
-      });
-      _variantNameController.clear();
-      _buyPriceController.clear();
-      _sellPriceController.clear();
-      _stockController.clear();
-      FocusScope.of(context).unfocus();
+    // Basic validation
+    if (_variantNameController.text.isEmpty ||
+        _buyPriceController.text.isEmpty ||
+        _sellPriceController.text.isEmpty ||
+        _stockController.text.isEmpty) {
+      Get.snackbar('Error', 'Please fill all variant fields.',
+          snackPosition: SnackPosition.BOTTOM);
+      return;
     }
+
+    final newVariant = ProductVariant(
+      name: _variantNameController.text,
+      buyPrice: double.tryParse(_buyPriceController.text) ?? 0.0,
+      sellPrice: double.tryParse(_sellPriceController.text) ?? 0.0,
+      stock: int.tryParse(_stockController.text) ?? 0,
+    );
+    setState(() {
+      _variants.add(newVariant);
+    });
+    _variantNameController.clear();
+    _buyPriceController.clear();
+    _sellPriceController.clear();
+    _stockController.clear();
+    FocusScope.of(context).unfocus();
   }
 
   void _removeVariant(int index) {
@@ -72,11 +81,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
     });
   }
 
-  // CHANGE 1: Added a new method to handle validation and submission.
+  // --- UPDATED VALIDATE & SUBMIT ---
   void _validateAndSubmit() {
     final List<String> errors = [];
 
-    // Check for common errors
     if (_productNameController.text.isEmpty) {
       errors.add('- Product name cannot be empty.');
     }
@@ -87,17 +95,20 @@ class _AddProductScreenState extends State<AddProductScreen> {
       errors.add('- Please add at least one variant.');
     }
 
-    // If there are errors, show a dialog
     if (errors.isNotEmpty) {
       _showErrorDialog(errors);
     } else {
-      // If everything is valid, proceed to save (and then navigate back)
-      // TODO: Add actual logic to save the new product data
-      Navigator.of(context).pop();
+      // --- CALL THE CONTROLLER ---
+      // No loading spinner here, the controller's `isUploading`
+      // will be used on the "Create Product" button.
+      controller.addProduct(
+        name: _productNameController.text.trim(),
+        imageFile: _imageFile!,
+        variants: _variants,
+      );
     }
   }
 
-  // CHANGE 2: Created a helper widget to show the validation errors.
   void _showErrorDialog(List<String> errors) {
     showDialog(
       context: context,
@@ -122,8 +133,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
       ),
     );
   }
-
-  // --- UI BUILD METHODS (Mostly unchanged) ---
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +167,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Get.back(), // Use Get.back()
               ),
               const Expanded(
                 child: Text(
@@ -172,7 +181,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   ),
                 ),
               ),
-              const SizedBox(width: 48), // Balances the IconButton
+              const SizedBox(width: 48),
             ],
           ),
           const SizedBox(height: 8),
@@ -314,11 +323,18 @@ class _AddProductScreenState extends State<AddProductScreen> {
           _buildVariantListHeader(),
           _buildVariantList(),
           const SizedBox(height: 24),
-          // CHANGE 3: The "Create Product" button now calls the validation method.
-          _buildActionButton(
-            text: 'Create Product',
-            onPressed: _validateAndSubmit,
-            isPrimary: false,
+          // --- WRAP BUTTON IN Obx ---
+          // This will show a loading spinner on the button
+          // when the controller is uploading.
+          Obx(
+            () => _buildActionButton(
+              text: 'Create Product',
+              onPressed: controller.isUploading.value
+                  ? () {} // Do nothing when loading
+                  : _validateAndSubmit, // Otherwise, validate
+              isPrimary: false,
+              isLoading: controller.isUploading.value, // Pass loading state
+            ),
           ),
         ],
       ),
@@ -472,6 +488,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     required String text,
     required VoidCallback onPressed,
     required bool isPrimary,
+    bool isLoading = false, // Add isLoading parameter
   }) {
     return ElevatedButton(
       onPressed: onPressed,
@@ -484,7 +501,18 @@ class _AddProductScreenState extends State<AddProductScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
-      child: Text(text),
+      // Show spinner or text based on isLoading
+      child: isLoading
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : Text(text),
     );
   }
 }
+

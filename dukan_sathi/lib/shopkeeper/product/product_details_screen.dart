@@ -1,10 +1,12 @@
 import 'package:dukan_sathi/shopkeeper/product/edit_product_screen.dart';
 import 'package:flutter/material.dart';
-import 'products_screen.dart'; // We need the Product model from here
+import 'package:get/get.dart'; // Import GetX
+// --- IMPORT FIX ---
+// We no longer need products_screen.dart for the model
+import 'product_model.dart'; // Import the new model
 
-// This screen will display the details for a single product.
 class ProductDetailsScreen extends StatelessWidget {
-  final Product product; // It accepts a Product object to display.
+  final Product product;
 
   const ProductDetailsScreen({Key? key, required this.product})
     : super(key: key);
@@ -18,7 +20,7 @@ class ProductDetailsScreen extends StatelessWidget {
           children: [
             _buildHeader(context),
             _buildProductImage(),
-            _buildDetailsCard(context), // Pass context to the card builder
+            _buildDetailsCard(context),
           ],
         ),
       ),
@@ -41,7 +43,7 @@ class ProductDetailsScreen extends StatelessWidget {
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Get.back(), // Use Get.back()
               ),
               const Expanded(
                 child: Text(
@@ -87,6 +89,29 @@ class ProductDetailsScreen extends StatelessWidget {
           fit: BoxFit.cover,
           height: 250,
           width: double.infinity,
+          // Add loading/error builders for robustness
+          loadingBuilder: (context, child, progress) {
+            if (progress == null) return child;
+            return Container(
+              height: 250,
+              color: Colors.grey.shade200,
+              child: const Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFF5A7D60),
+                  strokeWidth: 2,
+                ),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) => Container(
+            height: 250,
+            color: Colors.grey.shade200,
+            child: Icon(
+              Icons.image_not_supported_outlined,
+              color: Colors.grey.shade400,
+              size: 60,
+            ),
+          ),
         ),
       ),
     );
@@ -126,14 +151,13 @@ class ProductDetailsScreen extends StatelessWidget {
           const SizedBox(height: 8),
           ...product.variants.map((variant) => _buildVariantRow(variant)),
           const SizedBox(height: 30),
-          _buildEditButton(context), // Pass context to the button builder
+          _buildEditButton(context),
         ],
       ),
     );
   }
 
   Widget _buildPriceHeader() {
-    // Added a "Stock" header
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -179,7 +203,6 @@ class ProductDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildVariantRow(ProductVariant variant) {
-    // Added the stock quantity display
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -235,14 +258,10 @@ class ProductDetailsScreen extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        // CHANGE: Added navigation logic to the onPressed callback
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EditProductScreen(product: product),
-            ),
-          );
+          // --- NAVIGATION FIX ---
+          // Use Get.to to navigate
+          Get.to(() => EditProductScreen(product: product));
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFB3C5B5),

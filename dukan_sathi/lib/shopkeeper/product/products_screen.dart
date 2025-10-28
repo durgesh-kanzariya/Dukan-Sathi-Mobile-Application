@@ -1,151 +1,70 @@
 import 'dart:ui';
-import 'package:dukan_sathi/shopkeeper/product/add_product_screen.dart'; // <-- 1. IMPORT the new screen
+import 'package:dukan_sathi/shopkeeper/product/add_product_screen.dart';
 import 'package:dukan_sathi/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+// --- NEW IMPORTS ---
 import 'product_details_screen.dart';
+import 'product_controller.dart'; // Import the controller
+import 'product_model.dart'; // Import the new model
 
-// --- DATA MODELS ---
-class ProductVariant {
-  final String name;
-  final double buyPrice;
-  final double sellPrice;
-  final int stock;
-
-  const ProductVariant({
-    required this.name,
-    required this.buyPrice,
-    required this.sellPrice,
-    required this.stock,
-  });
-}
-
-class Product {
-  final String name;
-  final String imageUrl;
-  final bool isSoldOut;
-  final List<ProductVariant> variants;
-
-  const Product({
-    required this.name,
-    required this.imageUrl,
-    this.isSoldOut = false,
-    required this.variants,
-  });
-
-  double get lowestPrice =>
-      variants.map((v) => v.sellPrice).reduce((a, b) => a < b ? a : b);
-}
-
-// --- MOCK DATA ---
-final List<Product> mockProducts = [
-  const Product(
-    name: 'Chocolate Cake',
-    imageUrl: 'https://placehold.co/400x400/5A3825/FFFFFF/png?text=Cake',
-    variants: [
-      ProductVariant(
-        name: '1.5 KG',
-        buyPrice: 50.00,
-        sellPrice: 75.00,
-        stock: 12,
-      ),
-      ProductVariant(
-        name: '1 KG',
-        buyPrice: 35.00,
-        sellPrice: 50.00,
-        stock: 20,
-      ),
-      ProductVariant(
-        name: '500 GM',
-        buyPrice: 20.00,
-        sellPrice: 25.00,
-        stock: 35,
-      ),
-    ],
-  ),
-  const Product(
-    name: 'Strawberry Cake',
-    imageUrl: 'https://placehold.co/400x400/DE3163/FFFFFF/png?text=Cake',
-    isSoldOut: true,
-    variants: [
-      ProductVariant(name: '1 KG', buyPrice: 30.00, sellPrice: 40.00, stock: 0),
-    ],
-  ),
-  // ... (rest of the mock data remains the same)
-  const Product(
-    name: 'Wheat Bread',
-    imageUrl: 'https://placehold.co/400x400/AF8F6D/FFFFFF/png?text=Bread',
-    variants: [
-      ProductVariant(name: 'Loaf', buyPrice: 8.00, sellPrice: 10.00, stock: 50),
-    ],
-  ),
-  const Product(
-    name: 'Chocolate Pastry',
-    imageUrl: 'https://placehold.co/400x400/6F4E37/FFFFFF/png?text=Pastry',
-    isSoldOut: true,
-    variants: [
-      ProductVariant(name: 'Single', buyPrice: 2.00, sellPrice: 3.00, stock: 0),
-    ],
-  ),
-  const Product(
-    name: 'Croissant',
-    imageUrl: 'https://placehold.co/400x400/D2B48C/FFFFFF/png?text=Croissant',
-    variants: [
-      ProductVariant(
-        name: 'Single',
-        buyPrice: 4.00,
-        sellPrice: 6.00,
-        stock: 150,
-      ),
-    ],
-  ),
-  const Product(
-    name: 'Red Velvet Cupcake',
-    imageUrl: 'https://placehold.co/400x400/9B1C31/FFFFFF/png?text=Cupcake',
-    variants: [
-      ProductVariant(
-        name: 'Single',
-        buyPrice: 5.00,
-        sellPrice: 7.00,
-        stock: 85,
-      ),
-      ProductVariant(
-        name: 'Box of 4',
-        buyPrice: 18.00,
-        sellPrice: 25.00,
-        stock: 20,
-      ),
-    ],
-  ),
-];
-
-// --- WIDGETS ---
+// --- DATA MODELS & MOCK DATA REMOVED ---
+// (They are now in product_model.dart)
 
 class ProductsScreen extends StatelessWidget {
   const ProductsScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    // --- INITIALIZE THE CONTROLLER ---
+    // Get.put() creates and initializes the controller
+    final ProductController controller = Get.put(ProductController());
+
     return Column(
       children: [
         const CustomAppBar(title: 'Product details'),
-        _buildAddProductButton(context), // <-- 2. PASS context
-        Expanded(child: _buildProductsList()),
+        _buildAddProductButton(context),
+        // --- WRAP THE LIST IN Obx ---
+        // Obx will automatically rebuild the list when controller.products changes
+        Expanded(
+          child: Obx(
+            () {
+              if (controller.isLoading.value) {
+                return const Center(
+                    child: CircularProgressIndicator(
+                  color: Color(0xFF5A7D60),
+                ));
+              }
+              if (controller.products.isEmpty) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: const Text(
+                      'No products found. Tap "Add product" to start.',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }
+              // Pass the dynamic list to the list builder
+              return _buildProductsList(controller.products);
+            },
+          ),
+        ),
       ],
     );
   }
-  
+
   Widget _buildAddProductButton(BuildContext context) {
-    // <-- 2. RECEIVE context
     return Padding(
       padding: const EdgeInsets.fromLTRB(20.0, 24.0, 20.0, 16.0),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          // <-- 3. UPDATE onPressed
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AddProductScreen()),
-            );
+            // Use Get.to for navigation
+            Get.to(() => const AddProductScreen());
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFB3C5B5),
@@ -165,8 +84,8 @@ class ProductsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProductsList() {
-    // ... (product list code remains the same)
+  // --- UPDATED to accept a List<Product> ---
+  Widget _buildProductsList(List<Product> products) {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 85),
       decoration: BoxDecoration(
@@ -203,7 +122,7 @@ class ProductsScreen extends StatelessWidget {
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: mockProducts.length,
+              itemCount: products.length, // Use dynamic length
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
@@ -211,7 +130,8 @@ class ProductsScreen extends StatelessWidget {
                 childAspectRatio: 0.8,
               ),
               itemBuilder: (context, index) {
-                return _ProductCard(product: mockProducts[index]);
+                // Use product from controller list
+                return _ProductCard(product: products[index]);
               },
             ),
           ),
@@ -227,15 +147,10 @@ class _ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ... (product card code remains the same)
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductDetailsScreen(product: product),
-          ),
-        );
+        // Use Get.to for navigation
+        Get.to(() => ProductDetailsScreen(product: product));
       },
       child: Container(
         decoration: BoxDecoration(
@@ -258,7 +173,31 @@ class _ProductCard extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.network(product.imageUrl, fit: BoxFit.cover),
+                    // Use Image.network with a fallback
+                    Image.network(
+                      product.imageUrl,
+                      fit: BoxFit.cover,
+                      // Show a placeholder while loading
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
+                        return Container(
+                          color: Colors.grey.shade200,
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: Color(0xFF5A7D60),
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        );
+                      },
+                      // Show an icon if the image fails to load
+                      errorBuilder: (context, error, stackTrace) =>
+                          Container(
+                        color: Colors.grey.shade200,
+                        child: Icon(Icons.image_not_supported_outlined,
+                            color: Colors.grey.shade400, size: 40),
+                      ),
+                    ),
                     if (product.isSoldOut) _buildSoldOutOverlay(),
                   ],
                 ),
@@ -278,6 +217,7 @@ class _ProductCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
+                      // Use the calculated lowestPrice
                       '\$${product.lowestPrice.toStringAsFixed(2)}',
                       style: const TextStyle(
                         color: Colors.black54,
@@ -295,7 +235,6 @@ class _ProductCard extends StatelessWidget {
   }
 
   Widget _buildSoldOutOverlay() {
-    // ... (sold out overlay code remains the same)
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(15),
@@ -329,3 +268,4 @@ class _ProductCard extends StatelessWidget {
     );
   }
 }
+
