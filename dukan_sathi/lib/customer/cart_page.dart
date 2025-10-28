@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dashboard.dart'; // Assuming this is your dashboard page
-import '/bottom_nav.dart';
+import 'package:dukan_sathi/customer/dashboard.dart'; // Assuming this is your dashboard page
+import 'package:dukan_sathi/bottom_nav.dart';
 
 // --- DATA MODELS (These are correct and necessary for the cart to function) ---
 class CartItem {

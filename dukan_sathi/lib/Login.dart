@@ -1,7 +1,7 @@
 import 'package:dukan_sathi/shopkeeper/dashboard/shopkeeper_main_screen.dart';
+import 'package:dukan_sathi/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:dukan_sathi/customer/dashboard.dart';
-import 'package:dukan_sathi/customer/sign_up.dart';
 import 'package:get/get.dart';
 
 class Login extends StatefulWidget {

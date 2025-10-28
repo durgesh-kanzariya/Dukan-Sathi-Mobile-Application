@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../bottom_nav.dart';
-import 'profile.dart';
+import 'package:dukan_sathi/bottom_nav.dart';
+import 'package:dukan_sathi/customer/profile.dart';
 
 class ChangePassword extends StatefulWidget {
   const ChangePassword({super.key});
