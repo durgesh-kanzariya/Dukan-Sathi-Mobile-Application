@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:dukan_sathi/Login.dart'; // Corrected import path (assuming Login.dart is in lib)
-import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Cloud Firestore
+import 'package:get/get.dart'; // Import GetX
+import 'package:dukan_sathi/Login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -12,30 +12,42 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers (renamed username to name for clarity)
+  // Controllers - Renamed usernameController to nameController for clarity
   final nameController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final emailController = TextEditingController();
-  final mobileController = TextEditingController();
+  // final mobileController = TextEditingController(); // Removed, not used in signup logic
 
   // States
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  String? _selectedRole = "customer"; // Changed default to lowercase
-  final List<String> _roles = ["customer", "shopkeeper"]; // Simplified roles
-  bool _isLoading = false;
-  String _errorMessage = "";
+  String? _selectedRole = "customer"; // Default to customer, use lowercase
+  final List<String> _roles = [
+    "customer",
+    "shopkeeper",
+  ]; // Simplified roles for Firestore
+
+  bool _isLoading = false; // Loading state for button
+  String _errorMessage = ""; // Error message state
 
   // Firebase Instances
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  @override
+  void dispose() {
+    nameController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    emailController.dispose();
+    // mobileController.dispose();
+    super.dispose();
+  }
+
   // --- Sign Up Function ---
   Future<void> _signUp() async {
-    if (!_formKey.currentState!.validate()) {
-      return; // Form is not valid
-    }
+    if (!_formKey.currentState!.validate()) return; // Validation failed
 
     setState(() {
       _isLoading = true;
@@ -43,48 +55,68 @@ class _SignUpState extends State<SignUp> {
     });
 
     try {
-      // 1. Create the user in Firebase Authentication
+      // 1. Create user in Firebase Authentication
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(
             email: emailController.text.trim(),
             password: passwordController.text.trim(),
           );
 
-      // 2. Get the new user's UID
-      String uid = userCredential.user!.uid;
+      User? user = userCredential.user;
 
-      // 3. Create a document in the `users` collection in Firestore
-      await _firestore.collection('users').doc(uid).set({
-        'name': nameController.text.trim(),
-        'email': emailController.text.trim(),
-        'mobile': mobileController.text.trim(),
-        'role': _selectedRole, // 'customer' or 'shopkeeper'
-        'createdAt': Timestamp.now(), // Good practice to add a timestamp
-      });
+      if (user != null) {
+        // 2. Create user document in Firestore
+        await _firestore.collection('users').doc(user.uid).set({
+          'name': nameController.text.trim(),
+          'email': emailController.text
+              .trim()
+              .toLowerCase(), // Store email consistently
+          'role': _selectedRole, // Use the selected role (customer/shopkeeper)
+          'createdAt': Timestamp.now(), // Good practice to add a timestamp
+          // Add other fields like mobile number if needed after collecting them
+        });
 
-      // If successful, the AuthGate will automatically navigate
-      // to the RoleRouter, so we don't need to do it here.
-      // We'll just pop the sign up page.
-      if (mounted) {
-        Get.back(); // Go back to the login page
+        // If successful, DO NOTHING here for navigation.
+        // AuthGate will detect the new user state and navigate.
+
+        // Pop this screen to return to the Login screen.
+        // AuthGate will then handle the navigation to the dashboard.
+        if (mounted) {
+          Get.back(); // <-- This is correct.
+        }
+      } else {
+        // Handle case where user creation returned null (shouldn't happen often)
+        throw Exception("User creation failed, user is null.");
       }
     } on FirebaseAuthException catch (e) {
+      String message;
       if (e.code == 'weak-password') {
-        _errorMessage = 'The password provided is too weak.';
+        message = 'The password provided is too weak.';
       } else if (e.code == 'email-already-in-use') {
-        _errorMessage = 'An account already exists for that email.';
+        message = 'An account already exists for that email.';
+      } else if (e.code == 'invalid-email') {
+        message = 'The email address is not valid.';
       } else {
-        _errorMessage = 'An error occurred. Please try again.';
+        message = 'An error occurred during sign up.';
+        print("Firebase Auth Error (${e.code}): ${e.message}");
       }
-      print("Firebase Auth Error: ${e.message}");
+      if (mounted) {
+        setState(() {
+          _errorMessage = message;
+        });
+      }
     } catch (e) {
-      _errorMessage = 'An error occurred. Please try again.';
-      print("General Error: $e");
+      print("General Sign Up Error: $e");
+      if (mounted) {
+        setState(() {
+          _errorMessage = "An unexpected error occurred.";
+        });
+      }
     }
 
     if (mounted) {
       setState(() {
-        _isLoading = false;
+        _isLoading = false; // Stop loading spinner regardless of outcome
       });
     }
   }
@@ -109,8 +141,12 @@ class _SignUpState extends State<SignUp> {
 
   // ---------------- Widgets Section ----------------
 
-  Widget _headerImage() =>
-      Image.asset("assets/imgs/1.png", width: double.infinity, height: 110);
+  Widget _headerImage() => Image.asset(
+    "assets/imgs/1.png", // Ensure path is correct
+    width: double.infinity,
+    height: 110,
+    fit: BoxFit.cover, // Added fit
+  );
 
   Widget _formSection() => Form(
     key: _formKey,
@@ -119,25 +155,42 @@ class _SignUpState extends State<SignUp> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: 30),
+          // Removed SizedBox to reduce top space
           const Text(
             "Create account",
             style: TextStyle(
-              fontSize: 22,
+              fontSize: 28, // Slightly larger
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
+            textAlign: TextAlign.center, // Center title
           ),
           const SizedBox(height: 30),
 
           _roleDropdown(),
           const SizedBox(height: 20),
 
+          // Changed Username to Name
           _textField(
-            controller: nameController, // Changed from usernameController
-            hint: "Full Name", // Changed from "Username"
+            controller: nameController,
+            hint: "Full Name",
             icon: Icons.person_outline,
             validator: (v) => v!.isEmpty ? "Enter your full name" : null,
+          ),
+          const SizedBox(height: 20),
+
+          _textField(
+            // Added Email Field
+            controller: emailController,
+            hint: "E-mail",
+            icon: Icons.email_outlined,
+            keyboardType: TextInputType.emailAddress,
+            validator: (v) {
+              if (v == null || v.isEmpty) return "Enter email";
+              if (!GetUtils.isEmail(v))
+                return "Enter valid email"; // Use GetUtils
+              return null;
+            },
           ),
           const SizedBox(height: 20),
 
@@ -148,8 +201,9 @@ class _SignUpState extends State<SignUp> {
             toggle: () => setState(() {
               _obscurePassword = !_obscurePassword;
             }),
-            validator: (v) =>
-                v!.length < 6 ? "Min 6 characters required" : null,
+            validator: (v) => (v == null || v.length < 6)
+                ? "Min 6 characters required"
+                : null,
           ),
           const SizedBox(height: 20),
 
@@ -165,57 +219,61 @@ class _SignUpState extends State<SignUp> {
           ),
           const SizedBox(height: 20),
 
-          _textField(
-            controller: emailController,
-            hint: "E-mail",
-            icon: Icons.email_outlined,
-            validator: (v) => !v!.contains("@") ? "Enter valid email" : null,
-          ),
-          const SizedBox(height: 20),
-
-          _textField(
-            controller: mobileController,
-            hint: "Mobile",
-            icon: Icons.phone_android,
-            inputType: TextInputType.phone,
-            validator: (v) => v!.length != 10 ? "Enter valid number" : null,
-          ),
-          const SizedBox(height: 30),
-
-          _signUpButton(),
-
-          // Widget to show error messages
-          if (_errorMessage.isNotEmpty)
+          // Removed Mobile field - add back if needed for profile later
+          // _textField(
+          //   controller: mobileController,
+          //   hint: "Mobile",
+          //   icon: Icons.phone_android,
+          //   inputType: TextInputType.phone,
+          //   validator: (v) => v!.length != 10 ? "Enter valid number" : null,
+          // ),
+          // const SizedBox(height: 30),
+          if (_errorMessage.isNotEmpty) // Display error message
             Padding(
-              padding: const EdgeInsets.only(top: 16.0),
+              padding: const EdgeInsets.only(bottom: 15.0),
               child: Text(
                 _errorMessage,
                 style: const TextStyle(color: Colors.red, fontSize: 14),
                 textAlign: TextAlign.center,
               ),
             ),
+
+          _signUpButton(),
         ],
       ),
     ),
   );
 
   Widget _roleDropdown() => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16),
+    padding: const EdgeInsets.symmetric(
+      horizontal: 16,
+      vertical: 5,
+    ), // Added vertical padding
     decoration: _boxDecoration(),
     child: DropdownButtonHideUnderline(
       child: DropdownButton<String>(
         value: _selectedRole,
         isExpanded: true,
+        icon: const Icon(
+          Icons.arrow_drop_down,
+          color: Colors.grey,
+        ), // Style icon
+        style: TextStyle(color: Colors.black87, fontSize: 16), // Style text
         items: _roles
             .map(
               (role) => DropdownMenuItem(
-                value: role, // The value is lowercase (e.g., "customer")
+                value: role,
                 child: Row(
+                  // Keep icon if desired
                   children: [
-                    const Icon(Icons.person),
-                    const SizedBox(width: 10),
-                    // Capitalize the first letter for display (e.g., "Customer")
-                    Text(role[0].toUpperCase() + role.substring(1)),
+                    Icon(
+                      role == 'shopkeeper' ? Icons.storefront : Icons.person,
+                      color: Colors.grey.shade600,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      role.capitalizeFirst ?? role,
+                    ), // Capitalize for display
                   ],
                 ),
               ),
@@ -231,22 +289,21 @@ class _SignUpState extends State<SignUp> {
     required String hint,
     required IconData icon,
     required String? Function(String?) validator,
-    TextInputType inputType = TextInputType.text,
+    TextInputType keyboardType = TextInputType.text, // Corrected parameter name
   }) => Container(
     decoration: _boxDecoration(),
     child: TextFormField(
       controller: controller,
-      keyboardType: inputType,
+      keyboardType: keyboardType, // Use corrected parameter
       decoration: InputDecoration(
-        prefixIcon: Icon(icon),
+        prefixIcon: Icon(icon, color: Colors.grey.shade600), // Style icon
         hintText: hint,
+        hintStyle: TextStyle(color: Colors.grey.shade500), // Style hint
         border: InputBorder.none,
-        contentPadding: const EdgeInsets.only(
-          left: 20,
-          right: 10,
-          top: 15,
-          bottom: 15,
-        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 15,
+        ), // Adjusted padding
       ),
       validator: validator,
     ),
@@ -264,19 +321,24 @@ class _SignUpState extends State<SignUp> {
       controller: controller,
       obscureText: obscure,
       decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.lock_outline),
+        prefixIcon: Icon(
+          Icons.lock_outline,
+          color: Colors.grey.shade600,
+        ), // Style icon
         hintText: hint,
+        hintStyle: TextStyle(color: Colors.grey.shade500), // Style hint
         border: InputBorder.none,
         suffixIcon: IconButton(
-          icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+          icon: Icon(
+            obscure ? Icons.visibility_off : Icons.visibility,
+            color: Colors.grey.shade600, // Style icon
+          ),
           onPressed: toggle,
         ),
-        contentPadding: const EdgeInsets.only(
-          left: 20,
-          right: 10,
-          top: 15,
-          bottom: 15,
-        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 15,
+        ), // Adjusted padding
       ),
       validator: validator,
     ),
@@ -284,21 +346,24 @@ class _SignUpState extends State<SignUp> {
 
   Widget _signUpButton() => ElevatedButton(
     style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.green.shade400,
+      backgroundColor: const Color(0xFF5F7D5D), // Use primary color
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-      padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+      padding: const EdgeInsets.symmetric(vertical: 15), // Consistent padding
+      minimumSize: const Size(double.infinity, 50), // Make button wide
     ),
-    onPressed: _isLoading ? null : _signUp, // Call our new _signUp function
+    onPressed: _isLoading ? null : _signUp, // Disable when loading
     child: _isLoading
         ? const SizedBox(
-            width: 24,
+            // Show spinner inside button
             height: 24,
+            width: 24,
             child: CircularProgressIndicator(
-              color: Colors.white,
               strokeWidth: 3,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
           )
         : const Row(
+            // Keep icon and text layout
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
@@ -306,33 +371,49 @@ class _SignUpState extends State<SignUp> {
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
               SizedBox(width: 8),
-              Icon(Icons.arrow_forward, color: Colors.white),
+              Icon(Icons.arrow_forward, color: Colors.white, size: 20),
             ],
           ),
   );
 
-  Widget _loginRedirectButton() => ElevatedButton(
-    style: ElevatedButton.styleFrom(
-      backgroundColor: const Color(0xFFF9F3E7),
-      foregroundColor: Colors.black,
-      shadowColor: Colors.transparent,
+  Widget _loginRedirectButton() => TextButton(
+    // Changed to TextButton for subtlety
+    style: TextButton.styleFrom(
+      foregroundColor: Colors.black54, // Less prominent color
     ),
-    child: const Text("Already have an account? Sign In"), // Changed text
-    onPressed: () => Get.off(Login()),
+    child: const Text(
+      "Already have an account? Sign In",
+      style: TextStyle(decoration: TextDecoration.underline), // Keep underline
+    ),
+    // Use Get.back() to simply pop this screen and return to Login
+    onPressed: () => Get.back(), // <-- THIS LINE WAS THE PROBLEM
   );
 
-  Widget _bottomImage() =>
-      Row(children: [Image.asset("assets/imgs/2.jpg", height: 200)]);
+  Widget _bottomImage() => Align(
+    // Align image to bottom left
+    alignment: Alignment.bottomLeft,
+    child: Image.asset(
+      "assets/imgs/2.jpg", // Ensure path is correct
+      height: 180, // Slightly smaller
+      // width: MediaQuery.of(context).size.width * 0.5, // Example width
+      fit: BoxFit.contain, // Use contain or cover as needed
+    ),
+  );
 
   BoxDecoration _boxDecoration() => BoxDecoration(
     color: Colors.white,
-    borderRadius: BorderRadius.circular(30),
+    borderRadius: BorderRadius.circular(12), // Less rounded
     boxShadow: [
       BoxShadow(
-        color: Colors.grey.shade300,
-        blurRadius: 8,
-        offset: const Offset(0, 4),
+        color: Colors.grey.withOpacity(0.15), // Softer shadow
+        spreadRadius: 1,
+        blurRadius: 5,
+        offset: const Offset(0, 2),
       ),
     ],
+    border: Border.all(
+      color: Colors.grey.shade200,
+      width: 0.8,
+    ), // Subtle border
   );
 }

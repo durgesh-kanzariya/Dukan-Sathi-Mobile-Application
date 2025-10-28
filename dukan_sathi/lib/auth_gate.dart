@@ -1,30 +1,32 @@
-import 'package:dukan_sathi/onboarding_page.dart';
+import 'package:dukan_sathi/Login.dart';
 import 'package:dukan_sathi/role_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+// GetX is no longer needed here for navigation
+// import 'package:get/get.dart';
 
-/*
-  This is the new "home" widget of your app.
-  It listens to the Firebase Auth state (using Provider).
-  - If the user is logged out (user == null), it shows the OnboardingPage.
-  - If the user is logged in (user != null), it shows the RoleRouter.
-*/
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Get the current user's auth state from the provider we set up in main.dart
+    // Listen to the user state via Provider
     final User? user = Provider.of<User?>(context);
+    print("--- AuthGate Build ---");
+    print("AuthGate: Current User from Provider: ${user?.uid ?? 'NULL'}");
 
-    // if user is null (not logged in), show the OnboardingPage.
+    // Directly return the appropriate widget based on the user state
     if (user == null) {
-      return OnboardingPage();
+      print("AuthGate: User is NULL. Returning Login screen.");
+      // If user is not logged in, show the Login screen
+      // Add a unique key here too, although less critical
+      return const Login(key: ValueKey('login_screen'));
+    } else {
+      print("AuthGate: User is LOGGED IN (${user.uid}). Returning RoleRouter.");
+      // If user is logged in, show the RoleRouter to determine the dashboard
+      // *** ADD A ValueKey based on the user's UID ***
+      return RoleRouter(key: ValueKey(user.uid), user: user);
     }
-
-    // if user IS logged in, show the RoleRouter,
-    // which will check their 'role' in Firestore.
-    return RoleRouter(user: user);
   }
 }

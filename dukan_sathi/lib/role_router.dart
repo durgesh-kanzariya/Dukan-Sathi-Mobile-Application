@@ -1,92 +1,111 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dukan_sathi/customer/dashboard.dart';
 import 'package:dukan_sathi/shopkeeper/dashboard/shopkeeper_main_screen.dart';
+import 'package:dukan_sathi/Login.dart'; // Import Login for error fallback
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // Import GetX
 
-/*
-  This widget is shown *after* a user is successfully logged in.
-  Its only job is to:
-  1. Get the logged-in user's ID (uid).
-  2. Look up that user's document in the `users` collection in Firestore.
-  3. Read the `role` field.
-  4. Show the correct dashboard (Customer or Shopkeeper) based on that role.
-*/
 class RoleRouter extends StatelessWidget {
   final User user;
   const RoleRouter({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
-    // We use a FutureBuilder because we are making a one-time request
-    // to Firestore to get the user's role.
+    print("--- RoleRouter Build ---");
+    print("RoleRouter: Trying to get role for user ${user.uid}");
+
     return FutureBuilder<DocumentSnapshot>(
-      // Get the document from Firestore using the user's UID
       future: FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .get(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        print(
+          "RoleRouter FutureBuilder: Snapshot ConnectionState = ${snapshot.connectionState}",
+        );
+
         // --- Handle Loading State ---
-        // If we're still waiting for data, show a loading circle.
         if (snapshot.connectionState == ConnectionState.waiting) {
+          print("RoleRouter FutureBuilder: Waiting for Firestore data...");
+          // Show loading UI while fetching data
           return const Scaffold(
-            backgroundColor: Color(0xFFF9F3E7), // Match your app theme
+            backgroundColor: Color(0xFFF9F3E7),
             body: Center(
               child: CircularProgressIndicator(color: Color(0xFF5F7D5D)),
             ),
           );
         }
 
-        // --- Handle Error State ---
-        // If something went wrong (e.g., user deleted, network error)
+        // --- Handle Error or No Data State ---
         if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
-          // You could show an error page here. For now, we'll just sign
-          // the user out to be safe and they will land back on the login screen.
-          print("Error fetching user role: ${snapshot.error}");
-          FirebaseAuth.instance.signOut();
+          print("RoleRouter FutureBuilder: ERROR fetching user role!");
+          print(
+            "   - hasError: ${snapshot.hasError}, Error: ${snapshot.error}",
+          );
+          print("   - hasData: ${snapshot.hasData}");
+          print("   - data exists: ${snapshot.data?.exists}");
+
+          // Use addPostFrameCallback for navigation after build
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            FirebaseAuth.instance.signOut(); // Sign out on error
+            // AuthGate will handle navigation back to Login on next rebuild
+          });
+          // Show an error message briefly before AuthGate takes over
           return const Scaffold(
             backgroundColor: Color(0xFFF9F3E7),
-            body: Center(child: Text("Error loading user data. Logging out.")),
+            body: Center(
+              child: Text("Error loading user data. Logging out..."),
+            ),
           );
         }
 
         // --- Handle Success State ---
+        // No immediate navigation needed here, return the correct dashboard widget
         if (snapshot.connectionState == ConnectionState.done) {
+          print(
+            "RoleRouter FutureBuilder: ConnectionState is DONE. Determining route...",
+          );
           try {
             Map<String, dynamic> data =
                 snapshot.data!.data() as Map<String, dynamic>;
-            String role =
-                data['role'] ?? 'customer'; // Default to 'customer' if no role
+            String role = data['role'] ?? 'customer'; // Default to customer
+            print("RoleRouter FutureBuilder: Successfully read role = '$role'");
 
             if (role == 'shopkeeper') {
-              // It's a shopkeeper! Show their dashboard.
+              print("RoleRouter FutureBuilder: Returning ShopkeeperMainScreen");
+              // Directly return the widget, GetX handled the entry navigation
               return const ShopkeeperMainScreen();
             } else {
-              // It's a customer. Show their dashboard.
-              // We pass the name from the Firestore document
+              print("RoleRouter FutureBuilder: Returning Customer Dashboard");
+              // Directly return the widget, GetX handled the entry navigation
               return Dashboard(
                 username: data['name'] ?? 'Customer',
                 password: '',
-              );
+              ); // Assuming Dashboard constructor
             }
           } catch (e) {
-            // Handle case where data is null or not a map
-            print("Error reading role data: $e");
-            FirebaseAuth.instance.signOut();
+            print("RoleRouter FutureBuilder: Error reading role data: $e");
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              FirebaseAuth.instance.signOut();
+              // AuthGate will handle navigation back to Login on next rebuild
+            });
             return const Scaffold(
               backgroundColor: Color(0xFFF9F3E7),
-              body: Center(child: Text("Invalid user data. Logging out.")),
+              body: Center(
+                child: Text("Invalid user data format. Logging out..."),
+              ),
             );
           }
         }
 
-        // Default fallback (shouldn't be reached)
+        // Default fallback (should indicate an issue)
+        print(
+          "RoleRouter FutureBuilder: Reached default fallback state (unexpected)",
+        );
         return const Scaffold(
           backgroundColor: Color(0xFFF9F3E7),
-          body: Center(
-            child: CircularProgressIndicator(color: Color(0xFF5F7D5D)),
-          ),
+          body: Center(child: Text("Loading...")), // Or an error message
         );
       },
     );
