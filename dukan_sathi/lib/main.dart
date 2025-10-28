@@ -1,11 +1,11 @@
-import 'package:dukan_sathi/dashboard.dart';
+
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'dart:ffi';
+
 
 import 'home_page.dart';
 
-import 'discover_shop.dart';
+
 
 void main() {
   runApp(const MainApp());

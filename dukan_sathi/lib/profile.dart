@@ -4,8 +4,7 @@ import 'package:dukan_sathi/history.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dashboard.dart';
-import 'Login.dart';
-import 'sign_up.dart';
+
 import 'change_password.dart';
 
 

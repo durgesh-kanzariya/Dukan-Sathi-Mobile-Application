@@ -1,14 +1,10 @@
 import 'package:dukan_sathi/Login.dart';
-// import 'package:dukan_sathi/shopkeeper/dashboard/shopkeeper_main_screen.dart';
-import 'package:dukan_sathi/sign_up.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
-// import 'customer/dashboard.dart';
-// import 'shopkeeper/dashboard/dashboard_page.dart';
-// import
+
 
 class Foregot extends StatefulWidget {
   @override
@@ -84,7 +80,7 @@ void _showDialog(String title, String content, {bool isSuccess = false}) {
             // 2. Agar success hua hai, toh Login page par redirect karo
             if (isSuccess) {
               // GetX use karke seedha Login screen par jao aur pichli screens hata do
-              Get.offAll(Login()); 
+              Get.offAll(Login());
             }
           },
           child: Text("OK"),
@@ -94,25 +90,7 @@ void _showDialog(String title, String content, {bool isSuccess = false}) {
   );
 }
 
-  void _showErrorDialog(String title, String content) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text("OK"),
-          ),
-        ],
-      ),
-    );
-  }
 
-
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -203,35 +181,8 @@ void _showDialog(String title, String content, {bool isSuccess = false}) {
     ),
   );
 
-  Widget _passwordField({
-    required TextEditingController controller,
-    required String hint,
-    required bool obscure,
-    required VoidCallback toggle,
-    required String? Function(String?) validator,
-  }) => Container(
-    decoration: _boxDecoration(),
-    child: TextFormField(
-      controller: controller,
-      obscureText: obscure,
-      decoration: InputDecoration(
-        prefixIcon: Icon(Icons.lock_outline),
-        hintText: hint,
-        border: InputBorder.none,
-        suffixIcon: IconButton(
-          icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
-          onPressed: toggle,
-        ),
-        contentPadding: EdgeInsets.only(
-          left: 20,
-          right: 10,
-          top: 15,
-          bottom: 15,
-        ),
-      ),
-      validator: validator,
-    ),
-  );
+
+
 
   Widget _ForegotButton() => ElevatedButton(
     style: ElevatedButton.styleFrom(

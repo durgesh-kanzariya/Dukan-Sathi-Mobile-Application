@@ -109,7 +109,6 @@ class _LoginState extends State<Login> {
   }
 
   bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
   String? _selectedRole = "Customer";
   final List<String> _roles = ["Customer", "Shopkeeper"];
 

@@ -3,8 +3,8 @@ import 'dashboard.dart';
 import 'package:get/get.dart';
 
 import 'bottom_nav.dart';
-import 'monthly_spending_lage.dart';
-import 'product_page.dart';
+
+
 
 class MonthlySpendingLage extends StatefulWidget {
   const MonthlySpendingLage({super.key});

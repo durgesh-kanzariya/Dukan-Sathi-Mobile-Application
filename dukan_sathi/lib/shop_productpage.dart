@@ -1,10 +1,8 @@
 import 'package:dukan_sathi/discover_shop.dart';
 import 'package:flutter/material.dart';
-import 'dashboard.dart';
 import 'package:get/get.dart';
 
 import 'bottom_nav.dart';
-import 'monthly_spending_lage.dart';
 import 'product_page.dart';
 
 class ShopProductpage extends StatefulWidget {

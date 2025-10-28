@@ -1,8 +1,7 @@
-import 'package:dukan_sathi/pickup_code.dart';
+
 import 'package:flutter/material.dart';
 import 'bottom_nav.dart';
 import 'package:get/get.dart';
-import 'history.dart';
 import 'order_details.dart';
 
 class PickupCode extends StatefulWidget {
