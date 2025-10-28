@@ -5,8 +5,6 @@ import 'dart:ffi';
 
 import 'home_page.dart';
 
-
-
 import 'discover_shop.dart';
 
 void main() {

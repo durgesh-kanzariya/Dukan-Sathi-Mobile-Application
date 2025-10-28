@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "743665484397",
+    "project_id": "dukan-sathi-601a1",
+    "storage_bucket": "dukan-sathi-601a1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:743665484397:android:c328c69e68f6ea0de6f564",
+        "android_client_info": {
+          "package_name": "com.example.dukan_sathi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBp2RtIKQ16psAuaJN1M9xv8ER8JtrmBEE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
