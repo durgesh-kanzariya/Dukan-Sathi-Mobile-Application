@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // Import Get
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:dukan_sathi/shopkeeper/order/order_controller.dart'; // Import OrderController
 
 class PickupCodeScreen extends StatefulWidget {
   const PickupCodeScreen({Key? key}) : super(key: key);
@@ -9,33 +11,21 @@ class PickupCodeScreen extends StatefulWidget {
 }
 
 class _PickupCodeScreenState extends State<PickupCodeScreen> {
+  // --- 1. FIND THE CONTROLLER ---
+  final OrderController controller = Get.find<OrderController>();
+
   // Controller for the mobile scanner
-  final MobileScannerController controller = MobileScannerController(
+  final MobileScannerController scannerController = MobileScannerController(
     detectionSpeed: DetectionSpeed.normal,
     facing: CameraFacing.back,
   );
+  // Controller for the text field
+  final TextEditingController textController = TextEditingController();
+
   bool isScanCompleted = false; // To prevent multiple scans
 
-  // Function to show the success dialog
-  void _showSuccessDialog(String code) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // User must tap button to close
-      builder: (context) => AlertDialog(
-        title: const Text('Scan Successful'),
-        content: Text('Order Code: $code'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-              Navigator.of(context).pop(); // Go back from the scan screen
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
+  // --- 2. REMOVED _showSuccessDialog ---
+  // The OrderController now handles all success/error dialogs and navigation.
 
   @override
   Widget build(BuildContext context) {
@@ -60,16 +50,16 @@ class _PickupCodeScreenState extends State<PickupCodeScreen> {
                           alignment: Alignment.center,
                           children: [
                             MobileScanner(
-                              controller: controller,
+                              controller: scannerController,
                               onDetect: (capture) {
-                                // CHANGE: Added logic to stop the camera and prevent re-scans
+                                // --- 3. CALL THE CONTROLLER ---
                                 if (!isScanCompleted) {
-                                  isScanCompleted = true;
                                   final String? code =
                                       capture.barcodes.first.rawValue;
-                                  if (code != null) {
-                                    // controller.stop(); // <-- REMOVED THIS LINE
-                                    _showSuccessDialog(code);
+                                  if (code != null && code.isNotEmpty) {
+                                    isScanCompleted = true; // Prevent re-scans
+                                    // Call the controller to complete the order
+                                    controller.completeOrder(code);
                                   }
                                 }
                               },
@@ -102,7 +92,9 @@ class _PickupCodeScreenState extends State<PickupCodeScreen> {
                       style: TextStyle(fontSize: 18, color: Colors.black87),
                     ),
                     const SizedBox(height: 20),
-                    _buildCodeInput(),
+                    _buildCodeInput(), // This now uses textController
+                    const SizedBox(height: 20),
+                    _buildSubmitButton(), // --- 4. ADDED SUBMIT BUTTON ---
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -131,7 +123,7 @@ class _PickupCodeScreenState extends State<PickupCodeScreen> {
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Get.back();
                 },
               ),
               const Expanded(
@@ -150,7 +142,7 @@ class _PickupCodeScreenState extends State<PickupCodeScreen> {
             ],
           ),
           const Text(
-            'Order details',
+            'Order Pickup', // Updated title
             style: TextStyle(color: Colors.white70, fontSize: 18),
           ),
         ],
@@ -160,6 +152,7 @@ class _PickupCodeScreenState extends State<PickupCodeScreen> {
 
   Widget _buildCodeInput() {
     return TextField(
+      controller: textController, // --- 5. CONNECT TEXT CONTROLLER ---
       textAlign: TextAlign.center,
       style: const TextStyle(fontSize: 18, letterSpacing: 2),
       decoration: InputDecoration(
@@ -179,10 +172,38 @@ class _PickupCodeScreenState extends State<PickupCodeScreen> {
     );
   }
 
-  // Make sure to dispose of the controller
+  // --- 6. NEW SUBMIT BUTTON WIDGET ---
+  Widget _buildSubmitButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          final code = textController.text.trim();
+          if (code.isNotEmpty) {
+            // Call the same controller function
+            controller.completeOrder(code);
+          } else {
+            Get.snackbar('Error', 'Please enter a pickup code.');
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF5A7D60),
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        child: const Text('Submit Code'),
+      ),
+    );
+  }
+
   @override
   void dispose() {
-    controller.dispose();
+    scannerController.dispose();
+    textController.dispose();
     super.dispose();
   }
 }

@@ -1,116 +1,80 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../../widgets/custom_app_bar.dart';
 import 'shopkeeper_order_details.dart';
-import '../dashboard/dashboard_page.dart';
+import 'order_controller.dart'; // Import controller
+import 'order_model.dart'; // Import model
 
-// --- DATA MODEL ---
-class HistoricalOrder {
-  final String orderId;
-  final String customerName;
-  final String status;
-  final double totalPrice;
-  final String date;
+// --- ALL STATIC DATA MODELS & MOCK DATA ARE DELETED ---
 
-  const HistoricalOrder({
-    required this.orderId,
-    required this.customerName,
-    required this.status,
-    required this.totalPrice,
-    required this.date,
-  });
-}
-
-// --- MOCK DATA ---
-// UPDATED: The orderIds now match the ones in the dashboard's mock data
-// to ensure the lookup is successful.
-final List<HistoricalOrder> orderHistory = [
-  const HistoricalOrder(
-    orderId: '812463187642', // This ID belongs to John D.
-    customerName: 'John D.',
-    status: 'Ready for pickup',
-    totalPrice: 90.00,
-    date: '31/08/2025',
-  ),
-  const HistoricalOrder(
-    orderId: '5432109876', // This ID belongs to Sarah M.
-    customerName: 'Sarah M.',
-    status: 'Picked Up',
-    totalPrice: 25.00,
-    date: '30/08/2025',
-  ),
-  const HistoricalOrder(
-    orderId: '9876543210', // This ID belongs to Parvez B.
-    customerName: 'Parvez B.',
-    status: 'Picked Up',
-    totalPrice: 38.00,
-    date: '29/08/2025',
-  ),
-];
-
-// --- MAIN SCREEN ---
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Combine all orders from the dashboard into a single list to search from.
-    // In a real app, this data would come from a database.
-    final List<Order> allOrders = [...newOrders, ...preparingOrders];
+    // --- FIND THE CONTROLLER ---
+    final OrderController controller = Get.find<OrderController>();
 
     return Column(
       children: [
         const CustomAppBar(title: 'History'),
         Expanded(
-          child: Container(
-            margin: const EdgeInsets.fromLTRB(10, 10, 10, 90),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF5F7D5D), // Dark green top
-                  Color(0xFFDADBCF), // Creamy white bottom
-                ],
-              ),
-            ),
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-              itemCount: orderHistory.length,
-              itemBuilder: (context, index) {
-                final historicalOrder = orderHistory[index];
-                return InkWell(
-                  onTap: () {
-                    // Find the full order details from the master list using the orderId.
-                    final detailedOrder = allOrders.firstWhere(
-                      (order) => order.orderId == historicalOrder.orderId,
-                      // Fallback in case an order is not found (should not happen with mock data)
-                      orElse: () => Order(
-                        orderId: historicalOrder.orderId,
-                        customerName: historicalOrder.customerName,
-                        timeAgo: 'N/A',
-                        status: OrderStatus.New,
-                        date: historicalOrder.date,
-                        address: 'Address not found',
-                        items: [],
-                      ),
-                    );
+          // --- WRAP IN Obx TO LISTEN FOR CHANGES ---
+          child: Obx(
+            () {
+              if (controller.isLoading.value && controller.historyOrders.isEmpty) {
+                return const Center(
+                  child: CircularProgressIndicator(color: Color(0xFF5A7D60)),
+                );
+              }
+              
+              if (controller.historyOrders.isEmpty) {
+                 return const Center(
+                  child: Text(
+                    "No completed or cancelled orders found.",
+                    style: TextStyle(color: Colors.black54),
+                  ),
+                );
+              }
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ShopkeeperOrderDetailsScreen(
-                          order: detailedOrder,
-                          showActions: false, // Buttons are hidden for history
-                        ),
-                      ),
+              return Container(
+                margin: const EdgeInsets.fromLTRB(10, 10, 10, 90),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0xFF5F7D5D), // Dark green top
+                      Color(0xFFDADBCF), // Creamy white bottom
+                    ],
+                  ),
+                ),
+                child: ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                  itemCount: controller.historyOrders.length, // Use dynamic list
+                  itemBuilder: (context, index) {
+                    final order = controller.historyOrders[index];
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ShopkeeperOrderDetailsScreen(
+                              order: order,
+                              showActions: false, // Buttons are hidden for history
+                            ),
+                          ),
+                        );
+                      },
+                      child: HistoryCard(order: order), // Pass the new Order object
                     );
                   },
-                  child: HistoryCard(order: historicalOrder),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -118,14 +82,13 @@ class HistoryScreen extends StatelessWidget {
   }
 }
 
-// --- CARD DESIGN ---
 class HistoryCard extends StatelessWidget {
-  final HistoricalOrder order;
+  final Order order; // Use the REAL Order model
 
   const HistoryCard({Key? key, required this.order}) : super(key: key);
 
   Color _getStatusColor(String status) {
-    if (status == 'Cancelled') {
+    if (status == 'cancelled') {
       return Colors.red.shade400;
     }
     return const Color(0xFF5F7D5D); // Green shade for other statuses
@@ -173,16 +136,16 @@ class HistoryCard extends StatelessWidget {
                   children: [
                     const Text("Order Id:", style: labelStyle),
                     const SizedBox(width: 15),
-                    Expanded(child: Text(order.orderId, style: valueStyle)),
+                    Expanded(child: Text(order.id, style: valueStyle)),
                   ],
                 ),
                 const Divider(thickness: 1, color: Colors.white),
                 Row(
                   children: [
-                    const Text("Customer name:", style: labelStyle),
+                    const Text("Customer id:", style: labelStyle),
                     const SizedBox(width: 15),
                     Expanded(
-                      child: Text(order.customerName, style: valueStyle),
+                      child: Text(order.customerId, style: valueStyle),
                     ),
                   ],
                 ),
@@ -192,7 +155,7 @@ class HistoryCard extends StatelessWidget {
                     const SizedBox(width: 15),
                     Expanded(
                       child: Text(
-                        order.status,
+                        order.status.capitalizeFirst ?? order.status,
                         style: valueStyle.copyWith(
                           color: _getStatusColor(order.status),
                         ),
@@ -206,7 +169,7 @@ class HistoryCard extends StatelessWidget {
                     const SizedBox(width: 15),
                     Expanded(
                       child: Text(
-                        "\$${order.totalPrice.toStringAsFixed(0)}",
+                        "\$${order.totalPrice.toStringAsFixed(2)}", // Show cents
                         style: valueStyle,
                       ),
                     ),
@@ -216,7 +179,12 @@ class HistoryCard extends StatelessWidget {
                   children: [
                     const Text("Date:", style: labelStyle),
                     const SizedBox(width: 15),
-                    Expanded(child: Text(order.date, style: valueStyle)),
+                    Expanded(
+                      child: Text(
+                        DateFormat('dd/MM/yy').format(order.createdAt.toDate()),
+                        style: valueStyle,
+                      ),
+                    ),
                   ],
                 ),
               ],

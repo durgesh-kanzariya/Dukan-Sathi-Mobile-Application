@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; // Import GetX
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-// --- NEW IMPORTS ---
 import 'product_model.dart';
 import 'product_controller.dart';
 
@@ -15,10 +14,11 @@ class EditProductScreen extends StatefulWidget {
 }
 
 class _EditProductScreenState extends State<EditProductScreen> {
-  // --- FIND THE CONTROLLER ---
   final ProductController controller = Get.find<ProductController>();
 
   late TextEditingController _productNameController;
+  // --- 1. ADD DESCRIPTION CONTROLLER ---
+  late TextEditingController _descriptionController;
   final TextEditingController _variantNameController = TextEditingController();
   final TextEditingController _buyPriceController = TextEditingController();
   final TextEditingController _sellPriceController = TextEditingController();
@@ -30,13 +30,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
   @override
   void initState() {
     super.initState();
-    _productNameController = TextEditingController(text: widget.product.name);
+    // --- 2. INITIALIZE CONTROLLERS FROM WIDGET ---
+    _productNameController =
+        TextEditingController(text: widget.product.productName); // Fix: use productName
+    _descriptionController =
+        TextEditingController(text: widget.product.description);
     _variants = List<ProductVariant>.from(widget.product.variants);
   }
 
   @override
   void dispose() {
     _productNameController.dispose();
+    _descriptionController.dispose(); // --- 3. DISPOSE IT ---
     _variantNameController.dispose();
     _buyPriceController.dispose();
     _sellPriceController.dispose();
@@ -90,22 +95,27 @@ class _EditProductScreenState extends State<EditProductScreen> {
       _showErrorDialog(['- Product name cannot be empty.']);
       return;
     }
+    // --- 4. VALIDATE DESCRIPTION ---
+    if (_descriptionController.text.isEmpty) {
+      _showErrorDialog(['- Product description cannot be empty.']);
+      return;
+    }
     if (_variants.isEmpty) {
       _showErrorDialog(['- A product must have at least one variant.']);
       return;
     }
 
-    // --- CALL CONTROLLER'S UPDATE FUNCTION ---
+    // --- 5. PASS DESCRIPTION TO CONTROLLER ---
     controller.updateProduct(
       id: widget.product.id,
       name: _productNameController.text.trim(),
+      description: _descriptionController.text.trim(),
       variants: _variants,
       newImageFile: _imageFile,
       existingImageUrl: widget.product.imageUrl,
     );
   }
 
-  // --- NEW: CALL CONTROLLER'S DELETE FUNCTION ---
   void _deleteProduct() {
     controller.deleteProduct(widget.product.id);
   }
@@ -166,7 +176,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Get.back(), // Use Get.back()
+                onPressed: () => Get.back(),
               ),
               const Expanded(
                 child: Text(
@@ -180,7 +190,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ),
                 ),
               ),
-              // --- ADD DELETE BUTTON ---
               Obx(
                 () => controller.isDeleting.value
                     ? const SizedBox(
@@ -232,13 +241,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
             ),
-            // Show new file if it exists, otherwise show network image
             child: _imageFile == null
                 ? Image.network(
                     widget.product.imageUrl,
                     fit: BoxFit.cover,
                     height: 250,
                     width: double.infinity,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      height: 250,
+                      color: Colors.grey.shade200,
+                      child: Icon(Icons.image_not_supported, color: Colors.grey.shade400, size: 50),
+                    ),
                   )
                 : Image.file(
                     File(_imageFile!.path),
@@ -279,6 +292,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
           _buildTextField(
             controller: _productNameController,
             hint: 'Product Name',
+          ),
+          const SizedBox(height: 16),
+          // --- 6. ADD DESCRIPTION TEXT FIELD ---
+          _buildTextField(
+            controller: _descriptionController,
+            hint: 'Product Description',
+            maxLines: 3,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -332,7 +352,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
           _buildVariantListHeader(),
           _buildVariantList(),
           const SizedBox(height: 24),
-          // --- WRAP BUTTON IN Obx ---
           Obx(
             () => _buildActionButton(
               text: 'Update details',
@@ -351,10 +370,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
     required TextEditingController controller,
     required String hint,
     TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1, // Add maxLines
   }) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
+      maxLines: maxLines, // Use maxLines
       decoration: InputDecoration(
         hintText: hint,
         filled: true,

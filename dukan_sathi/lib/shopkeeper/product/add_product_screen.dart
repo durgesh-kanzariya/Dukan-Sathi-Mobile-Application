@@ -2,9 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-// --- NEW IMPORTS ---
-import 'product_model.dart'; // Import the new model
-import 'product_controller.dart'; // Import the controller
+import 'product_model.dart';
+import 'product_controller.dart';
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({Key? key}) : super(key: key);
@@ -14,11 +13,11 @@ class AddProductScreen extends StatefulWidget {
 }
 
 class _AddProductScreenState extends State<AddProductScreen> {
-  // --- FIND THE CONTROLLER ---
-  // We use Get.find() because the controller was already created by ProductsScreen
   final ProductController controller = Get.find<ProductController>();
 
   final TextEditingController _productNameController = TextEditingController();
+  // --- 1. ADD DESCRIPTION CONTROLLER ---
+  final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _variantNameController = TextEditingController();
   final TextEditingController _buyPriceController = TextEditingController();
   final TextEditingController _sellPriceController = TextEditingController();
@@ -30,6 +29,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   void dispose() {
     _productNameController.dispose();
+    _descriptionController.dispose(); // --- 2. DISPOSE IT ---
     _variantNameController.dispose();
     _buyPriceController.dispose();
     _sellPriceController.dispose();
@@ -49,7 +49,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   void _addVariant() {
-    // Basic validation
     if (_variantNameController.text.isEmpty ||
         _buyPriceController.text.isEmpty ||
         _sellPriceController.text.isEmpty ||
@@ -75,18 +74,23 @@ class _AddProductScreenState extends State<AddProductScreen> {
     FocusScope.of(context).unfocus();
   }
 
+  // --- ADD THIS METHOD ---
   void _removeVariant(int index) {
     setState(() {
       _variants.removeAt(index);
     });
   }
+  // --- END OF ADDITION ---
 
-  // --- UPDATED VALIDATE & SUBMIT ---
   void _validateAndSubmit() {
     final List<String> errors = [];
 
     if (_productNameController.text.isEmpty) {
       errors.add('- Product name cannot be empty.');
+    }
+    // --- 3. VALIDATE DESCRIPTION ---
+    if (_descriptionController.text.isEmpty) {
+      errors.add('- Product description cannot be empty.');
     }
     if (_imageFile == null) {
       errors.add('- Please select a product image.');
@@ -98,11 +102,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
     if (errors.isNotEmpty) {
       _showErrorDialog(errors);
     } else {
-      // --- CALL THE CONTROLLER ---
-      // No loading spinner here, the controller's `isUploading`
-      // will be used on the "Create Product" button.
+      // --- 4. PASS DESCRIPTION TO CONTROLLER ---
       controller.addProduct(
         name: _productNameController.text.trim(),
+        description: _descriptionController.text.trim(),
         imageFile: _imageFile!,
         variants: _variants,
       );
@@ -167,7 +170,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Get.back(), // Use Get.back()
+                onPressed: () => Get.back(),
               ),
               const Expanded(
                 child: Text(
@@ -269,6 +272,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
             hint: 'Product Name',
           ),
           const SizedBox(height: 16),
+          // --- 5. ADD DESCRIPTION TEXT FIELD ---
+          _buildTextField(
+            controller: _descriptionController,
+            hint: 'Product Description',
+            maxLines: 3,
+          ),
+          const SizedBox(height: 16),
           _buildTextField(
             controller: _variantNameController,
             hint: 'Variant Name',
@@ -323,17 +333,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
           _buildVariantListHeader(),
           _buildVariantList(),
           const SizedBox(height: 24),
-          // --- WRAP BUTTON IN Obx ---
-          // This will show a loading spinner on the button
-          // when the controller is uploading.
           Obx(
             () => _buildActionButton(
               text: 'Create Product',
               onPressed: controller.isUploading.value
-                  ? () {} // Do nothing when loading
-                  : _validateAndSubmit, // Otherwise, validate
+                  ? () {} 
+                  : _validateAndSubmit, 
               isPrimary: false,
-              isLoading: controller.isUploading.value, // Pass loading state
+              isLoading: controller.isUploading.value,
             ),
           ),
         ],
@@ -345,10 +352,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
     required TextEditingController controller,
     required String hint,
     TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1, // Add maxLines
   }) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
+      maxLines: maxLines, // Use maxLines
       decoration: InputDecoration(
         hintText: hint,
         filled: true,
@@ -488,7 +497,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     required String text,
     required VoidCallback onPressed,
     required bool isPrimary,
-    bool isLoading = false, // Add isLoading parameter
+    bool isLoading = false,
   }) {
     return ElevatedButton(
       onPressed: onPressed,
@@ -501,7 +510,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
-      // Show spinner or text based on isLoading
       child: isLoading
           ? const SizedBox(
               height: 20,
@@ -515,4 +523,3 @@ class _AddProductScreenState extends State<AddProductScreen> {
     );
   }
 }
-

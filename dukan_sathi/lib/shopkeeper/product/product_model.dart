@@ -13,7 +13,6 @@ class ProductVariant {
     required this.stock,
   });
 
-  // Convert a ProductVariant instance to a Map
   Map<String, dynamic> toMap() {
     return {
       'name': name,
@@ -23,7 +22,6 @@ class ProductVariant {
     };
   }
 
-  // Create a ProductVariant instance from a Map
   factory ProductVariant.fromMap(Map<String, dynamic> map) {
     return ProductVariant(
       name: map['name'] ?? '',
@@ -35,54 +33,64 @@ class ProductVariant {
 }
 
 class Product {
-  final String id; // Document ID from Firestore
-  final String name;
+  final String id;
+  // Your sample data uses 'productName', your old model uses 'name'
+  // I will use 'productName' to match your sample data.
+  final String productName;
   final String imageUrl;
+  final String description; // From your sample data
   final List<ProductVariant> variants;
 
-  // Calculated property for isSoldOut
   bool get isSoldOut => variants.every((variant) => variant.stock == 0);
 
-  // Calculated property for lowest price
   double get lowestPrice {
     if (variants.isEmpty) return 0.0;
+    // Your sample data has 'price' at the top level, but your
+    // model has it in the variants. I'll use the variants.
     return variants.map((v) => v.sellPrice).reduce((a, b) => a < b ? a : b);
   }
 
   const Product({
     required this.id,
-    required this.name,
+    required this.productName,
     required this.imageUrl,
+    required this.description,
     required this.variants,
   });
 
-  // Convert a Product instance to a Map for Firestore
-  // Note: We don't save 'id' as a field, it's the document ID.
-  Map<String, dynamic> toMap() {
-    return {
-      'name': name,
-      'imageUrl': imageUrl,
-      // Convert list of variants to a list of maps
-      'variants': variants.map((variant) => variant.toMap()).toList(),
-      'createdAt':
-          FieldValue.serverTimestamp(), // Good practice to timestamp
-    };
-  }
-
-  // Create a Product instance from a Firestore DocumentSnapshot
   factory Product.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snap) {
     final data = snap.data() ?? {};
-    final variantMaps = data['variants'] as List<dynamic>? ?? [];
+
+    final variantData = data['variants'] as List<dynamic>? ?? [];
+
+    // --- THIS IS THE FIX ---
+    // We will safely parse the variants and skip any bad ones.
+    final List<ProductVariant> parsedVariants = [];
+    for (final v in variantData) {
+      // Check if the item 'v' is actually a map
+      if (v is Map<String, dynamic>) {
+        try {
+          // Try to parse it
+          parsedVariants.add(ProductVariant.fromMap(v));
+        } catch (e) {
+          // If parsing fails, print an error but don't crash
+          print('Failed to parse variant for product ${snap.id}: $e');
+        }
+      } else {
+        // If 'v' is a String or something else, log it and skip
+        print(
+          'Skipping invalid variant data for product ${snap.id}. Expected Map, got ${v.runtimeType}',
+        );
+      }
+    }
+    // --- END OF FIX ---
 
     return Product(
-      id: snap.id, // Get the document ID
-      name: data['name'] ?? '',
+      id: snap.id,
+      productName: data['productName'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
-      variants: variantMaps
-          .map((variantMap) =>
-              ProductVariant.fromMap(variantMap as Map<String, dynamic>))
-          .toList(),
+      description: data['description'] ?? '',
+      variants: parsedVariants, // Use the safely parsed list
     );
   }
 }
-

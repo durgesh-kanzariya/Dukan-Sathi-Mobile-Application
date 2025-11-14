@@ -3,54 +3,42 @@ import 'package:dukan_sathi/shopkeeper/product/add_product_screen.dart';
 import 'package:dukan_sathi/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// --- NEW IMPORTS ---
 import 'product_details_screen.dart';
-import 'product_controller.dart'; // Import the controller
-import 'product_model.dart'; // Import the new model
-
-// --- DATA MODELS & MOCK DATA REMOVED ---
-// (They are now in product_model.dart)
+import 'product_controller.dart';
+import 'product_model.dart';
 
 class ProductsScreen extends StatelessWidget {
   const ProductsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // --- INITIALIZE THE CONTROLLER ---
-    // Get.put() creates and initializes the controller
-    final ProductController controller = Get.put(ProductController());
+    final ProductController controller = Get.find<ProductController>();
 
     return Column(
       children: [
         const CustomAppBar(title: 'Product details'),
         _buildAddProductButton(context),
-        // --- WRAP THE LIST IN Obx ---
-        // Obx will automatically rebuild the list when controller.products changes
         Expanded(
-          child: Obx(
-            () {
-              if (controller.isLoading.value) {
-                return const Center(
-                    child: CircularProgressIndicator(
-                  color: Color(0xFF5A7D60),
-                ));
-              }
-              if (controller.products.isEmpty) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: const Text(
-                      'No products found. Tap "Add product" to start.',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                      textAlign: TextAlign.center,
-                    ),
+          child: Obx(() {
+            if (controller.isLoading.value) {
+              return const Center(
+                child: CircularProgressIndicator(color: Color(0xFF5A7D60)),
+              );
+            }
+            if (controller.products.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: const Text(
+                    'No products found. Tap "Add product" to start.',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    textAlign: TextAlign.center,
                   ),
-                );
-              }
-              // Pass the dynamic list to the list builder
-              return _buildProductsList(controller.products);
-            },
-          ),
+                ),
+              );
+            }
+            return _buildProductsList(controller.products);
+          }),
         ),
       ],
     );
@@ -63,7 +51,6 @@ class ProductsScreen extends StatelessWidget {
         width: double.infinity,
         child: ElevatedButton(
           onPressed: () {
-            // Use Get.to for navigation
             Get.to(() => const AddProductScreen());
           },
           style: ElevatedButton.styleFrom(
@@ -84,7 +71,6 @@ class ProductsScreen extends StatelessWidget {
     );
   }
 
-  // --- UPDATED to accept a List<Product> ---
   Widget _buildProductsList(List<Product> products) {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 85),
@@ -122,7 +108,7 @@ class ProductsScreen extends StatelessWidget {
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: products.length, // Use dynamic length
+              itemCount: products.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
@@ -130,7 +116,6 @@ class ProductsScreen extends StatelessWidget {
                 childAspectRatio: 0.8,
               ),
               itemBuilder: (context, index) {
-                // Use product from controller list
                 return _ProductCard(product: products[index]);
               },
             ),
@@ -149,7 +134,6 @@ class _ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Use Get.to for navigation
         Get.to(() => ProductDetailsScreen(product: product));
       },
       child: Container(
@@ -173,11 +157,9 @@ class _ProductCard extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    // Use Image.network with a fallback
                     Image.network(
                       product.imageUrl,
                       fit: BoxFit.cover,
-                      // Show a placeholder while loading
                       loadingBuilder: (context, child, progress) {
                         if (progress == null) return child;
                         return Container(
@@ -190,12 +172,13 @@ class _ProductCard extends StatelessWidget {
                           ),
                         );
                       },
-                      // Show an icon if the image fails to load
-                      errorBuilder: (context, error, stackTrace) =>
-                          Container(
+                      errorBuilder: (context, error, stackTrace) => Container(
                         color: Colors.grey.shade200,
-                        child: Icon(Icons.image_not_supported_outlined,
-                            color: Colors.grey.shade400, size: 40),
+                        child: Icon(
+                          Icons.image_not_supported_outlined,
+                          color: Colors.grey.shade400,
+                          size: 40,
+                        ),
                       ),
                     ),
                     if (product.isSoldOut) _buildSoldOutOverlay(),
@@ -207,8 +190,9 @@ class _ProductCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // --- FIX: USE productName ---
                     Text(
-                      product.name,
+                      product.productName,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -217,7 +201,6 @@ class _ProductCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      // Use the calculated lowestPrice
                       '\$${product.lowestPrice.toStringAsFixed(2)}',
                       style: const TextStyle(
                         color: Colors.black54,
@@ -268,4 +251,3 @@ class _ProductCard extends StatelessWidget {
     );
   }
 }
-

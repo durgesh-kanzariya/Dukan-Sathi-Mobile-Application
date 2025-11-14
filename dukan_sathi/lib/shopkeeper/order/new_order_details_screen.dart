@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import '../dashboard/dashboard_page.dart'; // CHANGE 1: Import dashboard to get the Order model.
-
-// CHANGE 2: The local data models have been removed from this file.
+import 'package:get/get.dart';
+import 'package:intl/intl.dart'; // For formatting date
+import 'package:dukan_sathi/shopkeeper/order/order_model.dart';
+import 'package:dukan_sathi/shopkeeper/order/order_controller.dart';
 
 class NewOrderDetailsScreen extends StatelessWidget {
-  // CHANGE 3: The screen now requires an 'Order' object to be passed to it.
-  final Order order;
+  final Order order; // This part was already correct
+  // Find the controller
+  final OrderController controller = Get.find<OrderController>();
 
-  // CHANGE 4: The hardcoded mockOrder has been removed.
-  const NewOrderDetailsScreen({Key? key, required this.order})
-    : super(key: key);
+  NewOrderDetailsScreen({Key? key, required this.order}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class NewOrderDetailsScreen extends StatelessWidget {
             _buildOrderSummary(),
             _buildItemList(),
             _buildTotalPrice(),
-            _buildActionButtons(), // This now builds the Accept/Decline buttons
+            _buildActionButtons(),
             const SizedBox(height: 20),
           ],
         ),
@@ -47,7 +47,7 @@ class NewOrderDetailsScreen extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Get.back(); // Use GetX navigation
                 },
               ),
               const Expanded(
@@ -66,7 +66,7 @@ class NewOrderDetailsScreen extends StatelessWidget {
             ],
           ),
           const Text(
-            'New Order details', // Updated title
+            'New Order details',
             style: TextStyle(
               color: Colors.white,
               fontSize: 22,
@@ -80,16 +80,19 @@ class NewOrderDetailsScreen extends StatelessWidget {
     );
   }
 
-  // CHANGE 5: All widgets below now use 'order' from the widget constructor.
+  // --- UPDATED TO USE NEW MODEL ---
   Widget _buildOrderSummary() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(30, 16, 20, 0),
       child: Column(
         children: [
-          _buildSummaryRow('Order id:', order.orderId),
-          _buildSummaryRow('Customer name:', order.customerName),
-          _buildSummaryRow('Date:', order.date),
-          _buildSummaryRow('Address:', order.address, isAddress: true),
+          _buildSummaryRow('Order id:', order.id),
+          _buildSummaryRow('Customer id:', order.customerId), // Changed
+          _buildSummaryRow(
+            'Date:',
+            DateFormat('dd MMM yyyy, hh:mm a').format(order.createdAt.toDate()),
+          ),
+          _buildSummaryRow('Address:', "In-Store Pickup"), // Your app is pickup only
         ],
       ),
     );
@@ -129,6 +132,7 @@ class NewOrderDetailsScreen extends StatelessWidget {
     );
   }
 
+  // --- UPDATED TO USE NEW OrderItem MODEL ---
   Widget _buildItemList() {
     return ListView.builder(
       shrinkWrap: true,
@@ -147,22 +151,23 @@ class NewOrderDetailsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(12.0),
               child: Row(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.network(
-                      item.imageUrl,
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
+                  // --- IMAGE REMOVED (not in new model) ---
+                  // ClipRRect(
+                  //   borderRadius: BorderRadius.circular(10),
+                  //   child: Image.network(
+                  //     "https://placehold.co/100", // No image in OrderItem model
+                  //     width: 80,
+                  //     height: 80,
+                  //     fit: BoxFit.cover,
+                  //   ),
+                  // ),
+                  // const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.name,
+                          item.productName, // Use productName
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -232,6 +237,7 @@ class NewOrderDetailsScreen extends StatelessWidget {
     );
   }
 
+  // --- UPDATED BUTTONS TO USE CONTROLLER ---
   Widget _buildActionButtons() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
@@ -240,7 +246,8 @@ class NewOrderDetailsScreen extends StatelessWidget {
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                // TODO: Add logic to decline the order
+                controller.declineOrder(order.id);
+                Get.back(); // Go back after declining
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey.shade200,
@@ -261,7 +268,8 @@ class NewOrderDetailsScreen extends StatelessWidget {
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                // TODO: Add logic to accept the order
+                controller.acceptOrder(order.id);
+                Get.back(); // Go back after accepting
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF5A7D60),

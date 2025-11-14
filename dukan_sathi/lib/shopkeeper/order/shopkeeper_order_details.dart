@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
-import '../dashboard/dashboard_page.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:dukan_sathi/shopkeeper/order/order_model.dart';
+import 'package:dukan_sathi/shopkeeper/order/order_controller.dart';
 
 class ShopkeeperOrderDetailsScreen extends StatelessWidget {
   final Order order;
-  // ADDED: A boolean flag to control the visibility of the action buttons.
-  // It defaults to true, so they will show up unless explicitly told not to.
   final bool showActions;
+  // Find the controller
+  final OrderController controller = Get.find<OrderController>();
 
-  const ShopkeeperOrderDetailsScreen({
+  ShopkeeperOrderDetailsScreen({
     Key? key,
     required this.order,
-    this.showActions = true, // Default value is true
+    this.showActions = true,
   }) : super(key: key);
 
   @override
@@ -24,8 +27,13 @@ class ShopkeeperOrderDetailsScreen extends StatelessWidget {
             _buildOrderSummary(),
             _buildItemList(),
             _buildTotalPrice(),
-            // UPDATED: Conditionally display the buttons based on the showActions flag.
-            if (showActions) _buildActionButtons(),
+            // Show "Ready for Pickup" button if status is 'preparing'
+            if (showActions && order.status == 'preparing') _buildReadyButton(),
+            // Show "Cancel" button if status is 'preparing'
+            if (showActions && order.status == 'preparing')
+              _buildCancelButton(),
+            // Show pickup code if it's ready
+            if (order.status == 'ready_for_pickup') _buildPickupCode(),
             const SizedBox(height: 20),
           ],
         ),
@@ -50,7 +58,7 @@ class ShopkeeperOrderDetailsScreen extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Get.back();
                 },
               ),
               const Expanded(
@@ -83,19 +91,23 @@ class ShopkeeperOrderDetailsScreen extends StatelessWidget {
     );
   }
 
+  // --- UPDATED TO USE NEW MODEL ---
   Widget _buildOrderSummary() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(30, 16, 20, 0),
       child: Column(
         children: [
-          _buildSummaryRow('Order id:', order.orderId),
+          _buildSummaryRow('Order id:', order.id),
           _buildSummaryRow(
             'Order status:',
-            order.status == OrderStatus.Preparing ? 'Preparing' : 'New',
-          ), // Handle enum
-          _buildSummaryRow('Customer name:', order.customerName),
-          _buildSummaryRow('Date:', order.date),
-          _buildSummaryRow('Address:', order.address, isAddress: true),
+            order.status.capitalizeFirst ?? order.status,
+          ),
+          _buildSummaryRow('Customer id:', order.customerId),
+          _buildSummaryRow(
+            'Date:',
+            DateFormat('dd MMM yyyy, hh:mm a').format(order.createdAt.toDate()),
+          ),
+          _buildSummaryRow('Address:', "In-Store Pickup"),
         ],
       ),
     );
@@ -135,6 +147,7 @@ class ShopkeeperOrderDetailsScreen extends StatelessWidget {
     );
   }
 
+  // --- UPDATED TO USE NEW OrderItem MODEL ---
   Widget _buildItemList() {
     return ListView.builder(
       shrinkWrap: true,
@@ -153,22 +166,12 @@ class ShopkeeperOrderDetailsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(12.0),
               child: Row(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.network(
-                      item.imageUrl,
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.name,
+                          item.productName,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -238,54 +241,84 @@ class ShopkeeperOrderDetailsScreen extends StatelessWidget {
     );
   }
 
-  // RESTORED: The action buttons widget is now available to be shown or hidden.
-  Widget _buildActionButtons() {
+  // --- NEW WIDGET FOR PICKUP CODE ---
+  Widget _buildPickupCode() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                // TODO: Add logic to cancel the order
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade300,
-                foregroundColor: Colors.black87,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              child: const Text('Cancel Order'),
-            ),
+          const Text(
+            'Pickup Code:',
+            style: TextStyle(fontSize: 18, color: Colors.black54),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                // TODO: Add logic to set order as ready
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF5A7D60),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              child: const Text('Ready for pickup'),
+          const SizedBox(height: 8),
+          Text(
+            order.pickupCode,
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+              letterSpacing: 3,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // --- UPDATED BUTTONS TO USE CONTROLLER ---
+  Widget _buildReadyButton() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: () {
+            controller.markAsReady(order.id);
+            Get.back(); // Go back after marking as ready
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF5A7D60),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            textStyle: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          child: const Text('Ready for pickup'),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCancelButton() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: () {
+            controller.declineOrder(order.id);
+            Get.back(); // Go back after cancelling
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.grey.shade300,
+            foregroundColor: Colors.black87,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            textStyle: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          child: const Text('Cancel Order'),
+        ),
       ),
     );
   }

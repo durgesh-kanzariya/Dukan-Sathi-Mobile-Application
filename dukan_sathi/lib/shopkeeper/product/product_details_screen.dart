@@ -1,15 +1,13 @@
 import 'package:dukan_sathi/shopkeeper/product/edit_product_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; // Import GetX
-// --- IMPORT FIX ---
-// We no longer need products_screen.dart for the model
-import 'product_model.dart'; // Import the new model
+import 'package:get/get.dart';
+import 'product_model.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
   final Product product;
 
   const ProductDetailsScreen({Key? key, required this.product})
-    : super(key: key);
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +41,7 @@ class ProductDetailsScreen extends StatelessWidget {
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Get.back(), // Use Get.back()
+                onPressed: () => Get.back(),
               ),
               const Expanded(
                 child: Text(
@@ -57,7 +55,7 @@ class ProductDetailsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 48), // Balances the IconButton
+              const SizedBox(width: 48),
             ],
           ),
           const SizedBox(height: 8),
@@ -89,7 +87,6 @@ class ProductDetailsScreen extends StatelessWidget {
           fit: BoxFit.cover,
           height: 250,
           width: double.infinity,
-          // Add loading/error builders for robustness
           loadingBuilder: (context, child, progress) {
             if (progress == null) return child;
             return Container(
@@ -138,12 +135,22 @@ class ProductDetailsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // --- 1. FIX: USE productName ---
           Text(
-            product.name,
+            product.productName,
             style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2E4431),
+            ),
+          ),
+          const SizedBox(height: 8),
+          // --- 2. ADD DESCRIPTION ---
+          Text(
+            product.description,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.black87,
             ),
           ),
           const SizedBox(height: 24),
@@ -161,7 +168,7 @@ class ProductDetailsScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Expanded(flex: 3, child: Container()), // Spacer
+        Expanded(flex: 3, child: Container()),
         const Expanded(
           flex: 2,
           child: Text(
@@ -259,8 +266,6 @@ class ProductDetailsScreen extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          // --- NAVIGATION FIX ---
-          // Use Get.to to navigate
           Get.to(() => EditProductScreen(product: product));
         },
         style: ElevatedButton.styleFrom(

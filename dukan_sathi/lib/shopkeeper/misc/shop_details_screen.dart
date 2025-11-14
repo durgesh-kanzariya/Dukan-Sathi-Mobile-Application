@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'package:dukan_sathi/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // Import Get
 import 'package:image_picker/image_picker.dart';
+import 'package:dukan_sathi/shop_service.dart'; // Import ShopService
+import 'package:dukan_sathi/shop_model.dart'; // Import Shop Model
 
 class ShopDetailsScreen extends StatefulWidget {
   const ShopDetailsScreen({Key? key}) : super(key: key);
@@ -11,39 +14,63 @@ class ShopDetailsScreen extends StatefulWidget {
 }
 
 class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
-  // --- STATE & CONTROLLERS ---
-  final TextEditingController _usernameController = TextEditingController(
-    text: 'the_cake_shop',
-  );
-  final TextEditingController _shopNameController = TextEditingController(
-    text: 'The Cake Shop',
-  );
-  final TextEditingController _descriptionController = TextEditingController(
-    text:
-        'Your one-stop destination for delicious, freshly baked cakes, pastries, and bread.',
-  );
-  final TextEditingController _addressController = TextEditingController(
-    text: '123 Kalawad Road, Near Crystal Mall, Rajkot, Gujarat',
-  );
-  final TextEditingController _contactController = TextEditingController(
-    text: '98765 43210',
-  );
-  final TextEditingController _fromTimeController = TextEditingController(
-    text: '9:00',
-  );
-  final TextEditingController _toTimeController = TextEditingController(
-    text: '8:00',
-  );
+  // --- 1. FIND THE SERVICE ---
+  final ShopService shopService = Get.find<ShopService>();
 
-  XFile? _imageFile;
+  // --- 2. REMOVE STATIC TEXT ---
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _shopNameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _contactController = TextEditingController();
+  final TextEditingController _fromTimeController = TextEditingController();
+  final TextEditingController _toTimeController = TextEditingController();
 
+  XFile? _imageFile; // This is for a *new* image to upload
   String _selectedCountryCode = '+91';
   String _fromPeriod = 'AM';
   String _toPeriod = 'PM';
 
   @override
+  void initState() {
+    super.initState();
+    // --- 3. LOAD DATA & LISTEN FOR CHANGES ---
+    // Listen for changes from the service
+    shopService.currentShop.listen(_updateControllers);
+    // Load initial data if it's already available
+    _updateControllers(shopService.currentShop.value);
+  }
+
+  // --- 4. NEW METHOD TO POPULATE FIELDS ---
+  void _updateControllers(Shop? shop) {
+    if (shop != null && mounted) {
+      // Set text fields
+      _shopNameController.text = shop.shopName;
+      _descriptionController.text = shop.description;
+      _addressController.text = shop.address;
+      _contactController.text = shop.contact;
+
+      // We can't edit username (ownerId), so we'll just display it
+      _usernameController.text = shop.ownerId;
+
+      // Parse time strings, e.g., "9:00 AM"
+      var openTimeParts = shop.openTime.split(' ');
+      if (openTimeParts.length == 2) {
+        _fromTimeController.text = openTimeParts[0];
+        _fromPeriod = openTimeParts[1];
+      }
+
+      var closeTimeParts = shop.closeTime.split(' ');
+      if (closeTimeParts.length == 2) {
+        _toTimeController.text = closeTimeParts[0];
+        _toPeriod = closeTimeParts[1];
+      }
+      setState(() {}); // Ensure UI updates with new period
+    }
+  }
+
+  @override
   void dispose() {
-    // Clean up all controllers
     _usernameController.dispose();
     _shopNameController.dispose();
     _descriptionController.dispose();
@@ -54,185 +81,165 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
     super.dispose();
   }
 
-  // --- LOGIC METHODS ---
+  // --- 5. UPDATED IMAGE PICKER ---
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      setState(() {
-        _imageFile = image;
-      });
+      // Don't just set state, call the service to upload
+      await shopService.updateShopImage(image);
+      // We don't need setState for _imageFile anymore
+      // The `Obx` in `_buildProfileImagePicker` will react to the change
     }
   }
 
+  // --- 6. UPDATED SAVE METHOD ---
   void _saveChanges() {
-    final List<String> errorMessages = [];
-
-    if (_shopNameController.text.trim().isEmpty) {
-      errorMessages.add('• Shop Name cannot be empty.');
-    }
-    if (_descriptionController.text.trim().isEmpty) {
-      errorMessages.add('• Shop Description cannot be empty.');
-    }
-    if (_addressController.text.trim().isEmpty) {
-      errorMessages.add('• Shop Address cannot be empty.');
-    }
-    if (_contactController.text.trim().isEmpty) {
-      errorMessages.add('• Contact number cannot be empty.');
-    }
-    if (_fromTimeController.text.trim().isEmpty) {
-      errorMessages.add('• "From time" cannot be empty.');
-    }
-    if (_toTimeController.text.trim().isEmpty) {
-      errorMessages.add('• "To time" cannot be empty.');
-    }
-    if (_fromTimeController.text.trim() == _toTimeController.text.trim() &&
-        _fromPeriod == _toPeriod) {
-      errorMessages.add(
-        '• Business opening and closing times cannot be the same.',
-      );
+    // Validation (you can add more)
+    if (_shopNameController.text.trim().isEmpty ||
+        _addressController.text.trim().isEmpty) {
+      Get.snackbar('Error', 'Shop Name and Address cannot be empty.');
+      return;
     }
 
-    if (errorMessages.isNotEmpty) {
-      _showErrorDialog(errorMessages);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Color(0xFF5A7D60),
-          content: Text('Changes saved successfully!'),
-        ),
-      );
-    }
-  }
-
-  void _showErrorDialog(List<String> messages) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Missing Information'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: messages
-              .map(
-                (msg) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: Text(msg),
-                ),
-              )
-              .toList(),
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK', style: TextStyle(color: Color(0xFF5A7D60))),
-          ),
-        ],
-      ),
+    // Call the service
+    shopService.updateShopDetails(
+      shopName: _shopNameController.text.trim(),
+      address: _addressController.text.trim(),
+      description: _descriptionController.text.trim(),
+      contact: _contactController.text.trim(),
+      openTime: '${_fromTimeController.text.trim()} $_fromPeriod',
+      closeTime: '${_toTimeController.text.trim()} $_toPeriod',
     );
   }
 
-  // --- UI BUILD METHODS ---
+  // (Error dialog method _showErrorDialog removed as Get.snackbar handles it)
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         const CustomAppBar(title: 'Shop Details'),
         Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 24),
-                _buildProfileImagePicker(),
-                const SizedBox(height: 24),
-                _buildTextField(
-                  _usernameController,
-                  'Shop Username',
-                  enabled: false,
-                ),
-                const SizedBox(height: 16),
-                _buildTextField(_shopNameController, 'Shop Name'),
-                const SizedBox(height: 16),
-                _buildTextField(
-                  _descriptionController,
-                  'Shop Description',
-                  maxLines: 4,
-                ),
-                const SizedBox(height: 16),
-                _buildTextField(
-                  _addressController,
-                  'Shop Address',
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 16),
-                _buildPhoneNumberField(),
-                const SizedBox(height: 24),
-                const Text(
-                  'Business Hours',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildTimeField(
-                        _fromTimeController,
-                        'From',
-                        _fromPeriod,
-                        (val) {
-                          setState(() => _fromPeriod = val!);
-                        },
+          // --- 7. WRAP IN Obx TO SHOW LOADING SPINNER ---
+          child: Obx(() {
+            if (shopService.isLoading.value) {
+              return const Center(
+                child: CircularProgressIndicator(color: Color(0xFF5A7D60)),
+              );
+            }
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 24),
+                  _buildProfileImagePicker(),
+                  const SizedBox(height: 24),
+                  _buildTextField(
+                    _usernameController,
+                    'Shop Owner ID', // Changed label
+                    enabled: false, // Cannot edit
+                  ),
+                  const SizedBox(height: 16),
+                  _buildTextField(_shopNameController, 'Shop Name'),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                    _descriptionController,
+                    'Shop Description',
+                    maxLines: 4,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                    _addressController,
+                    'Shop Address',
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildPhoneNumberField(), // This now uses _contactController
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Business Hours',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTimeField(
+                          _fromTimeController,
+                          'From',
+                          _fromPeriod,
+                          (val) {
+                            setState(() => _fromPeriod = val!);
+                          },
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildTimeField(
-                        _toTimeController,
-                        'To',
-                        _toPeriod,
-                        (val) {
-                          setState(() => _toPeriod = val!);
-                        },
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _buildTimeField(
+                          _toTimeController,
+                          'To',
+                          _toPeriod,
+                          (val) {
+                            setState(() => _toPeriod = val!);
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                _buildSaveButton(),
-                const SizedBox(height: 95),
-              ],
-            ),
-          ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  _buildSaveButton(),
+                  const SizedBox(height: 95), // For bottom nav
+                ],
+              ),
+            );
+          }),
         ),
       ],
     );
   }
 
   Widget _buildProfileImagePicker() {
-    return Stack(
-      alignment: Alignment.bottomRight,
-      children: [
-        CircleAvatar(
-          radius: 60,
-          backgroundColor: Colors.grey.shade300,
-          backgroundImage: _imageFile != null
-              ? FileImage(File(_imageFile!.path))
-              : null,
-          child: _imageFile == null
-              ? Icon(Icons.person, size: 70, color: Colors.grey.shade500)
-              : null,
-        ),
-        CircleAvatar(
-          radius: 20,
-          backgroundColor: const Color(0xFF5A7D60),
-          child: IconButton(
-            icon: const Icon(Icons.edit, color: Colors.white, size: 20),
-            onPressed: _pickImage,
+    return Obx(() {
+      // --- 8. GET IMAGE URL FROM SERVICE ---
+      final imageUrl = shopService.currentShop.value?.imageUrl;
+      final isUploading = shopService.isUploadingImage.value;
+
+      ImageProvider? backgroundImage;
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        backgroundImage = NetworkImage(imageUrl);
+      }
+
+      return Stack(
+        alignment: Alignment.bottomRight,
+        children: [
+          CircleAvatar(
+            radius: 60,
+            backgroundColor: Colors.grey.shade300,
+            backgroundImage: backgroundImage,
+            child: (backgroundImage == null && !isUploading)
+                ? Icon(Icons.storefront, size: 70, color: Colors.grey.shade500)
+                : null,
           ),
-        ),
-      ],
-    );
+          if (isUploading)
+            const Positioned.fill(
+              child: CircularProgressIndicator(
+                color: Color(0xFF5A7D60),
+                strokeWidth: 3,
+              ),
+            ),
+          if (!isUploading)
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: const Color(0xFF5A7D60),
+              child: IconButton(
+                icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+                onPressed: _pickImage,
+              ),
+            ),
+        ],
+      );
+    });
   }
 
   Widget _buildTextField(
@@ -281,6 +288,7 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
     );
   }
 
+  // --- 9. UPDATED TO USE _contactController ---
   Widget _buildPhoneNumberField() {
     return Container(
       decoration: BoxDecoration(
@@ -320,7 +328,7 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
             const VerticalDivider(color: Colors.grey, thickness: 1),
             Expanded(
               child: TextField(
-                controller: _contactController,
+                controller: _contactController, // Use the correct controller
                 keyboardType: TextInputType.phone,
                 decoration: const InputDecoration(
                   hintText: 'Contact Number',
