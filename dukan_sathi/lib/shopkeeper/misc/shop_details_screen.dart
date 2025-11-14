@@ -83,13 +83,23 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
 
   // --- 5. UPDATED IMAGE PICKER ---
   Future<void> _pickImage() async {
+    print('_pickImage called');
+
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
     if (image != null) {
-      // Don't just set state, call the service to upload
-      await shopService.updateShopImage(image);
-      // We don't need setState for _imageFile anymore
-      // The `Obx` in `_buildProfileImagePicker` will react to the change
+      print('Image selected: ${image.path}');
+
+      try {
+        await shopService.updateShopImage(image);
+        print('updateShopImage completed');
+      } catch (e) {
+        print('Error in updateShopImage: $e');
+        Get.snackbar('Error', 'Cannot update image: $e');
+      }
+    } else {
+      print('No image selected');
     }
   }
 

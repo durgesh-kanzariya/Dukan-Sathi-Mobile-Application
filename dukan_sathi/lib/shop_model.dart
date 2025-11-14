@@ -25,6 +25,31 @@ class Shop {
     required this.closeTime,
   });
 
+  // Add this copyWith method
+  Shop copyWith({
+    String? id,
+    String? shopName,
+    String? address,
+    String? ownerId,
+    String? imageUrl,
+    String? description,
+    String? contact,
+    String? openTime,
+    String? closeTime,
+  }) {
+    return Shop(
+      id: id ?? this.id,
+      shopName: shopName ?? this.shopName,
+      address: address ?? this.address,
+      ownerId: ownerId ?? this.ownerId,
+      imageUrl: imageUrl ?? this.imageUrl,
+      description: description ?? this.description,
+      contact: contact ?? this.contact,
+      openTime: openTime ?? this.openTime,
+      closeTime: closeTime ?? this.closeTime,
+    );
+  }
+
   factory Shop.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snap) {
     final data = snap.data() ?? {};
     return Shop(

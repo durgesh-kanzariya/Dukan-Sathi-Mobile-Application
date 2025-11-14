@@ -9,13 +9,12 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:dukan_sathi/shopkeeper/product/product_model.dart';
-import 'package:dukan_sathi/shop_service.dart'; // <-- 1. Import ShopService
+import 'package:dukan_sathi/shop_service.dart';
 
 class ProductController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final ShopService _shopService =
-      Get.find<ShopService>(); // <-- 2. Find ShopService
+  final ShopService _shopService = Get.find<ShopService>();
 
   var products = <Product>[].obs;
   var isLoading = true.obs;
@@ -23,47 +22,40 @@ class ProductController extends GetxController {
   var isUpdating = false.obs;
   var isDeleting = false.obs;
 
-  // 3. Get the current Shop ID
   String? get _shopId => _shopService.currentShop.value?.id;
-  // 4. Get the owner ID (for image paths)
   String? get _ownerId => _shopService.currentShop.value?.ownerId;
 
-  // Inside product_controller.dart
   @override
   void onInit() {
     super.onInit();
-    // 5. Listen to changes in the currentShop from the ShopService
     ever(_shopService.currentShop, (Shop? shop) {
       if (shop != null) {
         fetchProducts(shop.id);
       } else {
         products.clear();
-        isLoading.value = false; // <-- ADD THIS LINE
+        isLoading.value = false;
       }
     });
   }
 
-  // 6. Get the correct collection reference
   CollectionReference<Map<String, dynamic>> _productsCollection(String shopId) {
     return _firestore.collection('shops').doc(shopId).collection('products');
   }
 
   void fetchProducts(String shopId) {
     isLoading.value = true;
-    _productsCollection(shopId)
-        .snapshots() // No orderBy needed, we'll sort in code if needed
-        .listen(
-          (snapshot) {
-            products.value = snapshot.docs
-                .map((doc) => Product.fromSnapshot(doc))
-                .toList();
-            isLoading.value = false;
-          },
-          onError: (error) {
-            isLoading.value = false;
-            Get.snackbar('Error', 'Could not fetch products: $error');
-          },
-        );
+    _productsCollection(shopId).snapshots().listen(
+      (snapshot) {
+        products.value = snapshot.docs
+            .map((doc) => Product.fromSnapshot(doc))
+            .toList();
+        isLoading.value = false;
+      },
+      onError: (error) {
+        isLoading.value = false;
+        Get.snackbar('Error', 'Could not fetch products: $error');
+      },
+    );
   }
 
   Future<bool> addProduct({
@@ -91,11 +83,11 @@ class ProductController extends GetxController {
       };
 
       await _productsCollection(_shopId!).add(newProductData);
-      return true; // Return success
+      return true;
     } catch (e) {
       print("Error adding product: $e");
       Get.snackbar('Error', 'Failed to add product: $e');
-      return false; // Return failure
+      return false;
     } finally {
       isUploading.value = false;
     }
@@ -111,18 +103,28 @@ class ProductController extends GetxController {
   }) async {
     if (_shopId == null) return;
     isUpdating.value = true;
+
+    String? oldImageUrl = existingImageUrl; // Store old image URL
+
     try {
       String imageUrl = existingImageUrl ?? '';
       if (newImageFile != null) {
+        // Upload new image first
         imageUrl = await _uploadImage(newImageFile, _ownerId!);
-        // TODO: Delete old image from storage
+
+        // Delete old image after successful upload
+        if (oldImageUrl != null && oldImageUrl.isNotEmpty) {
+          await _deleteImageFromStorage(oldImageUrl);
+        }
       }
+
       final updatedProductData = {
         'productName': name,
         'description': description,
         'imageUrl': imageUrl,
         'variants': variants.map((v) => v.toMap()).toList(),
       };
+
       await _productsCollection(_shopId!).doc(id).update(updatedProductData);
       Get.snackbar('Success', 'Product updated successfully!');
       Get.back();
@@ -179,9 +181,9 @@ class ProductController extends GetxController {
       // Delete the file
       await storageRef.delete();
 
-      print('Image deleted successfully from storage');
+      print('Product image deleted successfully from storage');
     } catch (e) {
-      print('Error deleting image from storage: $e');
+      print('Error deleting product image from storage: $e');
       // Don't throw the error here - we don't want image deletion failure
       // to prevent product deletion from Firestore
     }
@@ -194,15 +196,15 @@ class ProductController extends GetxController {
           '${ownerId}_${DateTime.now().millisecondsSinceEpoch}$fileExtension';
       Reference storageRef = _storage
           .ref()
-          .child('product_images') // Main folder
-          .child(ownerId) // Subfolder per user
-          .child(fileName); // File
+          .child('product_images')
+          .child(ownerId)
+          .child(fileName);
       UploadTask uploadTask = storageRef.putFile(File(imageFile.path));
       TaskSnapshot snapshot = await uploadTask;
       return await snapshot.ref.getDownloadURL();
     } catch (e) {
-      print("Image upload error: $e");
-      throw Exception('Image upload failed');
+      print("Product image upload error: $e");
+      throw Exception('Product image upload failed');
     }
   }
 }

@@ -179,24 +179,75 @@ class ShopService extends GetxService {
   }
 
   // --- NEW: Function to upload/update shop image ---
+  // In ShopService class
+  // In ShopService class, update the updateShopImage method
   Future<void> updateShopImage(XFile imageFile) async {
-    if (currentShop.value == null) return;
+    if (currentShop.value == null) {
+      Get.snackbar('Error', 'No shop found');
+      return;
+    }
 
     isUploadingImage.value = true;
-    try {
-      final ownerId = currentShop.value!.ownerId;
-      // 1. Upload new image
-      String imageUrl = await _uploadImage(imageFile, ownerId);
-      // 2. Update the URL in Firestore
-      final shopRef = _firestore.collection('shops').doc(currentShop.value!.id);
-      await shopRef.update({'imageUrl': imageUrl});
-      // 3. TODO: Delete old image from storage (optional)
 
-      Get.snackbar('Success', 'Shop image updated!');
+    String? oldImageUrl = currentShop.value!.imageUrl; // Store old image URL
+
+    try {
+      // Upload new image to Firebase Storage
+      String newImageUrl = await _uploadShopImage(imageFile);
+
+      // Update Firestore with new image URL
+      await _firestore.collection('shops').doc(currentShop.value!.id).update({
+        'imageUrl': newImageUrl,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // Delete the old image after successful update
+      if (oldImageUrl != null && oldImageUrl.isNotEmpty) {
+        // Added null check
+        await _deleteImageFromStorage(oldImageUrl);
+      }
+
+      // Update local state
+      currentShop.value = currentShop.value!.copyWith(imageUrl: newImageUrl);
+
+      Get.snackbar('Success', 'Shop image updated successfully!');
     } catch (e) {
-      Get.snackbar('Error', 'Could not update image.');
+      print('Error updating shop image: $e');
+      Get.snackbar('Error', 'Failed to update image: $e');
     } finally {
       isUploadingImage.value = false;
+    }
+  }
+
+  // Add this method to ShopService
+  Future<void> _deleteImageFromStorage(String imageUrl) async {
+    try {
+      Reference storageRef = _storage.refFromURL(imageUrl);
+      await storageRef.delete();
+      print('Old shop image deleted successfully');
+    } catch (e) {
+      print('Error deleting old shop image: $e');
+    }
+  }
+
+  Future<String> _uploadShopImage(XFile imageFile) async {
+    try {
+      String fileExtension = p.extension(imageFile.path);
+      String fileName =
+          'shop_${currentShop.value!.id}_${DateTime.now().millisecondsSinceEpoch}$fileExtension';
+
+      Reference storageRef = _storage
+          .ref()
+          .child('shop_images')
+          .child(currentShop.value!.ownerId)
+          .child(fileName);
+
+      UploadTask uploadTask = storageRef.putFile(File(imageFile.path));
+      TaskSnapshot snapshot = await uploadTask;
+      return await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      print("Shop image upload error: $e");
+      throw Exception('Shop image upload failed');
     }
   }
 

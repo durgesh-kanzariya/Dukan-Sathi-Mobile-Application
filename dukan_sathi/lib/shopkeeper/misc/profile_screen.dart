@@ -1,13 +1,13 @@
 import 'dart:io';
-import 'package:dukan_sathi/Login.dart'; // Import Login for navigation
+import 'package:dukan_sathi/Login.dart';
 import 'package:dukan_sathi/shopkeeper/misc/change_password.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; // Import GetX
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-// Provider not strictly needed here if we fetch data directly
-// import 'package:provider/provider.dart';
+import 'package:path/path.dart' as p;
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -19,9 +19,15 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+
   XFile? _imageFile;
   User? _currentUser;
-  bool _isLoadingData = true; // State to manage loading indicator
+  bool _isLoadingData = true;
+  bool _isUpdating = false;
+  bool _isUploadingImage = false;
+  String? _currentImageUrl;
 
   @override
   void initState() {
@@ -33,61 +39,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadUserData() async {
     setState(() {
       _isLoadingData = true;
-    }); // Start loading
+    });
+
     if (_currentUser != null) {
       _emailController.text = _currentUser!.email ?? 'No Email';
       try {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        DocumentSnapshot userDoc = await _firestore
             .collection('users')
             .doc(_currentUser!.uid)
             .get();
+
         if (userDoc.exists && userDoc.data() != null) {
           Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
           _nameController.text = data['name'] ?? 'No Name';
-          // TODO: Load image URL if stored:
-          // String? imageUrl = data['imageUrl'];
-          // if (imageUrl != null && imageUrl.isNotEmpty) {
-          //   // You'll need a way to display this NetworkImage or File image based on _imageFile
-          // }
+          _currentImageUrl = data['imageUrl'];
         } else {
           _nameController.text = 'Name not found';
         }
       } catch (e) {
         print("Error loading user data: $e");
         _nameController.text = 'Error loading name';
-        if (mounted) {
-          // Show snackbar on error
-          Get.snackbar(
-            'Error',
-            'Could not load profile data.',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red.shade400,
-            colorText: Colors.white,
-          );
-        }
+        Get.snackbar(
+          'Error',
+          'Could not load profile data.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade400,
+          colorText: Colors.white,
+        );
       }
     }
+
     if (mounted) {
       setState(() {
         _isLoadingData = false;
-      }); // Stop loading
+      });
     }
   }
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     try {
-      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 80,
+      );
+
       if (image != null) {
         setState(() {
           _imageFile = image;
         });
-        // TODO: Upload image to Firebase Storage & update Firestore 'imageUrl'
-        Get.snackbar(
-          'Success',
-          'Image selected. Upload logic needed.',
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        // Auto-upload when image is selected
+        await _uploadProfileImage();
       }
     } catch (e) {
       print("Error picking image: $e");
@@ -99,31 +103,213 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // --- Logout Function using GetX ---
-  Future<void> _signOut() async {
-    try {
-      await FirebaseAuth.instance.signOut();
-      // By ONLY calling signOut(), the StreamProvider in main.dart
-      // will fire, AuthGate will get 'null', and it will
-      // automatically return the Login screen.
+  // Add this method to delete old images
+  Future<void> _deleteOldImage(String imageUrl) async {
+    if (imageUrl.isEmpty) return;
 
-      // ** THE FIX IS HERE: **
-      // Now, we just need to close this profile page
-      // to reveal the Login screen underneath.
-      if (mounted) {
-        Get.back();
-      }
+    try {
+      // Create a reference from the download URL
+      Reference storageRef = _storage.refFromURL(imageUrl);
+
+      // Delete the file
+      await storageRef.delete();
+
+      print('Old profile image deleted successfully');
     } catch (e) {
-      print("Error signing out: $e");
+      print('Error deleting old image: $e');
+      // Don't throw error - we don't want image deletion failure to stop the update
+    }
+  }
+
+  // Update the _uploadProfileImage method
+  Future<void> _uploadProfileImage() async {
+    if (_currentUser == null || _imageFile == null) return;
+
+    setState(() {
+      _isUploadingImage = true;
+    });
+
+    String? oldImageUrl =
+        _currentImageUrl; // Store the old image URL before updating
+
+    try {
+      // Upload image to Firebase Storage
+      String imageUrl = await _uploadImageToStorage(_imageFile!);
+
+      // Update Firestore with new image URL
+      await _firestore.collection('users').doc(_currentUser!.uid).update({
+        'imageUrl': imageUrl,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // Delete the old image after successful update
+      if (oldImageUrl != null && oldImageUrl.isNotEmpty) {
+        await _deleteOldImage(oldImageUrl);
+      }
+
+      // Update local state
+      setState(() {
+        _currentImageUrl = imageUrl;
+        _isUploadingImage = false;
+      });
+
       Get.snackbar(
-        // Use GetX snackbar
-        'Logout Error',
-        'Could not sign out. Please try again.',
+        'Success',
+        'Profile image updated!',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.shade400,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      print("Error uploading image: $e");
+      setState(() {
+        _isUploadingImage = false;
+      });
+      Get.snackbar(
+        'Error',
+        'Failed to upload image: $e',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.shade400,
         colorText: Colors.white,
       );
     }
+  }
+
+  Future<String> _uploadImageToStorage(XFile imageFile) async {
+    try {
+      String fileExtension = p.extension(imageFile.path);
+      String fileName =
+          'profile_${_currentUser!.uid}_${DateTime.now().millisecondsSinceEpoch}$fileExtension';
+
+      Reference storageRef = _storage
+          .ref()
+          .child('profile_images')
+          .child(_currentUser!.uid)
+          .child(fileName);
+
+      UploadTask uploadTask = storageRef.putFile(File(imageFile.path));
+      TaskSnapshot snapshot = await uploadTask;
+      return await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      print("Profile image upload error: $e");
+      throw Exception('Profile image upload failed');
+    }
+  }
+
+  // Also update the _updateProfile method to handle image cleanup
+  Future<void> _updateProfile() async {
+    if (_currentUser == null) return;
+
+    // Validate name
+    if (_nameController.text.trim().isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please enter your name',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade400,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    setState(() {
+      _isUpdating = true;
+    });
+
+    String? oldImageUrl = _currentImageUrl; // Store old image URL
+
+    try {
+      Map<String, dynamic> updateData = {
+        'name': _nameController.text.trim(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+
+      // If there's a new image, upload it first
+      if (_imageFile != null) {
+        String imageUrl = await _uploadImageToStorage(_imageFile!);
+        updateData['imageUrl'] = imageUrl;
+
+        // Update Firestore
+        await _firestore
+            .collection('users')
+            .doc(_currentUser!.uid)
+            .update(updateData);
+
+        // Delete the old image after successful update
+        if (oldImageUrl != null && oldImageUrl.isNotEmpty) {
+          await _deleteOldImage(oldImageUrl);
+        }
+
+        setState(() {
+          _currentImageUrl = imageUrl;
+        });
+      } else {
+        // Just update the name without changing image
+        await _firestore
+            .collection('users')
+            .doc(_currentUser!.uid)
+            .update(updateData);
+      }
+
+      setState(() {
+        _isUpdating = false;
+        _imageFile = null; // Reset after successful update
+      });
+
+      Get.snackbar(
+        'Success',
+        'Profile updated successfully!',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.shade400,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      print("Error updating profile: $e");
+      setState(() {
+        _isUpdating = false;
+      });
+      Get.snackbar(
+        'Error',
+        'Failed to update profile: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade400,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> _signOut() async {
+    // Confirmation dialog before logout
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(child: const Text('Cancel'), onPressed: () => Get.back()),
+          TextButton(
+            child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            onPressed: () async {
+              Get.back();
+              try {
+                await FirebaseAuth.instance.signOut();
+                if (mounted) {
+                  Get.back();
+                }
+              } catch (e) {
+                print("Error signing out: $e");
+                Get.snackbar(
+                  'Logout Error',
+                  'Could not sign out. Please try again.',
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.red.shade400,
+                  colorText: Colors.white,
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -137,8 +323,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFDFBF5),
-      body:
-          _isLoadingData // Show loading indicator while data loads
+      body: _isLoadingData
           ? const Center(
               child: CircularProgressIndicator(color: Color(0xFF5A7D60)),
             )
@@ -161,38 +346,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           enabled: false,
                         ),
                         const SizedBox(height: 32),
-                        // TODO: Add Update Profile Button
                         _buildActionButton(
                           text: 'Update Profile',
-                          onPressed: () {
-                            // TODO: Implement logic to update name in Firestore
-                            // Optionally re-upload image if _imageFile is not null
-                            Get.snackbar(
-                              'Info',
-                              'Update Profile logic not implemented.',
-                              snackPosition: SnackPosition.BOTTOM,
-                            );
-                          },
-                          isPrimary: true, // Use primary style for update
+                          onPressed: _isUpdating ? null : _updateProfile,
+                          isPrimary: true,
+                          isLoading: _isUpdating,
                         ),
                         const SizedBox(height: 16),
                         _buildActionButton(
                           text: 'Change Password',
                           onPressed: () {
-                            // Use Get.to for navigation that allows going back
-                            Get.to(
-                              () => ChangePasswordAdmin(),
-                            ); // Ensure this page exists
+                            Get.to(() => ChangePasswordAdmin());
                           },
-                          // Make Change Password less prominent? Or use primary style?
-                          isPrimary: true, // Example: Using primary style
+                          isPrimary: true,
                         ),
                         const SizedBox(height: 16),
                         _buildActionButton(
                           text: 'Logout',
-                          onPressed: _signOut, // Call updated sign out
-                          isPrimary:
-                              false, // Logout is secondary / destructive action
+                          onPressed: _signOut,
+                          isPrimary: false,
                         ),
                         const SizedBox(height: 32),
                       ],
@@ -203,10 +375,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
     );
   }
-
-  // --- Builder methods remain largely the same ---
-  // (Header, Image Picker, TextField, ActionButton)
-  // Make sure asset paths in _buildHeader and font names are correct
 
   Widget _buildHeader(BuildContext context) {
     return Container(
@@ -224,7 +392,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
-                // Use Get.back() if this screen was pushed using Get.to()
                 onPressed: () => Get.back(),
               ),
               const Expanded(
@@ -235,11 +402,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: Colors.white,
                     fontSize: 30,
                     letterSpacing: 4,
-                    fontFamily: "Abel", // Ensure this font is in pubspec.yaml
+                    fontFamily: "Abel",
                   ),
                 ),
               ),
-              const SizedBox(width: 48), // Balances the IconButton
+              const SizedBox(width: 48),
             ],
           ),
           const SizedBox(height: 8),
@@ -258,18 +425,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProfileImagePicker() {
-    // TODO: Load profile image from user data (e.g., Firestore 'imageUrl' field)
-    // For now, it uses the picked file or a placeholder
-    ImageProvider<Object>? backgroundImage;
+    ImageProvider? backgroundImage;
+
+    // Priority: New selected image > Current stored image > Placeholder
     if (_imageFile != null) {
       backgroundImage = FileImage(File(_imageFile!.path));
-    } else {
-      // You could load a network image URL from user data here
-      // Example:
-      // if (_currentUser?.photoURL != null) { // From Firebase Auth profile (if updated)
-      //   backgroundImage = NetworkImage(_currentUser!.photoURL!);
-      // }
-      // Or load from your Firestore 'imageUrl' field
+    } else if (_currentImageUrl != null && _currentImageUrl!.isNotEmpty) {
+      backgroundImage = NetworkImage(_currentImageUrl!);
     }
 
     return Stack(
@@ -279,18 +441,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           radius: 60,
           backgroundColor: Colors.grey.shade300,
           backgroundImage: backgroundImage,
-          child: backgroundImage == null
-              ? const Icon(Icons.person, size: 70, color: Colors.grey)
-              : null,
+          child: _isUploadingImage
+              ? const CircularProgressIndicator(color: Color(0xFF5A7D60))
+              : (backgroundImage == null
+                    ? const Icon(Icons.person, size: 70, color: Colors.grey)
+                    : null),
         ),
-        CircleAvatar(
-          radius: 20,
-          backgroundColor: const Color(0xFF5A7D60),
-          child: IconButton(
-            icon: const Icon(Icons.edit, color: Colors.white, size: 20),
-            onPressed: _pickImage,
+        if (!_isUploadingImage)
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: const Color(0xFF5A7D60),
+            child: IconButton(
+              icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+              onPressed: _pickImage,
+            ),
           ),
-        ),
       ],
     );
   }
@@ -300,35 +465,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String labelText, {
     bool enabled = true,
   }) {
-    return TextField(
-      controller: controller,
-      enabled: enabled,
-      decoration: InputDecoration(
-        labelText: labelText,
-        fillColor: enabled ? Colors.white : Colors.grey.shade200,
-        filled: true,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        // Style the label text
-        labelStyle: TextStyle(
-          color: enabled ? Colors.grey.shade600 : Colors.grey.shade500,
-        ),
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 15,
-        ), // Consistent padding
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      // Style the input text
-      style: TextStyle(color: enabled ? Colors.black87 : Colors.grey.shade700),
+      child: TextField(
+        controller: controller,
+        enabled: enabled,
+        decoration: InputDecoration(
+          labelText: labelText,
+          fillColor: enabled ? Colors.white : Colors.grey.shade200,
+          filled: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF5A7D60), width: 2),
+          ),
+          labelStyle: TextStyle(
+            color: enabled ? Colors.grey.shade600 : Colors.grey.shade500,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 15,
+            vertical: 15,
+          ),
+        ),
+        style: TextStyle(
+          color: enabled ? Colors.black87 : Colors.grey.shade700,
+        ),
+      ),
     );
   }
 
   Widget _buildActionButton({
     required String text,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
     required bool isPrimary,
+    bool isLoading = false,
   }) {
     return SizedBox(
       width: double.infinity,
@@ -336,17 +518,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: isPrimary
-              ? const Color(0xFF5A7D60) // Primary green
-              : Colors.red.shade400, // Secondary/Destructive red
+              ? const Color(0xFF5A7D60)
+              : Colors.red.shade400,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          elevation: 3, // Add subtle elevation
+          elevation: 3,
         ),
-        child: Text(text),
+        child: isLoading
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : Text(text),
       ),
     );
   }
