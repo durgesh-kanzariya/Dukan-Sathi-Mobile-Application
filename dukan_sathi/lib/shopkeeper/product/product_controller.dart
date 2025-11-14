@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dukan_sathi/shop_model.dart';
+import 'package:dukan_sathi/shopkeeper/product/products_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +66,7 @@ class ProductController extends GetxController {
         );
   }
 
-  Future<void> addProduct({
+  Future<bool> addProduct({
     required String name,
     required String description,
     required XFile imageFile,
@@ -73,24 +74,28 @@ class ProductController extends GetxController {
   }) async {
     if (_shopId == null || _ownerId == null) {
       Get.snackbar('Error', 'No shop found. Cannot add product.');
-      return;
+      return false;
     }
+
     isUploading.value = true;
+
     try {
       String imageUrl = await _uploadImage(imageFile, _ownerId!);
+
       final newProductData = {
         'productName': name,
         'description': description,
         'imageUrl': imageUrl,
         'variants': variants.map((v) => v.toMap()).toList(),
-        'createdAt':
-            FieldValue.serverTimestamp(), // Not in your model, but good practice
+        'createdAt': FieldValue.serverTimestamp(),
       };
+
       await _productsCollection(_shopId!).add(newProductData);
-      Get.snackbar('Success', 'Product added successfully!');
-      Get.back();
+      return true; // Return success
     } catch (e) {
+      print("Error adding product: $e");
       Get.snackbar('Error', 'Failed to add product: $e');
+      return false; // Return failure
     } finally {
       isUploading.value = false;
     }
@@ -128,8 +133,9 @@ class ProductController extends GetxController {
     }
   }
 
-  Future<void> deleteProduct(String id) async {
+  Future<void> deleteProduct(String id, String imageUrl) async {
     if (_shopId == null) return;
+
     Get.dialog(
       AlertDialog(
         title: const Text('Delete Product'),
@@ -139,13 +145,19 @@ class ProductController extends GetxController {
           TextButton(
             child: const Text('Delete', style: TextStyle(color: Colors.red)),
             onPressed: () async {
-              Get.back();
+              Get.back(); // Close the dialog first
               isDeleting.value = true;
               try {
+                // Delete the Firestore document first
                 await _productsCollection(_shopId!).doc(id).delete();
-                // TODO: Delete image from Storage
+
+                // Then delete the image from Firebase Storage
+                await _deleteImageFromStorage(imageUrl);
+
                 Get.snackbar('Success', 'Product deleted.');
-                Get.back();
+                // Close both screens and go back to ProductsScreen
+                Navigator.of(Get.context!).pop(); // Close EditProductScreen
+                Navigator.of(Get.context!).pop(); // Close ProductDetailsScreen
               } catch (e) {
                 Get.snackbar('Error', 'Failed to delete product: $e');
               } finally {
@@ -156,6 +168,23 @@ class ProductController extends GetxController {
         ],
       ),
     );
+  }
+
+  // Add this method to delete image from Firebase Storage
+  Future<void> _deleteImageFromStorage(String imageUrl) async {
+    try {
+      // Create a reference from the download URL
+      Reference storageRef = _storage.refFromURL(imageUrl);
+
+      // Delete the file
+      await storageRef.delete();
+
+      print('Image deleted successfully from storage');
+    } catch (e) {
+      print('Error deleting image from storage: $e');
+      // Don't throw the error here - we don't want image deletion failure
+      // to prevent product deletion from Firestore
+    }
   }
 
   Future<String> _uploadImage(XFile imageFile, String ownerId) async {

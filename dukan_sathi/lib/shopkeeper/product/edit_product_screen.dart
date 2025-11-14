@@ -31,10 +31,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
   void initState() {
     super.initState();
     // --- 2. INITIALIZE CONTROLLERS FROM WIDGET ---
-    _productNameController =
-        TextEditingController(text: widget.product.productName); // Fix: use productName
-    _descriptionController =
-        TextEditingController(text: widget.product.description);
+    _productNameController = TextEditingController(
+      text: widget.product.productName,
+    ); // Fix: use productName
+    _descriptionController = TextEditingController(
+      text: widget.product.description,
+    );
     _variants = List<ProductVariant>.from(widget.product.variants);
   }
 
@@ -79,8 +81,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
       _stockController.clear();
       FocusScope.of(context).unfocus();
     } else {
-      Get.snackbar('Error', 'Please fill all variant fields.',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Error',
+        'Please fill all variant fields.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 
@@ -117,15 +122,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _deleteProduct() {
-    controller.deleteProduct(widget.product.id);
+    controller.deleteProduct(widget.product.id, widget.product.imageUrl);
   }
 
   void _showErrorDialog(List<String> errors) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Incomplete Information',
-            style: TextStyle(fontSize: 25)),
+        title: const Text(
+          'Incomplete Information',
+          style: TextStyle(fontSize: 25),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,8 +214,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         ),
                       )
                     : IconButton(
-                        icon: const Icon(Icons.delete_outline,
-                            color: Colors.white, size: 28),
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.white,
+                          size: 28,
+                        ),
                         onPressed: _deleteProduct,
                       ),
               ),
@@ -250,7 +260,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     errorBuilder: (context, error, stackTrace) => Container(
                       height: 250,
                       color: Colors.grey.shade200,
-                      child: Icon(Icons.image_not_supported, color: Colors.grey.shade400, size: 50),
+                      child: Icon(
+                        Icons.image_not_supported,
+                        color: Colors.grey.shade400,
+                        size: 50,
+                      ),
                     ),
                   )
                 : Image.file(
@@ -355,8 +369,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
           Obx(
             () => _buildActionButton(
               text: 'Update details',
-              onPressed:
-                  controller.isUpdating.value ? () {} : _validateAndSubmit,
+              onPressed: controller.isUpdating.value
+                  ? () {}
+                  : _validateAndSubmit,
               isPrimary: false,
               isLoading: controller.isUpdating.value,
             ),

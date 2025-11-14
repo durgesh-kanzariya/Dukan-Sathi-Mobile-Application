@@ -53,8 +53,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
         _buyPriceController.text.isEmpty ||
         _sellPriceController.text.isEmpty ||
         _stockController.text.isEmpty) {
-      Get.snackbar('Error', 'Please fill all variant fields.',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Error',
+        'Please fill all variant fields.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
       return;
     }
 
@@ -82,13 +85,17 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
   // --- END OF ADDITION ---
 
-  void _validateAndSubmit() {
+  void _validateAndSubmit() async {
+    // Prevent multiple submissions
+    if (controller.isUploading.value) {
+      return;
+    }
+
     final List<String> errors = [];
 
     if (_productNameController.text.isEmpty) {
       errors.add('- Product name cannot be empty.');
     }
-    // --- 3. VALIDATE DESCRIPTION ---
     if (_descriptionController.text.isEmpty) {
       errors.add('- Product description cannot be empty.');
     }
@@ -102,14 +109,37 @@ class _AddProductScreenState extends State<AddProductScreen> {
     if (errors.isNotEmpty) {
       _showErrorDialog(errors);
     } else {
-      // --- 4. PASS DESCRIPTION TO CONTROLLER ---
-      controller.addProduct(
+      bool success = await controller.addProduct(
         name: _productNameController.text.trim(),
         description: _descriptionController.text.trim(),
         imageFile: _imageFile!,
         variants: _variants,
       );
+
+      if (success) {
+        Get.snackbar('Success', 'Product added successfully!');
+        // Clear the form and reset state
+        _resetForm();
+        // Navigate back after success
+        Future.delayed(Duration(milliseconds: 1500), () {
+          Get.back();
+        });
+      }
     }
+  }
+
+  // Add this method to reset the form
+  void _resetForm() {
+    _productNameController.clear();
+    _descriptionController.clear();
+    _variantNameController.clear();
+    _buyPriceController.clear();
+    _sellPriceController.clear();
+    _stockController.clear();
+    setState(() {
+      _variants.clear();
+      _imageFile = null;
+    });
   }
 
   void _showErrorDialog(List<String> errors) {
@@ -337,8 +367,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
             () => _buildActionButton(
               text: 'Create Product',
               onPressed: controller.isUploading.value
-                  ? () {} 
-                  : _validateAndSubmit, 
+                  ? null
+                  : _validateAndSubmit, // Use null to disable
               isPrimary: false,
               isLoading: controller.isUploading.value,
             ),
@@ -495,12 +525,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   Widget _buildActionButton({
     required String text,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed, // Make it nullable
     required bool isPrimary,
     bool isLoading = false,
   }) {
     return ElevatedButton(
-      onPressed: onPressed,
+      onPressed: onPressed, // Will be null when disabled
       style: ElevatedButton.styleFrom(
         backgroundColor: isPrimary
             ? const Color(0xFFB3C5B5)
