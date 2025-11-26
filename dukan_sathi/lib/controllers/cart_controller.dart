@@ -91,7 +91,7 @@ class CartController extends GetxController {
   Future<void> placeOrders() async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) {
-      Get.snackbar("Error", "You must be logged in to place an order");
+      Get.snackbar("Error", "Please login first");
       return;
     }
 
@@ -103,8 +103,17 @@ class CartController extends GetxController {
     );
 
     try {
-      Map<String, List<CartItem>> itemsByShop = {};
+      // 1. DEBUG: Print what is currently in the cart
+      print("--- STARTING ORDER PLACEMENT ---");
+      print("Total items in cart: ${cartItems.length}");
+      for (var item in cartItems) {
+        print(
+          "Item: ${item.name} | Shop Name: ${item.shopName} | Shop ID: ${item.shopId}",
+        );
+      }
 
+      // 2. Group items by Shop ID
+      Map<String, List<CartItem>> itemsByShop = {};
       for (var item in cartItems) {
         if (!itemsByShop.containsKey(item.shopId)) {
           itemsByShop[item.shopId] = [];
@@ -112,21 +121,29 @@ class CartController extends GetxController {
         itemsByShop[item.shopId]!.add(item);
       }
 
+      print("--- GROUPING RESULT ---");
+      print("Unique Shops identified: ${itemsByShop.keys.length}");
+
+      // 3. Create Separate Orders
       for (var entry in itemsByShop.entries) {
         String shopId = entry.key;
         List<CartItem> items = entry.value;
-        String shopName = items.first.shopName;
+
+        print(
+          "Creating order for Shop ID: $shopId containing ${items.length} items...",
+        );
 
         double orderTotal = items.fold(
           0,
           (sum, x) => sum + (x.price * x.quantity.value),
         );
 
-        // --- FIX: Ensure Field Names Match Shopkeeper App ---
+        // Create the order in Firebase
         await FirebaseFirestore.instance.collection('orders').add({
           'customerId': uid,
-          'shopId': shopId,
-          'shopName': shopName,
+          'shopId':
+              shopId, // <--- THIS is what routes it to the specific shopkeeper
+          'shopName': items.first.shopName,
           'status': 'pending',
           'totalPrice': orderTotal,
           'createdAt': FieldValue.serverTimestamp(),
@@ -137,13 +154,10 @@ class CartController extends GetxController {
               .map(
                 (item) => {
                   'productId': item.productId,
-                  'productName': item
-                      .name, // Changed 'name' to 'productName' to match typical shopkeeper models
+                  'productName': item.name,
                   'variant': item.variant,
                   'price': item.price,
-                  'quantity': item
-                      .quantity
-                      .value, // Changed 'qty' to 'quantity' to be safer
+                  'quantity': item.quantity.value,
                   'imageUrl': item.imageUrl,
                 },
               )
@@ -151,29 +165,13 @@ class CartController extends GetxController {
         });
       }
 
-      Get.back();
+      Get.back(); // Close loading
       clearCart();
-
-      Get.defaultDialog(
-        title: "Success!",
-        middleText: "Your orders have been placed successfully.",
-        textConfirm: "OK",
-        confirmTextColor: Colors.white,
-        buttonColor: const Color(0xFF5A7D60),
-        onConfirm: () {
-          Get.back();
-          Get.back();
-        },
-      );
+      Get.snackbar("Success", "Orders placed separately!");
     } catch (e) {
       Get.back();
-      Get.snackbar(
-        "Error",
-        "Failed to place order: $e",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      print("Order Error: $e");
+      print("ERROR: $e");
+      Get.snackbar("Error", "Failed: $e");
     }
   }
 }

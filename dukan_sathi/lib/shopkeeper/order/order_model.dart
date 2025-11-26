@@ -2,24 +2,33 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 // This model is for one item *inside* an order
 class OrderItem {
+  final String productId; // Good to have for linking back to inventory
   final String productName;
   final int quantity;
   final double price;
   final String variant;
+  final String imageUrl; // <--- ADDED THIS
 
   OrderItem({
+    this.productId = '', // Optional but recommended
     required this.productName,
     required this.quantity,
     required this.price,
     required this.variant,
+    required this.imageUrl, // <--- ADDED THIS
   });
 
   factory OrderItem.fromMap(Map<String, dynamic> map) {
     return OrderItem(
-      productName: map['productName'] ?? '',
-      quantity: (map['quantity'] ?? 0).toInt(),
+      productId: map['productId'] ?? '',
+      productName:
+          map['productName'] ??
+          map['name'] ??
+          '', // Handle both naming conventions
+      quantity: (map['quantity'] ?? map['qty'] ?? 0).toInt(),
       price: (map['price'] ?? 0.0).toDouble(),
       variant: map['variant'] ?? '',
+      imageUrl: map['imageUrl'] ?? '', // <--- ADDED PARSING LOGIC
     );
   }
 }
@@ -35,8 +44,6 @@ class Order {
   final Timestamp createdAt;
   final String pickupCode;
   final List<OrderItem> items;
-  // You can add customerName here if you decide to denormalize it
-  // final String customerName;
 
   Order({
     required this.id,

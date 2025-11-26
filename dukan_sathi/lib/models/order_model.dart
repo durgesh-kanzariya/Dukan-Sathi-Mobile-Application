@@ -4,11 +4,11 @@ import 'package:intl/intl.dart';
 // --- ORDER ITEM MODEL ---
 class OrderItem {
   final String productId;
-  final String name;      // merged 'productName' and 'name'
+  final String name;
   final String variant;
   final double price;
   final int quantity;
-  final String imageUrl;  // Added this so customers can see images
+  final String imageUrl;
 
   const OrderItem({
     required this.productId,
@@ -19,15 +19,26 @@ class OrderItem {
     required this.imageUrl,
   });
 
-  // Create from Firestore Map
   factory OrderItem.fromMap(Map<String, dynamic> map) {
+    // 1. ROBUST PRICE PARSING (Handles String, Int, or Double)
+    double parsedPrice = 0.0;
+    try {
+      if (map['price'] is num) {
+        parsedPrice = (map['price'] as num).toDouble();
+      } else if (map['price'] is String) {
+        parsedPrice = double.tryParse(map['price']) ?? 0.0;
+      }
+    } catch (e) {
+      print("Error parsing item price: $e");
+    }
+
     return OrderItem(
       productId: map['productId'] ?? '',
       name: map['name'] ?? map['productName'] ?? 'Unknown',
       variant: map['variant'] ?? '',
-      price: (map['price'] ?? 0.0).toDouble(),
+      price: parsedPrice,
       quantity: (map['qty'] ?? map['quantity'] ?? 1).toInt(),
-      imageUrl: map['imageUrl'] ?? 'assets/imgs/image.png',
+      imageUrl: map['imageUrl'] ?? '',
     );
   }
 }
@@ -43,9 +54,7 @@ class OrderModel {
   final Timestamp createdAt;
   final String pickupCode;
   final List<OrderItem> items;
-  
-  // Extra fields for UI (not necessarily in DB)
-  String? shopAddress; 
+  String? shopAddress;
 
   OrderModel({
     required this.id,
@@ -60,16 +69,36 @@ class OrderModel {
     this.shopAddress,
   });
 
-  // Helper to get formatted date string (e.g. "26/11/2025")
   String get formattedDate {
     DateTime date = createdAt.toDate();
     return DateFormat('dd/MM/yyyy').format(date);
   }
 
-  // Create from Firestore Document
   factory OrderModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snap) {
     final data = snap.data() ?? {};
     final itemData = data['items'] as List<dynamic>? ?? [];
+
+    // Convert items first
+    List<OrderItem> parsedItems = itemData
+        .map((item) => OrderItem.fromMap(item))
+        .toList();
+
+    // 2. SMART TOTAL CALCULATION
+    double finalTotal = 0.0;
+
+    // First, try to get the total directly from the database
+    if (data['totalPrice'] is num) {
+      finalTotal = (data['totalPrice'] as num).toDouble();
+    } else if (data['totalPrice'] is String) {
+      finalTotal = double.tryParse(data['totalPrice']) ?? 0.0;
+    }
+
+    // FIX: If DB says 0 (because of old bug), calculate it manually from the items
+    if (finalTotal == 0.0 && parsedItems.isNotEmpty) {
+      for (var item in parsedItems) {
+        finalTotal += (item.price * item.quantity);
+      }
+    }
 
     return OrderModel(
       id: snap.id,
@@ -77,10 +106,10 @@ class OrderModel {
       shopId: data['shopId'] ?? '',
       shopName: data['shopName'] ?? 'Unknown Shop',
       status: data['status'] ?? 'pending',
-      totalPrice: (data['totalPrice'] ?? 0.0).toDouble(),
+      totalPrice: finalTotal, // Now contains the corrected total
       createdAt: data['createdAt'] ?? Timestamp.now(),
       pickupCode: data['pickupCode'] ?? '',
-      items: itemData.map((item) => OrderItem.fromMap(item)).toList(),
+      items: parsedItems,
     );
   }
 }

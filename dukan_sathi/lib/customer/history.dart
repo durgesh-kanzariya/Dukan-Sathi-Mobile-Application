@@ -33,7 +33,7 @@ class History extends StatelessWidget {
                   colors: [Color(0xFF5A7D60), Color(0xFFDADBCF)],
                 ),
               ),
-              child: uid == null 
+              child: uid == null
                   ? const Center(child: Text("Please login to view history"))
                   : _buildOrderList(uid),
             ),
@@ -49,18 +49,28 @@ class History extends StatelessWidget {
       stream: FirebaseFirestore.instance
           .collection('orders')
           .where('customerId', isEqualTo: uid)
-          .orderBy('createdAt', descending: true) 
+          .orderBy('createdAt', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: Colors.white));
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          );
         }
         if (snapshot.hasError) {
-          return Center(child: Text("Error: ${snapshot.error}", style: const TextStyle(color: Colors.red)));
+          return Center(
+            child: Text(
+              "Error: ${snapshot.error}",
+              style: const TextStyle(color: Colors.red),
+            ),
+          );
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return const Center(
-            child: Text("No order history found.", style: TextStyle(color: Colors.white70)),
+            child: Text(
+              "No order history found.",
+              style: TextStyle(color: Colors.white70),
+            ),
           );
         }
 
@@ -69,21 +79,27 @@ class History extends StatelessWidget {
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
             // Get the order document
-            var orderDoc = snapshot.data!.docs[index] as DocumentSnapshot<Map<String, dynamic>>;
-            
+            var orderDoc =
+                snapshot.data!.docs[index]
+                    as DocumentSnapshot<Map<String, dynamic>>;
+
             // Create initial OrderModel from Firestore data
             OrderModel order = OrderModel.fromSnapshot(orderDoc);
 
             // Fetch Shop Details (Address)
             return FutureBuilder<DocumentSnapshot>(
-              future: FirebaseFirestore.instance.collection('shops').doc(order.shopId).get(),
+              future: FirebaseFirestore.instance
+                  .collection('shops')
+                  .doc(order.shopId)
+                  .get(),
               builder: (context, shopSnapshot) {
                 if (shopSnapshot.hasData && shopSnapshot.data!.exists) {
-                   var shopData = shopSnapshot.data!.data() as Map<String, dynamic>;
-                   // Inject the address into the model
-                   order.shopAddress = shopData['address'] ?? "Unknown Address";
+                  var shopData =
+                      shopSnapshot.data!.data() as Map<String, dynamic>;
+                  // Inject the address into the model
+                  order.shopAddress = shopData['address'] ?? "Unknown Address";
                 } else {
-                   order.shopAddress = "Loading...";
+                  order.shopAddress = "Loading...";
                 }
 
                 return InkWell(
@@ -119,7 +135,11 @@ class History extends StatelessWidget {
               children: [
                 const Text(
                   "Dukan Sathi",
-                  style: TextStyle(fontSize: 35, color: Colors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 35,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -135,7 +155,14 @@ class History extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          const Text("History", style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w400)),
+          const Text(
+            "History",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 26,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
         ],
       ),
     );
@@ -151,13 +178,21 @@ class _HistoryCard extends StatelessWidget {
     if (s == 'cancelled') return Colors.red.shade400;
     if (s == 'picked up' || s == 'completed') return const Color(0xFF5F7D5D);
     if (s == 'ready' || s == 'ready for pickup') return Colors.green;
-    return Colors.orange; 
+    return Colors.orange;
   }
 
   @override
   Widget build(BuildContext context) {
-    const labelStyle = TextStyle(fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black87);
-    final valueStyle = const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF5F7D5D));
+    const labelStyle = TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.w400,
+      color: Colors.black87,
+    );
+    final valueStyle = const TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
+      color: Color(0xFF5F7D5D),
+    );
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0),
@@ -171,18 +206,46 @@ class _HistoryCard extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Colors.white.withOpacity(0.6), Colors.white.withOpacity(0.2)],
+                colors: [
+                  Colors.white.withOpacity(0.6),
+                  Colors.white.withOpacity(0.2),
+                ],
               ),
               border: Border.all(color: Colors.white.withOpacity(0.2)),
             ),
             child: Column(
               children: [
-                _buildInfoRow("Order Id:", "#${order.id.substring(order.id.length > 6 ? order.id.length - 6 : 0)}", labelStyle, valueStyle),
+                _buildInfoRow(
+                  "Order Id:",
+                  "#${order.id.substring(order.id.length > 6 ? order.id.length - 6 : 0)}",
+                  labelStyle,
+                  valueStyle,
+                ),
                 const Divider(thickness: 1, color: Colors.white),
-                _buildInfoRow("Shop Name:", order.shopName, labelStyle, valueStyle),
-                _buildInfoRow("Order Status:", order.status, labelStyle, valueStyle.copyWith(color: _getStatusColor(order.status))),
-                _buildInfoRow("Total Price:", "₹${order.totalPrice.toStringAsFixed(0)}", labelStyle, valueStyle),
-                _buildInfoRow("Date:", order.formattedDate, labelStyle, valueStyle),
+                _buildInfoRow(
+                  "Shop Name:",
+                  order.shopName,
+                  labelStyle,
+                  valueStyle,
+                ),
+                _buildInfoRow(
+                  "Order Status:",
+                  order.status,
+                  labelStyle,
+                  valueStyle.copyWith(color: _getStatusColor(order.status)),
+                ),
+                _buildInfoRow(
+                  "Total Price:",
+                  "₹${order.totalPrice.toStringAsFixed(0)}",
+                  labelStyle,
+                  valueStyle,
+                ),
+                _buildInfoRow(
+                  "Date:",
+                  order.formattedDate,
+                  labelStyle,
+                  valueStyle,
+                ),
               ],
             ),
           ),
@@ -191,14 +254,21 @@ class _HistoryCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value, TextStyle labelStyle, TextStyle valueStyle) {
+  Widget _buildInfoRow(
+    String label,
+    String value,
+    TextStyle labelStyle,
+    TextStyle valueStyle,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 1.0),
       child: Row(
         children: [
           Text(label, style: labelStyle),
           const SizedBox(width: 15),
-          Expanded(child: Text(value, style: valueStyle, textAlign: TextAlign.start)),
+          Expanded(
+            child: Text(value, style: valueStyle, textAlign: TextAlign.start),
+          ),
         ],
       ),
     );

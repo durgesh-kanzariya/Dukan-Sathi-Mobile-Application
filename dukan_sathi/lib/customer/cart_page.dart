@@ -428,7 +428,7 @@ class CardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final CartController cartController = Get.put(CartController());
+    final CartController cartController = Get.find<CartController>();
 
     return Scaffold(
       backgroundColor: const Color(0xFFFDFBF5),
@@ -610,18 +610,23 @@ class CardPage extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              item.imageUrl,
-              width: 60,
-              height: 60,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                color: Colors.grey[300],
-                width: 60,
-                height: 60,
-                child: const Icon(Icons.image),
-              ),
-            ),
+            child: (item.imageUrl.startsWith('http'))
+                ? Image.network(
+                    item.imageUrl,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      color: Colors.grey[300],
+                      child: Icon(Icons.broken_image),
+                    ),
+                  )
+                : Image.asset(
+                    "assets/imgs/image.png", // Your fallback local image
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
           ),
           const SizedBox(width: 12),
           Expanded(

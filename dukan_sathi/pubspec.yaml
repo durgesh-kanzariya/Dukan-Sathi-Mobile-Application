@@ -23,6 +23,7 @@ dependencies:
   firebase_app_check: ^0.4.1+2
   cloudinary_public: ^0.23.1
   cached_network_image: ^3.4.1
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

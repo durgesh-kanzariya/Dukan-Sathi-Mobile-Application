@@ -1,44 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dukan_sathi/models/order_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../bottom_nav.dart';
 import 'pickup_code.dart';
-import '../models/order_model.dart'; // IMPORT THE NEW MODEL
-
-// --- MOCK DATA (Updated to use new model) ---
-// Note: We use DateTime.now() for the mock timestamp
-final mockOrder = OrderModel(
-  id: '812463187642',
-  customerId: 'mock_user',
-  shopId: 'mock_shop',
-  status: 'Ready To PickUp',
-  shopName: 'Best Bakery',
-  createdAt: Timestamp.now(),
-  pickupCode: '1234',
-  shopAddress: 'Mavdi chowk, nana mauva main road, Rajkot',
-  totalPrice: 180.0,
-  items: [
-    const OrderItem(
-      productId: '1',
-      imageUrl: "assets/imgs/image.png",
-      name: "Chocolate Cake",
-      variant: "1.5 KG",
-      price: 50.0,
-      quantity: 2,
-    ),
-    const OrderItem(
-      productId: '2',
-      imageUrl: "assets/imgs/image.png",
-      name: "Butter Croissant",
-      variant: "Pack of 4",
-      price: 80.0,
-      quantity: 1,
-    ),
-  ],
-);
 
 class OrderDetails extends StatelessWidget {
-  final OrderModel order; // Use OrderModel
+  final OrderModel order;
   const OrderDetails({super.key, required this.order});
 
   @override
@@ -53,7 +20,7 @@ class OrderDetails extends StatelessWidget {
             const Divider(indent: 20, endIndent: 20),
             _buildItemList(),
             _buildTotalPrice(),
-            _buildActionButton(),
+            _buildActionButton(), // <--- Logic is inside here
             const SizedBox(height: 20),
           ],
         ),
@@ -62,6 +29,7 @@ class OrderDetails extends StatelessWidget {
     );
   }
 
+  // ... (Header, Summary, and ItemList widgets remain exactly the same as previous code) ...
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 50, left: 10, right: 20, bottom: 20),
@@ -116,8 +84,7 @@ class OrderDetails extends StatelessWidget {
           _buildSummaryRow('Order id:', order.id),
           _buildSummaryRow('Order status:', order.status),
           _buildSummaryRow('Shop name:', order.shopName),
-          _buildSummaryRow('Date:', order.formattedDate), // Use the getter
-          // Use the shopAddress field, fallback if null
+          _buildSummaryRow('Date:', order.formattedDate),
           _buildSummaryRow(
             'Address:',
             order.shopAddress ?? 'Address unavailable',
@@ -169,6 +136,7 @@ class OrderDetails extends StatelessWidget {
       itemCount: order.items.length,
       itemBuilder: (context, index) {
         final item = order.items[index];
+        bool isNetworkImage = item.imageUrl.startsWith('http');
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           child: Card(
@@ -182,17 +150,20 @@ class OrderDetails extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: Image.asset(
-                      // Or Image.network if you switch later
-                      item.imageUrl,
+                    child: SizedBox(
                       width: 80,
                       height: 80,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(
-                        Icons.image_not_supported_outlined,
-                        size: 80,
-                        color: Colors.grey,
-                      ),
+                      child: isNetworkImage
+                          ? Image.network(
+                              item.imageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) =>
+                                  const Icon(Icons.broken_image),
+                            )
+                          : Image.asset(
+                              "assets/imgs/image.png",
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -275,16 +246,33 @@ class OrderDetails extends StatelessWidget {
     );
   }
 
+  // --- LOGIC CHANGE HERE ---
   Widget _buildActionButton() {
+    // 1. Check if the status allows pickup
+    // We check lower case to be safe against "Ready for Pickup" vs "ready for pickup"
+    bool isReadyForPickup = order.status.toLowerCase().contains('ready');
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () => Get.to(() => const PickupCode()),
+          // 2. Logic: If ready, Navigate. If not, OnPressed is NULL (disables button)
+          onPressed: isReadyForPickup
+              ? () {
+                  Get.to(() => PickupCode(code: order.pickupCode));
+                }
+              : null, // Setting null disables the button automatically
+
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF5A7D60),
+            // 3. Logic: Green if ready, Grey if disabled
+            backgroundColor: isReadyForPickup
+                ? const Color(0xFF5A7D60)
+                : Colors.grey.shade400,
             foregroundColor: Colors.white,
+            disabledBackgroundColor:
+                Colors.grey.shade300, // Visual style when disabled
+            disabledForegroundColor: Colors.grey.shade500,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
@@ -294,7 +282,11 @@ class OrderDetails extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          child: const Text('Show Pick Up Code'),
+
+          // 4. Logic: Change Text based on status
+          child: Text(
+            isReadyForPickup ? 'Show Pick Up Code' : 'Waiting for Shopkeeper',
+          ),
         ),
       ),
     );

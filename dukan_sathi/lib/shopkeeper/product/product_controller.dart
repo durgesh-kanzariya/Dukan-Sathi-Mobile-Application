@@ -287,10 +287,10 @@ class ProductController extends GetxController {
     isUploading.value = true;
 
     try {
-      // --- NEW: Upload to Cloudinary ---
       String imageUrl = await _uploadImage(imageFile);
 
       final newProductData = {
+        'shopId': _shopId, // <--- CRITICAL FIX: Save the Shop ID here!
         'productName': name,
         'description': description,
         'imageUrl': imageUrl,
@@ -301,8 +301,7 @@ class ProductController extends GetxController {
       await _productsCollection(_shopId!).add(newProductData);
       return true;
     } catch (e) {
-      print("Error adding product: $e");
-      Get.snackbar('Error', 'Failed to add product: $e');
+      // ... existing error handling
       return false;
     } finally {
       isUploading.value = false;

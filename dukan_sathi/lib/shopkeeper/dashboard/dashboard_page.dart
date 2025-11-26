@@ -438,7 +438,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-// --- NEW IMPORTS ---
 import '../sells/monthly_sells_screen.dart';
 import 'package:dukan_sathi/shopkeeper/order/order_controller.dart';
 import 'package:dukan_sathi/shopkeeper/order/order_model.dart';
@@ -449,11 +448,10 @@ class AdminDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Add null safety check
     if (!Get.isRegistered<OrderController>() ||
         !Get.isRegistered<ShopService>()) {
-      return Scaffold(
-        backgroundColor: const Color.fromARGB(226, 249, 243, 231),
+      return const Scaffold(
+        backgroundColor: Color.fromARGB(226, 249, 243, 231),
         body: Center(
           child: CircularProgressIndicator(color: Color(0xFF5A7D60)),
         ),
@@ -474,6 +472,7 @@ class AdminDashboardScreen extends StatelessWidget {
               controller.isLoading.value,
               controller.newOrders,
               controller.preparingOrders,
+              controller.readyOrders,
             ),
           ),
         ),
@@ -522,12 +521,9 @@ class AdminDashboardScreen extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Obx(() {
-      // Show loading only if still actively loading
       if (shopService.isLoading.value) {
         return _buildPerformanceCardLoading(context);
       }
-
-      // Show actual shop data (even if currentShop is null, it will handle it gracefully)
       return _buildPerformanceCardWithData(context, shopService, screenWidth);
     });
   }
@@ -542,9 +538,12 @@ class AdminDashboardScreen extends StatelessWidget {
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: [
-                Text('Loading shop data...', style: TextStyle(fontSize: 16)),
-                SizedBox(height: 10),
-                CircularProgressIndicator(color: Color(0xFF5A7D60)),
+                const Text(
+                  'Loading shop data...',
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+                const CircularProgressIndicator(color: Color(0xFF5A7D60)),
               ],
             ),
           ),
@@ -558,6 +557,8 @@ class AdminDashboardScreen extends StatelessWidget {
     ShopService shopService,
     double screenWidth,
   ) {
+    final OrderController orderController = Get.find<OrderController>();
+
     return Transform.translate(
       offset: const Offset(0, -80),
       child: Padding(
@@ -601,17 +602,25 @@ class AdminDashboardScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    const Text(
-                      'Last Month - \$0.00',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 17,
-                        letterSpacing: 1,
-                      ),
-                    ),
+                    Obx(() {
+                      if (orderController.isCalculatingPerformance.value) {
+                        return const Text(
+                          'Last Month - ...',
+                          style: TextStyle(fontSize: 17),
+                        );
+                      }
+                      return Text(
+                        'Last Month Profit - \$${orderController.lastMonthProfit.value.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 17,
+                          letterSpacing: 1,
+                        ),
+                      );
+                    }),
                     const SizedBox(height: 5),
                     const Text(
-                      'Current Month Sells',
+                      'Current Month Profit',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 17,
@@ -620,15 +629,25 @@ class AdminDashboardScreen extends StatelessWidget {
                     ),
                     FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: Text(
-                        '\$0.00',
-                        style: TextStyle(
-                          color: Color(0xFF5A7D60),
-                          fontSize: 36,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'Abel',
-                        ),
-                      ),
+                      child: Obx(() {
+                        if (orderController.isCalculatingPerformance.value) {
+                          return const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: CircularProgressIndicator(
+                              color: Color(0xFF5A7D60),
+                            ),
+                          );
+                        }
+                        return Text(
+                          '\$${orderController.currentMonthProfit.value.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            color: Color(0xFF5A7D60),
+                            fontSize: 36,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: 'Abel',
+                          ),
+                        );
+                      }),
                     ),
                     Align(
                       alignment: Alignment.bottomRight,
@@ -672,11 +691,12 @@ class AdminDashboardScreen extends StatelessWidget {
     bool isLoading,
     List<Order> newOrders,
     List<Order> preparingOrders,
+    List<Order> readyOrders,
   ) {
     return Transform.translate(
       offset: const Offset(0, -80),
       child: DefaultTabController(
-        length: 2,
+        length: 3,
         child: Column(
           children: [
             const TabBar(
@@ -687,6 +707,7 @@ class AdminDashboardScreen extends StatelessWidget {
               tabs: [
                 Tab(text: 'New'),
                 Tab(text: 'Preparing'),
+                Tab(text: 'Ready'),
               ],
             ),
             Expanded(
@@ -698,8 +719,17 @@ class AdminDashboardScreen extends StatelessWidget {
                     )
                   : TabBarView(
                       children: [
-                        _buildOrderList(newOrders, context),
-                        _buildOrderList(preparingOrders, context),
+                        _buildOrderList(newOrders, context, isReadyTab: false),
+                        _buildOrderList(
+                          preparingOrders,
+                          context,
+                          isReadyTab: false,
+                        ),
+                        _buildOrderList(
+                          readyOrders,
+                          context,
+                          isReadyTab: true,
+                        ), // Enable Ready Mode
                       ],
                     ),
             ),
@@ -709,7 +739,11 @@ class AdminDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderList(List<Order> orders, BuildContext context) {
+  Widget _buildOrderList(
+    List<Order> orders,
+    BuildContext context, {
+    required bool isReadyTab,
+  }) {
     if (orders.isEmpty) {
       return const Center(
         child: Text(
@@ -725,7 +759,11 @@ class AdminDashboardScreen extends StatelessWidget {
       itemCount: orders.length,
       itemBuilder: (context, index) {
         final order = orders[index];
-        return OrderCard(order: order, controller: controller);
+        return OrderCard(
+          order: order,
+          controller: controller,
+          isReadyTab: isReadyTab,
+        );
       },
     );
   }
@@ -734,9 +772,14 @@ class AdminDashboardScreen extends StatelessWidget {
 class OrderCard extends StatelessWidget {
   final Order order;
   final OrderController controller;
+  final bool isReadyTab;
 
-  const OrderCard({Key? key, required this.order, required this.controller})
-    : super(key: key);
+  const OrderCard({
+    Key? key,
+    required this.order,
+    required this.controller,
+    this.isReadyTab = false,
+  }) : super(key: key);
 
   String _formatTimeAgo(DateTime dateTime) {
     final difference = DateTime.now().difference(dateTime);
@@ -812,30 +855,98 @@ class OrderCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
+
+            // --- BUTTON LOGIC ---
             if (order.status == 'pending')
               _buildNewOrderButtons()
+            else if (isReadyTab)
+              _buildReadyTabButtons(context) // <--- NEW: Logic for "Ready" page
             else
-              _buildPreparingOrderButton(context),
+              _buildPreparingOrderButton(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPreparingOrderButton(BuildContext context) {
+  // --- NEW: Buttons specifically for "Ready" Tab ---
+  Widget _buildReadyTabButtons(BuildContext context) {
+    return Column(
+      children: [
+        // 1. Waiting Status Button
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () =>
+                Get.to(() => ShopkeeperOrderDetailsScreen(order: order)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blueGrey[50],
+              foregroundColor: Colors.blueGrey[700],
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.access_time, size: 18),
+                SizedBox(width: 8),
+                Text('Waiting for Customer'),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        // 2. Cancel Button
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton(
+            onPressed: () => _confirmCancel(context),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.red,
+              side: const BorderSide(color: Colors.red),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+            child: const Text('Cancel Order'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _confirmCancel(BuildContext context) {
+    Get.defaultDialog(
+      title: "Cancel Order?",
+      middleText: "Customer didn't show up? This will remove the order.",
+      textConfirm: "Yes, Cancel",
+      textCancel: "Back",
+      confirmTextColor: Colors.white,
+      buttonColor: Colors.red,
+      onConfirm: () {
+        controller.declineOrder(order.id); // Sets status to 'cancelled'
+        Get.back(); // Close dialog
+      },
+    );
+  }
+
+  Widget _buildPreparingOrderButton() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {
-          Get.to(() => ShopkeeperOrderDetailsScreen(order: order));
-        },
+        onPressed: () =>
+            Get.to(() => ShopkeeperOrderDetailsScreen(order: order)),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF5A7D60),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(vertical: 12),
         ),
-        child: const Text('View Order Details'),
+        child: const Text('View & Mark Ready'),
       ),
     );
   }
@@ -845,9 +956,7 @@ class OrderCard extends StatelessWidget {
       children: [
         Expanded(
           child: ElevatedButton(
-            onPressed: () {
-              controller.declineOrder(order.id);
-            },
+            onPressed: () => controller.declineOrder(order.id),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.grey.shade200,
               foregroundColor: Colors.black87,
@@ -862,9 +971,7 @@ class OrderCard extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: ElevatedButton(
-            onPressed: () {
-              controller.acceptOrder(order.id);
-            },
+            onPressed: () => controller.acceptOrder(order.id),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF5A7D60),
               foregroundColor: Colors.white,

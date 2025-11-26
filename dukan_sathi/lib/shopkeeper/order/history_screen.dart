@@ -22,60 +22,59 @@ class HistoryScreen extends StatelessWidget {
         const CustomAppBar(title: 'History'),
         Expanded(
           // --- WRAP IN Obx TO LISTEN FOR CHANGES ---
-          child: Obx(
-            () {
-              if (controller.isLoading.value && controller.historyOrders.isEmpty) {
-                return const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF5A7D60)),
-                );
-              }
-              
-              if (controller.historyOrders.isEmpty) {
-                 return const Center(
-                  child: Text(
-                    "No completed or cancelled orders found.",
-                    style: TextStyle(color: Colors.black54),
-                  ),
-                );
-              }
+          child: Obx(() {
+            if (controller.isLoading.value &&
+                controller.historyOrders.isEmpty) {
+              return const Center(
+                child: CircularProgressIndicator(color: Color(0xFF5A7D60)),
+              );
+            }
 
-              return Container(
-                margin: const EdgeInsets.fromLTRB(10, 10, 10, 90),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF5F7D5D), // Dark green top
-                      Color(0xFFDADBCF), // Creamy white bottom
-                    ],
-                  ),
-                ),
-                child: ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                  itemCount: controller.historyOrders.length, // Use dynamic list
-                  itemBuilder: (context, index) {
-                    final order = controller.historyOrders[index];
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ShopkeeperOrderDetailsScreen(
-                              order: order,
-                              showActions: false, // Buttons are hidden for history
-                            ),
-                          ),
-                        );
-                      },
-                      child: HistoryCard(order: order), // Pass the new Order object
-                    );
-                  },
+            if (controller.historyOrders.isEmpty) {
+              return const Center(
+                child: Text(
+                  "No completed or cancelled orders found.",
+                  style: TextStyle(color: Colors.black54),
                 ),
               );
-            },
-          ),
+            }
+
+            return Container(
+              margin: const EdgeInsets.fromLTRB(10, 10, 10, 90),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF5F7D5D), // Dark green top
+                    Color(0xFFDADBCF), // Creamy white bottom
+                  ],
+                ),
+              ),
+              child: ListView.builder(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                itemCount: controller.historyOrders.length, // Use dynamic list
+                itemBuilder: (context, index) {
+                  final order = controller.historyOrders[index];
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ShopkeeperOrderDetailsScreen(order: order),
+                        ),
+                      );
+                    },
+                    child: HistoryCard(
+                      order: order,
+                    ), // Pass the new Order object
+                  );
+                },
+              ),
+            );
+          }),
         ),
       ],
     );
@@ -144,9 +143,7 @@ class HistoryCard extends StatelessWidget {
                   children: [
                     const Text("Customer id:", style: labelStyle),
                     const SizedBox(width: 15),
-                    Expanded(
-                      child: Text(order.customerId, style: valueStyle),
-                    ),
+                    Expanded(child: Text(order.customerId, style: valueStyle)),
                   ],
                 ),
                 Row(
