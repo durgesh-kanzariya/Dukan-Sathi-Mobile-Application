@@ -36,7 +36,7 @@ class _MonthlySpendingLageState extends State<MonthlySpendingLage> {
                     ListTile(
                       leading: IconButton(
                         onPressed: () {
-                          Get.to( Dashboard(username: "kishan",password: "12345677",));
+                          Get.to(Dashboard());
                         },
                         icon: Icon(Icons.arrow_back),
                         style: IconButton.styleFrom(
@@ -51,7 +51,6 @@ class _MonthlySpendingLageState extends State<MonthlySpendingLage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
                     ),
                   ],
                 ),
@@ -68,9 +67,8 @@ class _MonthlySpendingLageState extends State<MonthlySpendingLage> {
               ),
             ],
           ),
-          
-          SizedBox(height: 5),
 
+          SizedBox(height: 5),
 
           // this is for the listview builder wite here
           Expanded(
@@ -92,7 +90,7 @@ class _MonthlySpendingLageState extends State<MonthlySpendingLage> {
               ),
             ),
           ),
-          SizedBox(height: 20,),
+          SizedBox(height: 20),
         ],
       ),
 

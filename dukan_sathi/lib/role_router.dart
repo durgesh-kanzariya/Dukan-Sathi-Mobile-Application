@@ -222,10 +222,7 @@ class RoleRouter extends StatelessWidget {
               return const ShopkeeperMainScreen();
             } else {
               print("RoleRouter FutureBuilder: Returning Customer Dashboard");
-              return Dashboard(
-                username: data['name'] ?? 'Customer',
-                password: '',
-              );
+              return const Dashboard();
             }
           } catch (e) {
             print("RoleRouter FutureBuilder: Error reading role data: $e");

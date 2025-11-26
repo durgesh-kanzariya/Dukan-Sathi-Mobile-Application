@@ -22,6 +22,7 @@ dependencies:
   provider: ^6.1.5+1
   firebase_app_check: ^0.4.1+2
   cloudinary_public: ^0.23.1
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:

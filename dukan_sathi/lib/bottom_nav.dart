@@ -33,9 +33,7 @@ class _BottomNavState extends State<BottomNav> {
                 label: 'Home',
                 onPressed: () {
                   // TODO: Use a state management solution instead of passing credentials
-                  Get.offAll(
-                    () => Dashboard(username: "kishan", password: "1234567"),
-                  );
+                  Get.offAll(() => Dashboard());
                 },
               ),
 

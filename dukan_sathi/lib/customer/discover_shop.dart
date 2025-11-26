@@ -1,8 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dukan_sathi/bottom_nav.dart';
 import 'package:dukan_sathi/customer/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/state_manager.dart';
 import 'shop_productpage.dart';
 
 class DiscoverShop extends StatefulWidget {
@@ -13,6 +13,10 @@ class DiscoverShop extends StatefulWidget {
 }
 
 class _DiscoverShopState extends State<DiscoverShop> {
+  // Controller for search text
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +53,7 @@ class _DiscoverShopState extends State<DiscoverShop> {
                       padding: const EdgeInsets.all(10),
                     ),
                     onPressed: () {
-                      Get.to(Profile());
+                      Get.to(() => const Profile());
                     },
                     child: const Icon(Icons.person),
                   ),
@@ -65,6 +69,12 @@ class _DiscoverShopState extends State<DiscoverShop> {
                   elevation: 4,
                   borderRadius: BorderRadius.circular(30),
                   child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value.toLowerCase();
+                      });
+                    },
                     decoration: InputDecoration(
                       hintText: 'Search for shop',
                       prefixIcon: const Icon(Icons.search),
@@ -84,9 +94,9 @@ class _DiscoverShopState extends State<DiscoverShop> {
 
           const SizedBox(height: 10),
 
-          Positioned(
-            top: 180,
-            left: 90,
+          // "Your favorite shops" Text - Fixed layout (was Positioned in Column)
+          const Padding(
+            padding: EdgeInsets.only(top: 40.0), 
             child: Center(
               child: Text(
                 "Your favorite shops",
@@ -94,64 +104,104 @@ class _DiscoverShopState extends State<DiscoverShop> {
               ),
             ),
           ),
-
-          Positioned(
-            top: 240, // just below the text
-            left: 80,
-            right: 80,
-            child: Padding(
-              padding: EdgeInsetsGeometry.fromLTRB(30, 1, 30, 0),
-              child: Divider(
-                color: Colors.black.withOpacity(0.5),
-                thickness: 2,
-              ),
+          
+          Padding(
+            padding: const EdgeInsets.fromLTRB(30, 5, 30, 0),
+            child: Divider(
+              color: Colors.black.withOpacity(0.5),
+              thickness: 2,
             ),
           ),
 
           Expanded(
             child: Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Container(
-                decoration: BoxDecoration(),
-                child: ListView.builder(
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () {
-                        Get.to(ShopProductpage());
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [Color(0xFF5A7D60), Color(0xFFF9F3E7)],
+              padding: const EdgeInsets.all(20.0),
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('shops').snapshots(),
+                builder: (context, snapshot) {
+                  // 1. Loading State
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator(color: Color(0xFF5A7D60)));
+                  }
+                  
+                  // 2. Error or Empty State
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(child: Text("No shops found."));
+                  }
+
+                  // 3. Client-side Filter for Search
+                  var shops = snapshot.data!.docs.where((doc) {
+                    var data = doc.data() as Map<String, dynamic>;
+                    String shopName = (data['shopName'] ?? "").toString().toLowerCase();
+                    return shopName.contains(_searchQuery);
+                  }).toList();
+
+                  if (shops.isEmpty) {
+                     return const Center(child: Text("No shops match your search."));
+                  }
+
+                  return ListView.builder(
+                    itemCount: shops.length,
+                    itemBuilder: (context, index) {
+                      var shopDoc = shops[index];
+                      var shopData = shopDoc.data() as Map<String, dynamic>;
+                      
+                      String shopName = shopData['shopName'] ?? "Unknown Shop";
+                      String address = shopData['address'] ?? "No Address";
+
+                      return InkWell(
+                        onTap: () {
+                          // NAVIGATE to ShopProductpage with correct ID and Name
+                          Get.to(() => ShopProductpage(
+                            shopId: shopDoc.id,
+                            shopName: shopName,
+                          ));
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 10.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [Color(0xFF5A7D60), Color(0xFFF9F3E7)],
+                              ),
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: const ListTile(
-                              leading: Icon(Icons.person_2_rounded),
-                              title: Text('Bakry Shop'),
-                              subtitle: Text('Best Bakry'),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: ListTile(
+                                leading: const CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  child: Icon(Icons.store, color: Color(0xFF5A7D60)),
+                                ),
+                                title: Text(
+                                  shopName,
+                                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                                ),
+                                subtitle: Text(
+                                  address,
+                                  style: TextStyle(color: Colors.white.withOpacity(0.9)),
+                                  maxLines: 1, 
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ),
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
         ],
       ),
 
-      bottomNavigationBar: BottomNav(),
+      bottomNavigationBar: const BottomNav(),
     );
   }
 }

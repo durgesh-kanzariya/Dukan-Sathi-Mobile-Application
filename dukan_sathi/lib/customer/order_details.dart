@@ -1,65 +1,33 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '/bottom_nav.dart';
+import '../bottom_nav.dart';
 import 'pickup_code.dart';
+import '../models/order_model.dart'; // IMPORT THE NEW MODEL
 
-// --- DATA MODELS ---
-// These models are structured to provide the data needed for the new design.
-class OrderItem {
-  final String imageUrl;
-  final String name;
-  final String variant;
-  final double price;
-  final int quantity;
-
-  const OrderItem({
-    required this.imageUrl,
-    required this.name,
-    required this.variant,
-    required this.price,
-    required this.quantity,
-  });
-}
-
-class Order {
-  final String id;
-  final String status;
-  final String shopName;
-  final String date;
-  final String address;
-  final List<OrderItem> items;
-
-  const Order({
-    required this.id,
-    required this.status,
-    required this.shopName,
-    required this.date,
-    required this.address,
-    required this.items,
-  });
-
-  // Helper to calculate total price
-  double get totalPrice {
-    return items.fold(0, (sum, item) => sum + (item.price * item.quantity));
-  }
-}
-
-// --- MOCK DATA ---
-final mockOrder = Order(
+// --- MOCK DATA (Updated to use new model) ---
+// Note: We use DateTime.now() for the mock timestamp
+final mockOrder = OrderModel(
   id: '812463187642',
+  customerId: 'mock_user',
+  shopId: 'mock_shop',
   status: 'Ready To PickUp',
   shopName: 'Best Bakery',
-  date: '31/08/2025',
-  address: 'Mavdi chowk, nana mauva main road, Rajkot',
+  createdAt: Timestamp.now(),
+  pickupCode: '1234',
+  shopAddress: 'Mavdi chowk, nana mauva main road, Rajkot',
+  totalPrice: 180.0,
   items: [
     const OrderItem(
-      imageUrl: "assets/imgs/image.png", // Make sure this path is correct
+      productId: '1',
+      imageUrl: "assets/imgs/image.png",
       name: "Chocolate Cake",
       variant: "1.5 KG",
       price: 50.0,
       quantity: 2,
     ),
     const OrderItem(
+      productId: '2',
       imageUrl: "assets/imgs/image.png",
       name: "Butter Croissant",
       variant: "Pack of 4",
@@ -69,16 +37,14 @@ final mockOrder = Order(
   ],
 );
 
-// --- MAIN WIDGET ---
 class OrderDetails extends StatelessWidget {
-  final Order order;
+  final OrderModel order; // Use OrderModel
   const OrderDetails({super.key, required this.order});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFDFBF5),
-      // The body is a SingleChildScrollView, exactly like the shopkeeper screen
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -87,17 +53,15 @@ class OrderDetails extends StatelessWidget {
             const Divider(indent: 20, endIndent: 20),
             _buildItemList(),
             _buildTotalPrice(),
-            _buildActionButton(), // Customer-specific button
+            _buildActionButton(),
             const SizedBox(height: 20),
           ],
         ),
       ),
-      // RESTORED: The BottomNavigationBar is included.
       bottomNavigationBar: const BottomNav(),
     );
   }
 
-  /// Header design taken directly from the Shopkeeper screen
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 50, left: 10, right: 20, bottom: 20),
@@ -127,7 +91,7 @@ class OrderDetails extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 48), // Balances the IconButton
+              const SizedBox(width: 48),
             ],
           ),
           const Text(
@@ -144,7 +108,6 @@ class OrderDetails extends StatelessWidget {
     );
   }
 
-  /// Order summary section, matching the shopkeeper design
   Widget _buildOrderSummary() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
@@ -153,8 +116,13 @@ class OrderDetails extends StatelessWidget {
           _buildSummaryRow('Order id:', order.id),
           _buildSummaryRow('Order status:', order.status),
           _buildSummaryRow('Shop name:', order.shopName),
-          _buildSummaryRow('Date:', order.date),
-          _buildSummaryRow('Address:', order.address, isAddress: true),
+          _buildSummaryRow('Date:', order.formattedDate), // Use the getter
+          // Use the shopAddress field, fallback if null
+          _buildSummaryRow(
+            'Address:',
+            order.shopAddress ?? 'Address unavailable',
+            isAddress: true,
+          ),
         ],
       ),
     );
@@ -194,7 +162,6 @@ class OrderDetails extends StatelessWidget {
     );
   }
 
-  /// Item list using Cards, matching the shopkeeper design
   Widget _buildItemList() {
     return ListView.builder(
       shrinkWrap: true,
@@ -216,6 +183,7 @@ class OrderDetails extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: Image.asset(
+                      // Or Image.network if you switch later
                       item.imageUrl,
                       width: 80,
                       height: 80,
@@ -280,7 +248,6 @@ class OrderDetails extends StatelessWidget {
     );
   }
 
-  /// Total price section, aligned to the right like the shopkeeper screen
   Widget _buildTotalPrice() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(30, 8, 30, 16),
@@ -308,7 +275,6 @@ class OrderDetails extends StatelessWidget {
     );
   }
 
-  /// Customer-specific action button
   Widget _buildActionButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
