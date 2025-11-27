@@ -613,32 +613,6 @@ class _DashboardState extends State<Dashboard> {
                       );
                     },
                   ),
-
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: ElevatedButton(
-                      onPressed: () => Get.to(MonthlySpendingLage()),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4C6A52),
-                        shape: const StadiumBorder(),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('More', style: TextStyle(color: Colors.white)),
-                          Icon(
-                            Icons.arrow_forward,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
