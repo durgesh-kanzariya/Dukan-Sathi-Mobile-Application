@@ -4,7 +4,6 @@
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.8.1+-02569B?logo=flutter)
 ![Firebase](https://img.shields.io/badge/Firebase-6.0+-FFCA28?logo=firebase)
-![License](https://img.shields.io/badge/license-MIT-blue)
 
 ---
 
