@@ -326,17 +326,6 @@ Then archive and upload via Xcode.
 
 ---
 
-## 📝 Known Issues & TODOs
-
-- [ ] Implement password change functionality (currently shows placeholder)
-- [ ] Configure Cloudinary with actual cloud name
-- [ ] Switch Firebase App Check to production mode
-- [ ] Clean up commented code
-- [ ] Add comprehensive error handling
-- [ ] Implement push notifications for order updates
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:
@@ -346,12 +335,6 @@ Contributions are welcome! Please follow these steps:
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
