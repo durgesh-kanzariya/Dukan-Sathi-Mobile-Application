@@ -1,378 +1,117 @@
-# 🛍️ Dukan Sathi
+# 🛍️ Dukan Sathi (Shop Companion)
 
-**Dukan Sathi** (Shop Companion) is a Flutter-based mobile application that connects local shops with customers, enabling seamless ordering and in-store pickup experiences. The app provides separate interfaces for customers and shopkeepers, facilitating a complete local commerce ecosystem.
+**Dukan Sathi** is a modern, enterprise-grade Flutter mobile application built with Clean Architecture and Riverpod. It bridges local neighborhood retail shops with nearby customers, offering pre-ordering, real-time inventory management, financial profit analytics, and secure in-store QR code & 4-digit PIN verification.
 
-![Flutter](https://img.shields.io/badge/Flutter-3.8.1+-02569B?logo=flutter)
-![Firebase](https://img.shields.io/badge/Firebase-6.0+-FFCA28?logo=firebase)
-<!-- ![License](https://img.shields.io/badge/license-MIT-blue) -->
-
----
-
-## 📱 Features
-
-### For Customers
-- 🏪 **Shop Discovery** - Browse and search local shops
-- 🛒 **Shopping Cart** - Add products from multiple shops
-- ⚡ **Quick Order List** - Save frequently ordered items for faster checkout
-- 📦 **Order Tracking** - Real-time order status updates (Pending → Accepted → Preparing → Ready → Completed)
-- 📱 **QR Code Pickup** - Scan QR codes at shops to collect orders
-- 📊 **Spending Analytics** - Track monthly spending with detailed breakdowns
-- 📜 **Order History** - View past orders and receipts
-- 👤 **Profile Management** - Update personal information and preferences
-
-### For Shopkeepers
-- 🏬 **Shop Management** - Set up and manage shop details, hours, and contact information
-- 📦 **Product Management** - Add, edit, and delete products with images and variants
-- 📋 **Order Management** - Handle orders with categorized tabs:
-  - **New Orders** - Accept or decline incoming orders
-  - **Preparing** - Track orders being prepared
-  - **Ready** - Manage orders ready for pickup
-- 💰 **Sales Analytics** - Monitor monthly profits and sales performance
-- 🔍 **QR Code Scanner** - Scan customer QR codes for order verification
-- 📊 **Order History** - View complete order history and customer details
+![Flutter](https://img.shields.io/badge/Flutter-3.29.0-02569B?logo=flutter)
+![Dart](https://img.shields.io/badge/Dart-3.7.0-0175C2?logo=dart)
+![Riverpod](https://img.shields.io/badge/State-Flutter--Riverpod-42A5F5?logo=riverpod)
+![Firebase](https://img.shields.io/badge/Backend-Firebase-FFCA28?logo=firebase)
 
 ---
 
-## 🛠️ Tech Stack
+## 🚀 Recent Key Enhancements & Security Upgrades
 
-- **Framework**: Flutter 3.8.1+
-- **State Management**: GetX 4.6.6, Provider 6.1.5
-- **Backend**: Firebase
-  - Authentication (Firebase Auth)
-  - Database (Cloud Firestore)
-  - Storage (Firebase Storage)
-  - App Check (Firebase App Check)
-- **Image Handling**: Cloudinary Public API
-- **QR Code**: `mobile_scanner` 5.1.1, `qr_flutter` 4.1.0
-- **UI**: Material Design with Glassmorphism effects
+- 🔒 **Secure Handover Verification**: Eliminates order fulfillment bypass. Shopkeepers must scan the customer's QR code or enter the secret 4-digit PIN to trigger atomic Firestore handover completion.
+- ⚡ **Atomic Read-Before-Write Transactions**: Guaranteed real-time product variant inventory stock deduction upon completed order pickup.
+- 📷 **Direct Camera & Gallery Product Photo Capture**: Integrated native camera picker with instant Cloudinary CDN media uploads.
+- 📊 **Cost Price, Selling Price & Real-Time Net Profit Analytics**: Track variant cost price (`buyPrice`), selling price (`sellPrice`), unit profit margins (`+X%`), Today's Net Profit, and Average Order Value (AOV).
+- 🏪 **Single-Document Shop Profile Upsert**: Prevents duplicate shop registration by maintaining a single deterministic merchant document linked to the owner's Firebase UID.
+- 🎨 **Unified Animated Pill Navigation Shell**: Ultra-sleek, responsive bottom navigation shell shared across both Customer and Shopkeeper profiles.
 
 ---
 
-## 📋 Prerequisites
+## 📱 Features Overview
 
-Before you begin, ensure you have the following installed:
+### 🏪 For Customers
+- **Local Shop Discovery**: Browse nearby stores with live search and filter options.
+- **Product Catalog & Variant Selector**: View detailed product variants with dynamic pricing.
+- **Multi-Store Shopping Cart**: Organize products into store-specific groupings for checkout.
+- **Quick Order List**: Re-order frequent essentials instantly.
+- **Order Pickup Pass**: Display secret 4-digit PIN and dynamic QR code for counter verification.
+- **Order History & Status Tracking**: Live updates across order lifecycle (`Pending` → `Accepted` → `Preparing` → `Ready for Pickup` → `Completed`).
 
-- **Flutter SDK** (3.8.1 or higher)
-- **Dart SDK** (comes with Flutter)
-- **Android Studio** / **Xcode** (for iOS development)
-- **Firebase Account** (for backend services)
-- **Cloudinary Account** (for image hosting)
-- **Git** (for version control)
-
----
-
-## 🚀 Installation
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/durgesh-kanzariya/Dukan-Sathi-Mobile-Application.git
-cd Dukan-Sathi-Mobile-Application/dukan_sathi
-```
-
-### 2. Install Dependencies
-
-```bash
-flutter pub get
-```
-
-### 3. Firebase Setup
-
-#### Create Firebase Project
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Create a new project or select an existing one
-3. Enable the following services:
-   - **Authentication** (Email/Password)
-   - **Cloud Firestore**
-   - **Firebase Storage**
-   - **App Check**
-
-#### Configure Android
-1. Download `google-services.json` from Firebase Console
-2. Place it in `android/app/google-services.json`
-
-#### Configure iOS
-1. Download `GoogleService-Info.plist` from Firebase Console
-2. Place it in `ios/Runner/GoogleService-Info.plist`
-
-#### Generate Firebase Options
-```bash
-flutterfire configure
-```
-
-### 4. Cloudinary Configuration
-
-1. Sign up at [Cloudinary](https://cloudinary.com/)
-2. Get your **Cloud Name** from the dashboard
-3. Update the following files with your Cloudinary Cloud Name:
-   - `lib/shopkeeper/product/product_controller.dart` (line ~228)
-   - `lib/shop_service.dart` (line ~289)
-   - `lib/shopkeeper/misc/profile_screen.dart` (line ~570)
-
-Replace `'YOUR_CLOUD_NAME'` with your actual Cloudinary cloud name.
-
-### 5. Run the App
-
-```bash
-# For Android
-flutter run
-
-# For iOS
-flutter run -d ios
-
-# For a specific device
-flutter devices
-flutter run -d <device-id>
-```
+### 🏬 For Merchants / Shopkeepers
+- **Live Order Dashboard**: Compact top banner with daily revenue, profit metrics, and instant action filters.
+- **Inventory & Variant Manager**: Manage stock levels, low-stock warnings, cost price, selling price, and direct camera photo uploads.
+- **Dedicated Financial Analytics**: Deep dive into daily revenue, net profit, average order value, order status progress, and inventory stock health.
+- **QR Code & PIN Verification**: Integrated CameraX scanner and manual 4-digit PIN validator to prevent unauthorized order collection.
+- **Store Profile Management**: One-click shop details editor and secure account logout.
 
 ---
 
-## 📁 Project Structure
+## 🛠️ Architecture & Tech Stack
+
+- **Framework**: Flutter 3.29+ / Dart 3.7+
+- **Architecture**: Domain-Driven Feature-First Clean Architecture (`data`, `domain`, `presentation`)
+- **State Management**: `flutter_riverpod` (Notifier & Stream Providers)
+- **Backend & Database**: 
+  - Firebase Authentication
+  - Cloud Firestore (Real-time streams & atomic transactions)
+- **Camera & QR Scanning**: `mobile_scanner` 5.1+, `image_picker` 1.1+
+- **Cloud Media Hosting**: Cloudinary REST API
+- **Typography & Theme**: Google Fonts (`Outfit` & `Inter`), Custom `AppColors` palette with glassmorphic cards and subtle micro-animations.
+
+---
+
+## 📁 Repository Structure
 
 ```
 lib/
-├── auth_gate.dart              # Authentication routing
-├── main.dart                   # App entry point
-├── role_router.dart            # Role-based navigation
-├── shop_model.dart             # Shop data model
-├── shop_service.dart           # Shop service layer
-│
-├── controllers/
-│   └── cart_controller.dart    # Shopping cart state management
-│
-├── customer/                   # Customer-facing features
-│   ├── dashboard.dart
-│   ├── discover_shop.dart
-│   ├── cart_page.dart
-│   ├── product_page.dart
-│   ├── shop_productpage.dart
-│   ├── quick_order.dart
-│   ├── history.dart
-│   ├── order_details.dart
-│   ├── pickup_code.dart
-│   ├── profile.dart
-│   └── change_password.dart
-│
-├── shopkeeper/                 # Shopkeeper-facing features
-│   ├── dashboard/
-│   │   ├── dashboard_page.dart
-│   │   └── shopkeeper_main_screen.dart
-│   ├── product/
-│   │   ├── products_screen.dart
-│   │   ├── add_product_screen.dart
-│   │   ├── edit_product_screen.dart
-│   │   ├── product_details_screen.dart
-│   │   ├── product_controller.dart
-│   │   └── product_model.dart
-│   ├── order/
-│   │   ├── order_controller.dart
-│   │   ├── order_model.dart
-│   │   ├── new_order_details_screen.dart
-│   │   ├── shopkeeper_order_details.dart
-│   │   └── history_screen.dart
-│   ├── misc/
-│   │   ├── profile_screen.dart
-│   │   ├── shop_details_screen.dart
-│   │   ├── shop_setup_screen.dart
-│   │   ├── pickup_code_screen.dart
-│   │   └── change_password.dart
-│   └── sells/
-│       └── monthly_sells_screen.dart
-│
-├── models/
-│   └── order_model.dart        # Order data model
-│
-└── widgets/
-    ├── bottom_navbar.dart      # Shopkeeper bottom navigation
-    └── custom_app_bar.dart     # Reusable app bar
+├── app/
+│   ├── routes/                # GoRouter / AppRouter configuration
+│   └── theme/                 # AppColors, typography, global theme tokens
+├── core/
+│   ├── services/              # Image upload (Cloudinary) & helper utilities
+│   ├── utils/                 # Constants, formatters, and validators
+│   └── widgets/               # Reusable buttons, cards, dialogs, snackbars
+├── features/
+│   ├── auth/                  # Firebase Auth, Login, Signup & Role Router
+│   ├── customer/
+│   │   ├── cart/              # Cart management & checkout
+│   │   ├── discovery/         # Shop discovery & product screens
+│   │   ├── orders/            # Customer order tracking & QR pickup code
+│   │   └── quick_list/        # Re-order quick list
+│   └── shopkeeper/
+│       ├── data/              # Shopkeeper remote datasource & repositories
+│       ├── domain/            # Order & Inventory entities & use cases
+│       ├── presentation/
+│       │   ├── providers/     # Shopkeeper Riverpod providers & analytics metrics
+│       │   └── screens/       # Dashboard, Analytics, Inventory, Scanner & Setup
+│       └── shop_mgmt/         # Shop registration & profile setup
+├── main.dart                  # App initialization & Firebase configuration
+└── role_router.dart           # Role-based shell navigation dispatcher
 ```
 
 ---
 
-## 🔧 Configuration
+## 🚀 Getting Started
 
-### Firebase App Check (Production)
+### 1. Prerequisites
+- **Flutter SDK**: `3.29.0` or higher
+- **Android Studio / VS Code** with Flutter extensions
+- **Android SDK 21+** / **iOS 13.0+**
 
-Before deploying to production, update `lib/main.dart`:
-
-```dart
-// Change from DEBUG mode to production
-await FirebaseAppCheck.instance.activate(
-  androidProvider: AndroidProvider.playIntegrity, // For Android
-  // For iOS, use: appleProvider: AppleProvider.appAttest
-);
-```
-
-### Android Signing
-
-Configure release signing in `android/app/build.gradle.kts`:
-
-```kotlin
-signingConfigs {
-    create("release") {
-        storeFile = file("path/to/keystore.jks")
-        storePassword = "your-store-password"
-        keyAlias = "your-key-alias"
-        keyPassword = "your-key-password"
-    }
-}
-```
-
----
-
-## 🎨 Design Theme
-
-- **Primary Color**: `#5A7D60` (Green)
-- **Background Color**: `#F9F3E7` (Cream/Beige)
-- **Design Style**: Material Design with Glassmorphism effects
-
----
-
-## 📱 Screenshots
-
-> Add screenshots of your app here
-> 
-> Example:
-> - Customer Dashboard
-> - Shop Discovery
-> - Order Tracking
-> - Shopkeeper Dashboard
-> - Product Management
-
----
-
-## 🔐 Security Rules
-
-### Firestore Security Rules
-
-Ensure your Firestore security rules are properly configured:
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Users collection
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Shops collection
-    match /shops/{shopId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        resource.data.ownerId == request.auth.uid;
-    }
-    
-    // Products collection
-    match /shops/{shopId}/products/{productId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/shops/$(shopId)).data.ownerId == request.auth.uid;
-    }
-    
-    // Orders collection
-    match /orders/{orderId} {
-      allow read: if request.auth != null && 
-        (resource.data.customerId == request.auth.uid || 
-         resource.data.shopId in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shops);
-      allow create: if request.auth != null && 
-        request.resource.data.customerId == request.auth.uid;
-      allow update: if request.auth != null && 
-        (resource.data.customerId == request.auth.uid || 
-         resource.data.shopId in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shops);
-    }
-  }
-}
-```
-
----
-
-## 🧪 Testing
-
-Run tests with:
-
+### 2. Installation
 ```bash
-flutter test
+git clone https://github.com/durgesh-kanzariya/Dukan-Sathi-Mobile-Application.git
+cd Dukan-Sathi-Mobile-Application/dukan_sathi
+flutter pub get
 ```
 
-For integration testing:
-
+### 3. Execution
 ```bash
-flutter drive --target=test_driver/app.dart
+# Run on connected Android / iOS device
+flutter run
 ```
-
----
-
-## 🚢 Building for Production
-
-### Android
-
-```bash
-# Build APK
-flutter build apk --release
-
-# Build App Bundle (for Play Store)
-flutter build appbundle --release
-```
-
-### iOS
-
-```bash
-# Build for iOS
-flutter build ios --release
-```
-
-Then archive and upload via Xcode.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ---
 
 ## 👨‍💻 Author
 
 **Durgesh Kanzariya**
-- GitHub: [@durgesh-kanzariya](https://github.com/durgesh-kanzariya)
-- Email: durgesh.j.kanzariya@gmail.com
+- **GitHub**: [@durgesh-kanzariya](https://github.com/durgesh-kanzariya)
+- **Email**: durgesh.j.kanzariya@gmail.com
 
 ---
 
-## 🙏 Acknowledgments
-
-- Flutter team for the amazing framework
-- Firebase for backend services
-- All contributors and testers
-
----
-
-## 📞 Support
-
-If you encounter any issues or have questions:
-
-1. Check the [Issues](https://github.com/durgesh-kanzariya/Dukan-Sathi-Mobile-Application/issues) page
-2. Create a new issue with detailed information
-3. Contact: durgesh.j.kanzariya@gmail.com
-
----
-
-## 🔄 Version History
-
-- **v0.1.0** (Current)
-  - Initial release
-  - Customer and Shopkeeper interfaces
-  - Order management system
-  - QR code pickup functionality
-  - Basic analytics
-
----
-
-**Made with ❤️ using Flutter**
+**Made with ❤️ using Flutter & Firebase**
